@@ -1,0 +1,15 @@
+*pass*/activities - GET - getActivities
+*pass*/activities/{activityId} - GET - getActivityDetail รายละเอียดเวลากดเข้าไปแต่ละกิจกรรม
+*check*/activities/{activityId}/assessment - POST - submitAssesment
+*pass*/activities/{activityId}/participants - GET - getActivityParticipants --> JS advisor-overall ดูจำนวนผู้เข้าร่วม ใครบ้าง มีactivities ยังไง
+*pass*/activities/register - POST - registerActivity --> JS detailed-activities นักศึกษากดสมัครเข้าร่วมกิจกรรม
+*pass*/activities/verify-qr - POST - verifyActivityCode --> JS my-activities.js มีกำหนดแพทเทิร์นความถูกต้องด้วย
+*pass*/advisors/{advisorId}/students - GET - getAdvisorStudents --> JS advisor-dashboard.js ดึงข้อมูลของนักศึกษาในที่ปรึกษามาแสดงผล
+*pass*/login - POST - login --> JS Login --> JS login.js ล็อกอินไปหน้าตามบทบาท
+*check*/quiz/questions/{skillId} - GET - getQuizQuestions --> JS quiz.js
+*check*/quiz/submit - POST - submitQuizAnswers --> JS quiz.js
+*check ดึงมาไม่ได้เพราะไม่รู้ปี??*/requiredSkills/{yearLevel} - GET -getRequiredSkills --> JS current-skill.js ดึงทักษะบังคับของชั้นปีมา
+*check*/skills/all - GET - getAllSkills --> JS current-skill.js ดึงสกิลทั้งหมดของนศที่ได้รับมา ?
+*pass*/students/{studentId}/activities - GET - getStudentActivities --> JS my-activities.js ดึงกิจกรรมที่นศคนนั้นเข้าร่วมมา
+*pass*/students/{studentId}/info - GET - getStudentInfo --> JS student-dashboard.js แสดงรายละเอียดข้อมูลส่วนตัวของนศ.
+/students/{studentId}/skills - GET - getStudentSkills

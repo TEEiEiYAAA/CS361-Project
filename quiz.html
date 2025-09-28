@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AchieveHub - แบบทดสอบทักษะ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../CSS/quiz.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 id="quiz-title">แบบทดสอบทักษะ</h1>
+      <p id="quiz-description">ทำแบบทดสอบเพื่อรับรองทักษะของคุณ</p>
+    </div>
+    
+    <div class="quiz-info">
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">จำนวนข้อ</div>
+          <div class="info-value" id="total-questions">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">เกณฑ์ผ่าน</div>
+          <div class="info-value">70%</div>
+        </div>
+        <div class="info-item timer">
+          <div class="info-label">เวลาที่เหลือ</div>
+          <div class="info-value" id="timer">00:00</div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="quiz-container">
+      <div class="loading">กำลังโหลดแบบทดสอบ...</div>
+    </div>
+  </div>
+  
+  <!-- Result Modal -->
+  <div id="result-modal" class="modal">
+    <div class="modal-content">
+      <div id="result-icon" class="result-icon">🎉</div>
+      <div id="result-title" class="result-title">ผลการทดสอบ</div>
+      <div id="result-score" class="result-score">0%</div>
+      <div id="result-message" class="result-message">-</div>
+      <button class="result-btn" onclick="goToDashboard()">กลับหน้าหลัก</button>
+    </div>
+  </div>
+
+  <script src="../JS/quiz.js"></script>
+</body>
+</html>

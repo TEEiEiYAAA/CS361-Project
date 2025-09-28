@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AchieveHub - Home</title>
+  <link rel="stylesheet" href="../CSS/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    button.green-bt {
+      background-color: #4CAF50 !important;
+      color: rgb(255, 255, 255) !important;
+      border: none !important;
+      padding: 10px 20px !important;
+      border-radius: 8px !important;
+      cursor: pointer !important;
+      font-weight: 700 !important;
+      transition: background-color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease !important;
+    }
+
+    button.green-bt:hover {
+      background-color: #388E3C !important;
+      transform: translateY(-2px) !important;
+    }
+  </style>
+</head>
+<body>
+  <!--<header>
+      <h1>Welcome to <br><strong>AchieveHub</strong></h1>
+      <div class="top-buttons">
+        <a href="add-skill.html" class="add-btn">เพิ่มทักษะ</a>
+        <div class="user-icon" id="user-icon">👤</div>
+        <button class="add-btn" onclick="logout()" style="background-color: #ff6b6b;">ออกจากระบบ</button>
+      </div>
+  </header>-->
+  <!-- ส่วนหัว -->
+  <div class="main-container">
+    <header class="header">
+      <div class="logo">AchieveHub</div>
+      <div class="nav-menu">
+        <button class="nav-button" style="font-weight: bold;" onclick="navigateTo('student-dashboard.html')">หน้าแรก</button>
+        <button class="nav-button" style="font-weight: bold;" onclick="navigateTo('recommend-activities.html')">กิจกรรมที่แนะนำ</button>
+        <button class="nav-button" style="font-weight: bold;" onclick="navigateTo('my-activities.html')" >กิจกรรมของฉัน</button>
+        <div class="logout-icon" id="user-icon" onclick="logout()">
+          <img src="../Image/LogOut.png" alt="User Profile" style="margin-left: 10px;  width: 40px; height: 40px; border-radius: 50%;" />
+        </div>
+      </div>
+    </header>
+  
+
+    <div class="">
+      <div class="info-skill-container">
+        <section class="student-info-box">
+          <div class="student-profile">
+            <div class="profile-icon">👤</div>
+            <div class="student-details">
+              <p>ชื่อ: <span id="student-name">-</span></p>
+              <p>ชั้นปีที่กำลังศึกษา: <span id="student-year">-</span></p>
+              <p>คณะ: <span id="student-faculty">-</span></p>
+              <p>สาขา: <span id="student-department">-</span></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="skill-box">
+          <h2>ทักษะปัจจุบัน</h2>
+          <div class="skill-stats">
+            <div class="circle-progress">
+              <svg width="100" height="100" id="progress-circle">
+                <circle cx="50" cy="50" r="45" stroke="#D3EAD7" stroke-width="10" fill="none" />
+                <circle id="progress-indicator" cx="50" cy="50" r="45" stroke="#4CAF50" stroke-width="10" fill="none" stroke-dasharray="282.74" stroke-dashoffset="141.37" transform="rotate(-90 50 50)" />
+              </svg>
+              <div class="circle-text" id="progress-text">0/0</div>
+            </div>
+            <div class="skill-detail">
+              <p>ทักษะบังคับที่ผ่านแล้ว: <strong id="completed-required-skills">0</strong></p>
+              <p>ทักษะบังคับที่ยังไม่ผ่าน: <strong id="pending-required-skills">0</strong></p>
+              <p>ทักษะเพิ่มเติมที่ได้รับ: <strong id="completed-optional-skills">0</strong></p>
+            </div>
+          </div>
+          <div class="button-group">
+            <a href="current-skill.html" class="currentskill-button">ดูเพิ่มเติม &gt;</a>
+          </div>
+        </section>
+      </div>
+
+
+      <section class="quiz-box">
+        <h2>แบบทดสอบ (ปลดล็อคเมื่อเข้าร่วมครบ 3 ครั้ง)</h2>
+        <div id="quiz-container">
+          <div class="loading" style="text-align: center; padding: 20px; color: #666;">กำลังโหลดข้อมูล...</div>
+        </div>
+      </section>
+
+      <section class="recommend-box">
+        <h2>กิจกรรมที่แนะนำ</h2>
+        <div class="img-placeholder">
+          <img src="../Image/Guide-to-Effective-Communication-in-the-Workplace-Featured-Image.png " alt="กิจกรรมที่แนะนำ" />
+        </div>
+        <a href="recommend-activities.html" class="currentskill-button">ดูเพิ่มเติม &gt;</a>
+      </section>
+    </div>
+  </div>
+  <footer>
+    <p>AchieveHub ©2025<br>CS232 | Group 8</p>
+    <small>ภูริต เฟื่องฟู 6609650038 ปิยะชาติ สลางสิงห์ 6609650061 ธวัลหทัย เทียมทอง 6609650111 กชมนต์ บริบูรณ์ 6609650145 ธีรัตม์ ศรีสุโข 6609650442 ปริญ จิระมหาโภคี 6609650475 พรธีรา เสาวรส 6609650517 อัฐภิญญา กำหนด 6609650749</small>
+  </footer>
+
+  <script src="../JS/student-dashboard.js"></script>
+</body>
+</html>

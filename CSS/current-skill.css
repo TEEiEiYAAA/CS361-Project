@@ -1,0 +1,355 @@
+* {
+      box-sizing: border-box;
+      font-family: 'Sarabun', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      background: linear-gradient(to bottom, #80CEC7, #93B8D2);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .main-container {
+      max-width: 70%; /* ขยายเต็มพื้นที่ */
+      width: 100%;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 0 20px;
+      position: relative; /* เพื่อให้ back-btn ซ้อนทับได้ */
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      background-color: transparent;
+      position: relative;
+      z-index: 10;
+    }
+
+    .logo {
+      color: white;
+      font-size: 1.8rem;
+      font-weight: bold;
+      text-align: left; /* ชิดซ้าย */
+    }
+    
+    .nav-menu {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .nav-button {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: none;
+      border-radius: 20px;
+      padding: 0.5rem 1.2rem;
+      color: #333;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+    
+    .nav-button:hover {
+      background-color: white;
+    }
+    
+    .user-icon {
+      background-color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+    
+    .back-btn {
+      background-color: white;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: absolute; /* ซ้อนทับ */
+      top: 9rem;          /* ปรับตำแหน่งตามต้องการ */
+      left: 4px;
+      z-index: 20;
+    }
+
+    .back-btn img {
+      width: 45px;
+      height: 45px;
+    }
+    
+    /* Main Content */
+    .content-container {
+      background-color: rgba(240, 240, 240, 0.95);
+      border-radius: 20px;
+      padding: 2rem 2rem 2rem 4rem; /* เว้นซ้ายเพิ่มเพื่อไม่ให้ทับปุ่ม back */
+      margin: 1rem 0;
+      flex: 1;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin-bottom: 2rem;
+      color: #333;
+    }
+    
+    .profile-section {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    
+    .profile-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #ddd;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      margin-right: 1rem;
+    }
+    
+    .profile-info h3 {
+      font-size: 1.3rem;
+      margin-bottom: 0.3rem;
+      color: #333;
+    }
+    
+    .profile-info p {
+      color: #666;
+      font-size: 1rem;
+    }
+    
+    /* Skills Section */
+    .skills-section {
+      margin-bottom: 2rem;
+    }
+    
+    .skills-section h3 {
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      color: #333;
+    }
+    
+    .skill-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+      margin-bottom: 0.8rem;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .skill-left {
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+    
+    .skill-checkbox {
+      width: 20px;
+      height: 20px;
+      margin-right: 1rem;
+      accent-color: #4CAF50;
+    }
+    
+    .skill-info {
+      flex: 1;
+    }
+    
+    .skill-name {
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #333;
+      margin-bottom: 0.3rem;
+    }
+    
+    .skill-description {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    .skill-status {
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 0.2rem;
+      font-style: italic;
+    }
+    
+    .activity-count {
+      background-color: #f0f0f0;
+      border: 2px solid #ddd;
+      border-radius: 25px;
+      padding: 0.5rem 1rem;
+      font-weight: bold;
+      font-size: 1rem;
+      min-width: 60px;
+      text-align: center;
+    }
+    
+    .activity-count.completed {
+      background-color: #4CAF50;
+      color: white;
+      border-color: #4CAF50;
+    }
+    
+    .activity-count.in-progress {
+      background-color: #FF9800;
+      color: white;
+      border-color: #FF9800;
+    }
+    
+    .activity-count.need-survey {
+      background-color: #FFC107;
+      color: #333;
+      border-color: #FFC107;
+    }
+    
+    /* ส่วนทักษะที่ได้รับ */
+    .received-skills-section {
+      background-color: rgba(240, 240, 240, 0.95);
+      border-radius: 20px;
+      padding: 2rem;
+      margin: 1rem 0;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .skill-card {
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .skill-card h4 {
+      color: #4CAF50;
+      font-size: 1.2rem;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    
+    .skill-badge {
+      display: inline-block;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 12px;
+      padding: 2px 8px;
+      font-size: 0.8rem;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    
+    .skill-card p {
+      text-align: center;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+    
+    .skill-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: #888;
+      border-top: 1px solid #eee;
+      padding-top: 1rem;
+    }
+    
+    /* Loading & Error States */
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+      font-style: italic;
+    }
+    
+    .error-message {
+      color: #f44336;
+      background-color: #ffebee;
+      padding: 1rem;
+      border-radius: 10px;
+      text-align: center;
+      margin: 1rem 0;
+    }
+    
+    .empty-message {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+      font-style: italic;
+    }
+    
+    /* Requirement notice */
+    .requirement-notice {
+      background-color: #e3f2fd;
+      border-left: 4px solid #2196F3;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      color: #333;
+    }
+    
+    /* Footer */
+    footer {
+            background: rgba(255, 255, 255, 0.25); /* สีขาวจาง ๆ */
+            backdrop-filter: blur(12px);          /* ทำให้พื้นหลังเบลอ */
+            -webkit-backdrop-filter: blur(12px);  /* Safari รองรับ */ 
+            text-align: center;
+            color: #333;
+            font-size: 0.9rem;
+            padding: 1.25rem;
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .main-container {
+        max-width: 95%;
+        padding: 0 10px;
+      }
+      
+      .content-container {
+        padding: 1.5rem;
+      }
+      
+      .skill-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      
+      .activity-count {
+        align-self: stretch;
+        text-align: center;
+      }
+    }

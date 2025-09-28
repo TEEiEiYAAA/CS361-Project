@@ -1,0 +1,473 @@
+* {
+  box-sizing: border-box;
+  font-family: 'Sarabun', sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to bottom, #80CEC7, #93B8D2);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  flex: 1; /* ขยายให้เต็มพื้นที่ก่อน footer */
+  width: 100%;
+  max-width: 70%;
+  margin: 0 auto;
+  padding: 2rem;
+  background: transparent;
+}
+
+.main-container {
+      max-width: 70%;
+      width: 100%;
+      margin: 0 auto;
+}
+
+/* ส่วนหัว */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background-color: transparent;
+    }
+    
+    /********/
+    .logo {
+      color: white;
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+    
+    .nav-menu {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .nav-button {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: none;
+      border-radius: 20px;
+      padding: 0.5rem 1.2rem;
+      color: #333;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-button:hover {
+      background-color: white;
+    }
+    
+    .user-icon {
+      background-color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+/* Add CSS for student info display*/
+.info-skill-container {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 2rem;
+}
+
+.student-info-box {
+  flex: 0 0 auto;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  padding: 20px 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: flex-start;
+  height: fit-content !important;
+  margin-top: 50px;
+}
+
+.student-profile {
+  display: flex;
+  gap: 25px;
+}
+
+.profile-icon {
+  font-size: 48px;
+  color: #4CAF50;
+  margin-top: 4px;
+}
+
+.student-details p {
+  margin: 8px 0;
+  font-weight: normal;
+  color: #333;
+}
+
+.student-details span {
+  font-weight: bold;
+  color: #333;
+}
+
+.skill-box {
+  flex: 1;
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+}
+
+.skill-stats {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.circle-progress {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.circle-text { 
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.skill-detail p {
+  margin: 0.5rem 0;
+}
+
+
+.currentskill-button {
+  color: #2b2b2b;
+  font-size: 12px;
+  background: rgb(255, 255, 255);
+  padding: 0.4rem 1.2rem;
+  border: none ;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(108, 108, 108, 0.5);
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.top-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.add-btn {
+  background: rgba(255, 255, 255, 0.125);
+  padding: 0.5rem 1rem;
+  border: 2px solid white;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.user-icon {
+  font-size: 1.5rem;
+}
+
+.skill-box, .quiz-box, .recommend-box {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.skill-box h2, .quiz-box h2, .recommend-box h2 {
+  margin-top: 0;
+  color: #3B3B3B;
+}
+
+.skill-stats {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.circle-progress {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+/*Text ในวงกลม*/
+.circle-text { 
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.skill-detail p {
+  margin: 0.5rem 0;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.quiz-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.green-btn {
+  background: #6DD89C;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.gray-btn {
+  background: #C0C0C0;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.img-placeholder {
+  background: #EAEAEA;
+  height: 200px;
+  margin: 1rem 0;
+  display: flex;
+  color: #888;
+  overflow: hidden;  /* ตัดส่วนเกินของรูปภาพ */
+}
+
+.img-placeholder img {
+  width: 100%;     /* ให้กว้างเต็มพื้นที่ container */
+  height: 100%;    /* ให้สูงเต็มพื้นที่ container */
+  object-fit: cover;  /* ปรับขนาดรูปให้พอดีกับ container โดยไม่ผิดสัดส่วน */
+  display: block;   /* ลบช่องว่างใต้รูป */
+}
+
+/* ปรับขนาด recommend-box ให้กระชับ */
+.recommend-box {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 100%;  /* จำกัดความกว้างสูงสุด */
+}
+
+footer {
+    background: rgba(255, 255, 255, 0.25); /* สีขาวจาง ๆ */
+  backdrop-filter: blur(12px);          /* ทำให้พื้นหลังเบลอ */
+  -webkit-backdrop-filter: blur(12px);  /* Safari รองรับ */ 
+  
+  text-align: center;
+  color: #333;
+  font-size: 0.9rem;
+  padding: 1.25rem;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+  width: 100%;
+}
+
+
+
+/*เพิ่มเติมสำหรับ หน้าเพิ่มทักษะ*/
+.add-skill-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: white;
+  margin-bottom: 1.5rem;
+}
+
+.back-icon {
+  background: white;
+  color: #3B3B3B;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.add-skill-form {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-item {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.5rem;
+}
+
+.form-item input {
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: 'Sarabun', sans-serif;
+}
+
+.file-label {
+  background: #f0f0f0;
+  padding: 0.75rem 1rem;
+  border: 1px dashed #ccc;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+  font-weight: bold;
+  color: #555;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/*เพิ่มเติมสำหรับ หน้าแนะนำทักษะ*/
+
+    .tab-buttons {
+      display: flex;
+      justify-content: center;
+      margin: 1.5rem 0;
+      gap: 1rem;
+    }
+
+    .tab-btn {
+      padding: 0.5rem 1.5rem;
+      border: none;
+      border-radius: 20px;
+      background: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: #3B3B3B;
+      color: white;
+    }
+
+    .recommend-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .recommend-item {
+      background: #F0F6F9;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      position: relative;
+      padding-bottom: 1rem;
+    }
+
+    .recommend-item::before {
+      content: 'NEW';
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: #F6C700;
+      color: #3B3B3B;
+      font-weight: bold;
+      padding: 0.25rem 0.75rem;
+      border-radius: 0 0 10px 0;
+    }
+
+    .recommend-header {
+      height: 140px;
+      background: #D9E7EF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .recommend-info {
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .recommend-info h3 {
+      margin: 0.5rem 0;
+      font-size: 1rem;
+      color: #3B3B3B;
+    }
+
+    .recommend-info p {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+
+    .primary {
+      background: white;
+      padding: 0.6rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(108, 108, 108, 0.5);
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .back-icon {
+      background: white;
+      color: #3B3B3B;
+      padding: 0.5rem 0.75rem;
+      border-radius: 12px;
+      font-size: 1.25rem;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .user-icon {
+      font-size: 1.5rem;
+      background: white;
+      padding: 0.4rem;
+      border-radius: 50%;
+    }
+
+    .top-btn-area {
+      display: flex;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
+    .scroll-top-btn {
+      background: white;
+      padding: 0.6rem 2rem;
+      border-radius: 12px;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }

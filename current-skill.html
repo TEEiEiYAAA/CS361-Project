@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AchieveHub - ทักษะปัจจุบัน</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../CSS/current-skill.css">
+</head>
+<body>
+  <div class="main-container">
+    <!-- Header -->
+    <header class="header">
+      <button class="back-btn" onclick="window.location.href='student-dashboard.html'">
+        <img src="../Image/Backward.png" alt="ย้อนกลับ">
+      </button>
+
+      <div class="logo">AchieveHub</div>
+      <div class="nav-menu">
+        <a href="student-dashboard.html" class="nav-button">หน้าแรก</a>
+        <a href="recommend-activities.html" class="nav-button">กิจกรรมที่แนะนำ</a>
+        <a href="my-activities.html" class="nav-button">กิจกรรมของฉัน</a>
+        <div class="logout-icon" id="user-icon" onclick="logout()">
+          <img src="../Image/LogOut.png" alt="User Profile" style="margin-left: 10px;  width: 40px; height: 40px; border-radius: 50%;" />
+        </div>
+      </div>
+    </header>
+    
+    <!-- Requirement Notice -->
+    <div class="requirement-notice">
+      <strong>📋 เงื่อนไขการนับทักษะ:</strong> 
+      กิจกรรมจะนับเข้าทักษะเมื่อ <strong>ยืนยันการเข้าร่วม</strong> และ <strong>ทำแบบประเมินเสร็จสิ้น</strong> เท่านั้น
+    </div>
+    
+    <!-- Main Content -->
+    <div class="content-container">
+      <h2 class="section-title">ทักษะปัจจุบัน</h2>
+      
+      <!-- Profile Section -->
+      <div class="profile-section">
+        <div class="profile-icon">👤</div>
+        <div class="profile-info">
+          <h3 id="student-name">ชื่อ - นามสกุล</h3>
+          <p id="student-info">ชั้นปีที่กำลังศึกษา</p>
+        </div>
+      </div>
+      
+      <!-- ทักษะที่คุณได้ผ่านการทดสอบแล้ว -->
+      <div class="skills-section">
+        <h3>ทักษะที่คุณได้ผ่านการทดสอบแล้ว</h3>
+        <div id="completed-skills">
+          <div class="loading">กำลังโหลดข้อมูล...</div>
+        </div>
+      </div>
+      
+      <!-- ทักษะที่คุณยังไม่ได้ทำการทดสอบ -->
+      <div class="skills-section">
+        <h3>ทักษะที่คุณยังไม่ได้ทำการทดสอบ</h3>
+        <div id="pending-skills">
+          <div class="loading">กำลังโหลดข้อมูล...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ส่วนทักษะอื่นๆ (ไม่บังคับ) -->
+    <div class="content-container">
+      <h2 class="section-title">ทักษะอื่นๆ</h2>
+      
+      <!-- ทักษะที่คุณได้ผ่านการทดสอบแล้ว -->
+      <div class="skills-section">
+        <h3>ทักษะที่คุณได้ผ่านการทดสอบแล้ว</h3>
+        <div id="optional-completed-skills">
+          <div class="loading">กำลังโหลดข้อมูล...</div>
+        </div>
+      </div>
+      
+      <!-- ทักษะที่คุณยังไม่ได้ทำการทดสอบ -->
+      <div class="skills-section">
+        <h3>ทักษะที่คุณยังไม่ได้ทำการทดสอบ</h3>
+        <div id="optional-pending-skills">
+          <div class="loading">กำลังโหลดข้อมูล...</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ส่วนทักษะที่ได้รับ -->
+    <div class="received-skills-section">
+      <h2 class="section-title">ทักษะที่ได้รับ</h2>
+      <div id="all-skills-list">
+        <div class="loading">กำลังโหลดข้อมูล...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+    <footer class="footer">
+      <p>AchieveHub ©2025<br>CS232 | Group 8</p>
+      <small>ภูริต เฟื่องฟู 6609650038 ปิยะชาติ สลางสิงห์ 6609650061 ธวัลหทัย เทียมทอง 6609650111 กชมนต์ บริบูรณ์ 6609650145 ธีรัตม์ ศรีสุโข 6609650442 ปริญ จิระมหาโภคี 6609650475 พรธีรา เสาวรส 6609650517 อัฐภิญญา กำหนด 6609650749</small>
+    </footer>
+    
+  <script src="../JS/current-skill.js"></script>
+</body>
+</html>
