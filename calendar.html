@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>เว็บปฏิทิน</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #80CEC7, #93B8D2);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;   /* จัดให้อยู่กลางแนวตั้ง */
+      align-items: center;       /* จัดให้อยู่กลางแนวนอน */
+      font-family: 'Sarabun', sans-serif;
+    }
+
+    header {
+      color: white;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    iframe {
+      width: 700px;
+      height: 700px;
+      border: 0;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+
+    footer {
+    background: rgba(255, 255, 255, 0.25); /* สีขาวจาง ๆ */
+  backdrop-filter: blur(12px);          /* ทำให้พื้นหลังเบลอ */
+  -webkit-backdrop-filter: blur(12px);  /* Safari รองรับ */ 
+  
+  text-align: center;
+  color: #333;
+  font-size: 0.9rem;
+  padding: 1.25rem;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+  width: 100%;
+}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ปฏิทินกิจกรรม</h1>
+  </header>
+
+  <main>
+    <!-- เปลี่ยน src ให้เป็น Calendar ของคุณ -->
+    <iframe 
+      src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=Asia%2FBangkok&showPrint=0&title&src=dGVlcmF0LnNyaXNAZG9tZS50dS5hYy50aA&src=ZW4udGgjaG9saWRheUBncm91cC52LmNhbGVuZGFyLmdvb2dsZS5jb20&color=%23039be5&color=%230b8043"
+      frameborder="0"
+      scrolling="no">
+    </iframe>
+  </main>
+  <footer>
+    <p>AchieveHub ©2025<br>CS361</p>
+    <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194 นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
+    </footer>
+</body>
+</html>
