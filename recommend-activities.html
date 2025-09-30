@@ -1,32 +1,40 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AchieveHub - กิจกรรมแนะนำ</title>
+    <title>กิจกรรมแนะนำ</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../CSS/recommend-activities.css">
+    <link rel="stylesheet" href="./CSS/my-activities.css">
 </head>
+
 <body>
     <div class="container">
         <header class="header">
             <div class="logo">AchieveHub</div>
-            <div class="nav-menu">
-                <button class="nav-button" style="font-weight: bold;" onclick="navigateTo('student-dashboard.html')">หน้าแรก</button>
-                <button class="nav-button" style="font-weight: bold;" onclick="navigateTo('recommend-activities.html')">กิจกรรมที่แนะนำ</button>
-                <button class="nav-button" style="font-weight: bold;" onclick="navigateTo('my-activities.html')" >กิจกรรมของฉัน</button>
+            <div class="nav-container">
+                <nav class="nav-menu">
+                    <button class="nav-button" onclick="navigateTo('student-dashboard.html')">หน้าแรก</button>
+                    <button class="nav-button active"
+                        onclick="navigateTo('recommend-activities.html')">กิจกรรมที่แนะนำ</button>
+                    <button class="nav-button" onclick="navigateTo('calendar.html')">ปฏิทินกิจกรรม</button>
+                    <button class="nav-button" onclick="navigateTo('my-activities.html')">กิจกรรมของฉัน</button>
+                    <button class="nav-button" onclick="navigateTo('current-skills.html')">ทักษะปัจจุบัน</button>
+                </nav>
                 <div class="logout-icon" id="user-icon" onclick="logout()">
-                    <img src="../Image/LogOut.png" alt="User Profile" style="margin-left: 10px;  width: 40px; height: 40px; border-radius: 50%;" />
+                    <img src="./Image/LogOut.png" />
                 </div>
             </div>
         </header>
 
-        <h1 style="margin-bottom: 10px;">กิจกรรมแนะนำ</h1>
         <div class="tab-buttons">
-            <button class="tab-btn active" data-filter="all">ทั้งหมด</button>
-            <button class="tab-btn" data-filter="soft skill">Soft Skill</button>
+            <button class="tab-btn active" data-filter="all">กิจกรรมทั้งหมด</button>
             <button class="tab-btn" data-filter="hard skill">Hard Skill</button>
+            <button class="tab-btn" data-filter="soft skill">Soft Skill</button>
+            <button class="tab-btn" data-filter="multi-skill">Multi-Skill</button>
         </div>
+
 
         <div class="activities-container">
             <div id="activities-list">
@@ -36,10 +44,12 @@
     </div>
 
     <footer>
-        <p>AchieveHub ©2025<br>CS232 | Group 8</p>
-        <small>ภูริต เฟื่องฟู 6609650038 ปิยะชาติ สลางสิงห์ 6609650061 ธวัลหทัย เทียมทอง 6609650111 กชมนต์ บริบูรณ์ 6609650145 ธีรัตม์ ศรีสุโข 6609650442 ปริญ จิระมหาโภคี 6609650475 พรธีรา เสาวรส 6609650517 อัฐภิญญา กำหนด 6609650749</small>
+        <p>AchieveHub ©2025<br>CS361</p>
+        <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194
+            นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
     </footer>
 
     <script src="../JS/recommend-activities.js"></script>
 </body>
+
 </html>
