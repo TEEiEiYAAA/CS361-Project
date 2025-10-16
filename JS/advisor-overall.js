@@ -259,7 +259,29 @@
       }
     }
 
-  //กดย้อนกลับ
-    function goBack() {
-  window.history.back();
-}
+  // === โค้ดควบคุม POP-UP ===
+  const deleteModal = document.getElementById('delete-modal');
+  const mainDeleteBtn = document.querySelector('.delete-btn');
+  const cancelBtn = document.getElementById('cancel-btn');
+  const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+
+  mainDeleteBtn.addEventListener('click', () => {
+    deleteModal.style.display = 'flex'; // แสดง pop-up
+  });
+
+  cancelBtn.addEventListener('click', () => {
+    deleteModal.style.display = 'none'; // ซ่อน pop-up
+  });
+
+  confirmDeleteBtn.addEventListener('click', () => {
+    console.log(`Confirmed deletion for activity ID: ${activityId}`); // ใส่ Logic การลบจริงที่นี่
+    // เพิ่มโค้ดเรียก API สำหรับลบที่นี่
+    deleteModal.style.display = 'none'; // ซ่อน pop-up
+  });
+
+  window.addEventListener('click', (event) => {
+    if (event.target == deleteModal) {
+      deleteModal.style.display = 'none';
+    }
+  });
+  // === จบส่วน POP-UP ===
