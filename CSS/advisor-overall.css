@@ -221,7 +221,7 @@ main {
 .card-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: space-between; /* เพิ่มบรรทัดนี้ */
   margin-bottom: 1.5rem;
 }
 
@@ -232,7 +232,6 @@ main {
   padding: 0.75rem 1.25rem;
   border-radius: 16px;
   display: inline-block;
-  margin-bottom: 1.5rem;
   word-break: break-word;
 }
 
@@ -344,4 +343,41 @@ footer {
     font-size: 1.1rem;
     padding: 0.5rem 0.8rem;
   }
+}
+
+/* --- Action Button Styles --- */
+.action-buttons {
+  display: flex;
+  gap: 10px; /* ระยะห่างระหว่างปุ่ม */
+}
+
+.action-buttons button {
+  padding: 10px 20px; /* เพิ่ม padding เพื่อให้ปุ่มดูใหญ่ขึ้น */
+  border: none;
+  border-radius: 20px; /* ปรับ border-radius ให้ปุ่มโค้งมน */
+  font-size: 1.1rem; /* เพิ่มขนาด font */
+  /*font-weight: bold; /* ทำให้ตัวอักษรหนาขึ้น */
+  font-family: 'Sarabun', sans-serif; /* ใช้ Font Sarabun */
+  cursor: pointer;
+  transition: all 0.3s ease; /* ปรับ transition ให้ราบรื่นขึ้น */
+  color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* เพิ่มเงาให้ปุ่มมีมิติ */
+}
+
+/* --- Delete Button Style (สีแดง) --- */
+.delete-btn {
+  background-color: #EF7777; /* สีแดงอ่อน ตามรูป */
+}
+
+.delete-btn:hover {
+  background-color: #E25B5B; /* สีแดงเข้มขึ้นเมื่อ hover */
+}
+
+/* --- Edit Button Style (สีม่วงเทา) --- */
+.edit-btn {
+  background-color: #B0B7C6; /* สีม่วงเทา */
+}
+
+.edit-btn:hover {
+  background-color: #9DA6B6; /* สีม่วงเทาเข้มขึ้นเมื่อ hover */
 }

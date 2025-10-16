@@ -258,3 +258,8 @@
         window.location.href = "login.html";
       }
     }
+
+  //กดย้อนกลับ
+    function goBack() {
+  window.history.back();
+}

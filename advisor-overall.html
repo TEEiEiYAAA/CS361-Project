@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>รายละเอียดกิจกรรม - AchieveHub</title>
-  <link rel="stylesheet" href="./CSS/advisor-overall.css">
+  <link rel="stylesheet" href="../CSS/advisor-overall.css"> 
 </head>
 
 <body>
@@ -21,15 +21,21 @@
     </nav>
   </header>
 
+
   <main>
     <div class="back-button-container">
-      <img src="./Image/Backward.png" class="back-icon" alt="ย้อนกลับ" onclick="goBack()">
+      <img src="../Image/Backward.png" class="back-icon" alt="ย้อนกลับ" onclick="goBack()">
     </div>
 
     <div class="student-card">
       <div class="card-header">
         <h2 class="activity-title">กำลังโหลดข้อมูล...</h2>
-      </div>
+        
+          <div class="action-buttons">
+            <button class="delete-btn">ลบ</button>
+            <button class="edit-btn">แก้ไข</button>
+          </div>
+        </div>
 
       <div class="skill-section">
         <h3>ทักษะที่ได้รับ</h3>
@@ -46,12 +52,11 @@
       </div>
 
       <div class="additional-info">
-        <!-- ข้อมูลเพิ่มเติมจะถูกใส่ที่นี่โดย JavaScript -->
-      </div>
+        </div>
     </div>
   </main>
 
-  <footer>
+  <footer class="footer">
     <p>AchieveHub ©2025<br>CS361</p>
     <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194
       นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
