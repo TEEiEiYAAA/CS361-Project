@@ -16,8 +16,8 @@
         <nav class="nav-menu">
           <a href="advisor-dashboard.html" class="nav-button active">หน้าแรก</a>
           <a href="advisor-activities.html" class="nav-button">ตรวจสอบกิจกรรม</a>
-          <a href="calendar.html" class="nav-button">ปฏิทินกิจกรรม</a>
-          <a href="my-activities.html" class="nav-button">เพิ่มกิจกรรม</a>
+          <a href="" class="nav-button">ปฏิทินกิจกรรม</a>
+          <a href="" class="nav-button">เพิ่มกิจกรรม</a>
         </nav>
         <div class="logout-icon" id="user-icon" onclick="logout()">
           <img src="./Image/LogOut.png" />
@@ -25,49 +25,49 @@
       </div>
     </header>
 
-    <main>
-      <div class="back-button-container">
-        <img src="../Image/Backward.png" class="back-icon" alt="ย้อนกลับ" onclick="goBack()">
-      </div>
+      <main>
+        <div class="back-button-container">
+          <img src="../Image/Backward.png" class="back-icon" alt="ย้อนกลับ" onclick="goBack()">
+        </div>
 
-      <div class="student-card">
-        <div class="card-header">
-          <h2 class="activity-title">กำลังโหลดข้อมูล...</h2>
-          
-            <div class="action-buttons">
-              <button class="delete-btn">ลบ</button>
-              <button class="edit-btn">แก้ไข</button>
+        <div class="student-card">
+          <div class="card-header">
+            <h2 class="activity-title">กำลังโหลดข้อมูล...</h2>
+            
+              <div class="action-buttons">
+                <button class="delete-btn">ลบ</button>
+                <button class="edit-btn">แก้ไข</button>
+              </div>
+            </div>
+
+          <div class="skill-section">
+            <h3>ทักษะที่ได้รับ</h3>
+            <div class="skill-list">
+              <div class="loading">กำลังโหลดข้อมูลทักษะ...</div>
             </div>
           </div>
 
-        <div class="skill-section">
-          <h3>ทักษะที่ได้รับ</h3>
-          <div class="skill-list">
-            <div class="loading">กำลังโหลดข้อมูลทักษะ...</div>
+          <div class="participant-section">
+            <h3>สถิติการเข้าร่วม</h3>
+            <div class="participant-count">
+              <div class="loading">กำลังโหลดข้อมูลผู้เข้าร่วม...</div>
+            </div>
+          </div>
+
+          <div class="additional-info">
           </div>
         </div>
+      </main>
+    </div>
 
-        <div class="participant-section">
-          <h3>สถิติการเข้าร่วม</h3>
-          <div class="participant-count">
-            <div class="loading">กำลังโหลดข้อมูลผู้เข้าร่วม...</div>
-          </div>
+    <div id="delete-modal" class="modal-overlay">
+      <div class="modal-content">
+        <h2><span class="highlight-title">ลบกิจกรรม</span></h2>
+        <p>ท่านต้องการลบกิจกรรมนี้หรือไม่ ? <br> (การกระทำนี้ไม่สามารถย้อนกลับได้)</p>
+        <div class="modal-buttons">
+          <button id="confirm-delete-btn" class="confirm-button">ยืนยันการลบ</button>
+          <button id="cancel-btn" class="cancel-button">ยกเลิก</button>
         </div>
-
-        <div class="additional-info">
-        </div>
-      </div>
-    </main>
-  </div>
-
-  <div id="delete-modal" class="modal-overlay">
-    <div class="modal-content">
-      <h2><span class="highlight-title">ลบกิจกรรม</span></h2>
-      <p>ท่านต้องการลบกิจกรรมนี้หรือไม่ ? <br> (การกระทำนี้ไม่สามารถย้อนกลับได้)</p>
-      <div class="modal-buttons">
-        <button id="confirm-delete-btn" class="confirm-button">ยืนยันการลบ</button>
-        <button id="cancel-btn" class="cancel-button">ยกเลิก</button>
-      </div>
     </div>
   </div>
 
