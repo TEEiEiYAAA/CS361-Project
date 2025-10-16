@@ -1,9 +1,24 @@
+@font-face {
+  font-family: 's';
+  src: url('../Fonts/s.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 's';
+  src: url('../Fonts/sbold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+}
+
 body {
-  background-image: url('../Image/Login Background.png'); /* หรือ .jpg ตามชื่อไฟล์จริง */
+  background-image: url('../Image/Login Background.png');
+  /* หรือ .jpg ตามชื่อไฟล์จริง */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  font-family: 'Sarabun', sans-serif;
+  font-family: s;
   height: 100vh;
   margin: 0;
   display: flex;
@@ -12,8 +27,10 @@ body {
 }
 
 .login-box {
-  background: rgba(255, 255, 255, 0.2); /* โปร่งใสจริง */
-  backdrop-filter: blur(10px);          /* เบลอพื้นหลังที่ลอดมา */
+  background: rgba(255, 255, 255, 0.2);
+  /* โปร่งใสจริง */
+  backdrop-filter: blur(10px);
+  /* เบลอพื้นหลังที่ลอดมา */
   border-radius: 20px;
   padding: 2rem;
   width: 100%;
@@ -30,7 +47,8 @@ body {
 input[type="text"],
 input[type="password"] {
   width: 100%;
-  padding: 0.75rem 1rem;  /* เพิ่ม padding ด้านข้าง */
+  padding: 0.75rem 1rem;
+  /* เพิ่ม padding ด้านข้าง */
   margin-bottom: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 12px;
@@ -38,7 +56,8 @@ input[type="password"] {
   color: white;
   font-size: 1rem;
   backdrop-filter: blur(5px);
-  box-sizing: border-box; /* ทำให้ padding ไม่ดันขอบกล่องเกิน */
+  box-sizing: border-box;
+  /* ทำให้ padding ไม่ดันขอบกล่องเกิน */
 }
 
 
@@ -51,7 +70,8 @@ button {
   padding: 0.75rem;
   border: none;
   border-radius: 12px;
-  background-color: #4CAF50; /* เขียวสด */
+  background-color: #4CAF50;
+  /* เขียวสด */
   color: white;
   font-weight: bold;
   font-size: 1rem;
@@ -60,6 +80,6 @@ button {
 }
 
 button:hover {
-  background-color: #45a049; /* เขียวเข้มตอน hover */
+  background-color: #45a049;
+  /* เขียวเข้มตอน hover */
 }
-

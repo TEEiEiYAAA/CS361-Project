@@ -4,52 +4,24 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>เว็บปฏิทิน</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(to bottom, #80CEC7, #93B8D2);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;   /* จัดให้อยู่กลางแนวตั้ง */
-      align-items: center;       /* จัดให้อยู่กลางแนวนอน */
-      font-family: 'Sarabun', sans-serif;
-    }
-
-    header {
-      color: white;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-
-    iframe {
-      width: 700px;
-      height: 700px;
-      border: 0;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-    }
-
-    footer {
-    background: rgba(255, 255, 255, 0.25); /* สีขาวจาง ๆ */
-  backdrop-filter: blur(12px);          /* ทำให้พื้นหลังเบลอ */
-  -webkit-backdrop-filter: blur(12px);  /* Safari รองรับ */ 
-  
-  text-align: center;
-  color: #333;
-  font-size: 0.9rem;
-  padding: 1.25rem;
-  border-radius: 16px 16px 0 0;
-  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
-  width: 100%;
-}
-  </style>
+  <link rel="stylesheet" href="./CSS/calendar.css" />
 </head>
 <body>
-  <header>
-    <h1>ปฏิทินกิจกรรม</h1>
-  </header>
+      <header class="header">
+      <div class="logo">AchieveHub</div>
+      <div class="nav-container">
+        <nav class="nav-menu">
+          <a href="student-dashboard.html" class="nav-button">หน้าแรก</a>
+          <a href="recommend-activities.html" class="nav-button">กิจกรรมที่แนะนำ</a>
+          <a href="calendar.html" class="nav-button active">ปฏิทินกิจกรรม</a>
+          <a href="my-activities.html" class="nav-button">กิจกรรมของฉัน</a>
+          <a href="current-skill.html" class="nav-button">ทักษะปัจจุบัน</a>
+        </nav>
+        <div class="logout-icon" id="user-icon" onclick="logout()">
+          <img src="./Image/LogOut.png" />
+        </div>
+      </div>
+    </header>
 
   <main>
     <!-- เปลี่ยน src ให้เป็น Calendar ของคุณ -->

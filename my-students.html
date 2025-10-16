@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AchieveHub - ข้อมูลนักศึกษา</title>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../CSS/my-students.css" />
+  <title>ข้อมูลนักศึกษา</title>
+  <link rel="stylesheet" href="./CSS/my-students.css" />
 </head>
+
 <body>
   <div class="main-container">
     <!-- Header -->
@@ -20,11 +21,12 @@
         <a href="advisor-dashboard.html" class="nav-button">หน้าแรก</a>
         <a href="advisor-activities.html" class="nav-button">ตรวจสอบกิจกรรม</a>
         <div class="logout-icon" id="user-icon" onclick="logout()">
-          <img src="../Image/LogOut.png" alt="User Profile" style="margin-left: 10px; width: 40px; height: 40px; border-radius: 50%;" />
+          <img src="../Image/LogOut.png" alt="User Profile"
+            style="margin-left: 10px; width: 40px; height: 40px; border-radius: 50%;" />
         </div>
       </div>
     </header>
-    
+
     <!-- Dashboard Section -->
     <div class="dashboard-container">
       <div class="info-skill-container">
@@ -46,7 +48,8 @@
             <div class="circle-progress">
               <svg width="100" height="100" id="progress-circle">
                 <circle cx="50" cy="50" r="45" stroke="#D3EAD7" stroke-width="10" fill="none" />
-                <circle id="progress-indicator" cx="50" cy="50" r="45" stroke="#4CAF50" stroke-width="10" fill="none" stroke-dasharray="282.74" stroke-dashoffset="141.37" transform="rotate(-90 50 50)" />
+                <circle id="progress-indicator" cx="50" cy="50" r="45" stroke="#4CAF50" stroke-width="10" fill="none"
+                  stroke-dasharray="282.74" stroke-dashoffset="141.37" transform="rotate(-90 50 50)" />
               </svg>
               <div class="circle-text" id="progress-text">0/0</div>
             </div>
@@ -59,17 +62,17 @@
         </section>
       </div>
     </div>
-    
+
     <!-- Requirement Notice -->
     <div class="requirement-notice">
-      <strong>📋 เงื่อนไขการนับทักษะ:</strong> 
+      <strong>📋 เงื่อนไขการนับทักษะ:</strong>
       กิจกรรมจะนับเข้าทักษะเมื่อ <strong>ยืนยันการเข้าร่วม</strong> และ <strong>ทำแบบประเมินเสร็จสิ้น</strong> เท่านั้น
     </div>
-    
+
     <!-- Skills Detail Section -->
     <div class="skills-detail-container">
-      <h2 class="section-title">ทักษะปัจจุบัน</h2>
-      
+      <h2 class="section-title">ทักษะที่ได้รับ</h2>
+
       <!-- ทักษะที่ได้ผ่านการทดสอบแล้ว -->
       <div class="skills-section">
         <h3>ทักษะที่ได้ผ่านการทดสอบแล้ว</h3>
@@ -77,7 +80,7 @@
           <div class="loading">กำลังโหลดข้อมูล...</div>
         </div>
       </div>
-      
+
       <!-- ทักษะที่ยังไม่ได้ทำการทดสอบ -->
       <div class="skills-section">
         <h3>ทักษะที่ยังไม่ได้ทำการทดสอบ</h3>
@@ -87,12 +90,15 @@
       </div>
     </div>
   </div>
-  
-    <!-- Footer -->
-    <footer class="footer">
-      <p>AchieveHub ©2025<br>CS232 | Group 8</p>
-      <small>ภูริต เฟื่องฟู 6609650038 ปิยะชาติ สลางสิงห์ 6609650061 ธวัลหทัย เทียมทอง 6609650111 กชมนต์ บริบูรณ์ 6609650145 ธีรัตม์ ศรีสุโข 6609650442 ปริญ จิระมหาโภคี 6609650475 พรธีรา เสาวรส 6609650517 อัฐภิญญา กำหนด 6609650749</small>
-    </footer>
+
+  <footer>
+    <p>AchieveHub ©2025<br>CS361</p>
+    <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194
+      นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
+  </footer>
+
   <script src="../JS/my-students.js"></script>
+  
 </body>
+
 </html>

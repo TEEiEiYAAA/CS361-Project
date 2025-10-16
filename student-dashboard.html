@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AchieveHub</title>
   <link rel="stylesheet" href="./CSS/newstyle.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -15,14 +14,14 @@
       <div class="logo">AchieveHub</div>
       <div class="nav-container">
         <nav class="nav-menu">
-          <button class="nav-button active" onclick="navigateTo('student-dashboard.html')">หน้าแรก</button>
-          <button class="nav-button" onclick="navigateTo('recommend-activities.html')">กิจกรรมที่แนะนำ</button>
-          <button class="nav-button" onclick="navigateTo('calendar.html')">ปฏิทินกิจกรรม</button>
-          <button class="nav-button" onclick="navigateTo('my-activities.html')">กิจกรรมของฉัน</button>
-          <button class="nav-button" onclick="navigateTo('current-skills.html')">ทักษะปัจจุบัน</button>
+          <a href="student-dashboard.html" class="nav-button active">หน้าแรก</a>
+          <a href="recommend-activities.html" class="nav-button">กิจกรรมที่แนะนำ</a>
+          <a href="calendar.html" class="nav-button">ปฏิทินกิจกรรม</a>
+          <a href="my-activities.html" class="nav-button">กิจกรรมของฉัน</a>
+          <a href="current-skill.html" class="nav-button">ทักษะปัจจุบัน</a>
         </nav>
         <div class="logout-icon" id="user-icon" onclick="logout()">
-          <img src="../Image/LogOut.png" />
+          <img src="./Image/LogOut.png" />
         </div>
       </div>
     </header>

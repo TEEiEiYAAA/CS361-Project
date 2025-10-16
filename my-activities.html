@@ -1,87 +1,49 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AchieveHub - กิจกรรมของฉัน</title>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../CSS/my-activities.css">
+  <title>กิจกรรมของฉัน</title>
+  <link rel="stylesheet" href="./CSS/my-activities.css"> 
 </head>
+
 <body>
-  <div class="main-container">
-    <!-- ส่วนหัว -->
-    <header class="header">
-      <div class="logo">AchieveHub</div>
-      <div class="nav-menu">
-        <button class="nav-button" style="font-weight: bold;" onclick="navigateTo('student-dashboard.html')">หน้าแรก</button>
-        <button class="nav-button" style="font-weight: bold;" onclick="navigateTo('recommend-activities.html')">กิจกรรมที่แนะนำ</button>
-        <button class="nav-button" style="font-weight: bold;" onclick="navigateTo('my-activities.html')" >กิจกรรมของฉัน</button>
-        <div class="logout-icon" id="user-icon" onclick="logout()">
-          <img src="../Image/LogOut.png" alt="User Profile" style="margin-left: 10px;  width: 40px; height: 40px; border-radius: 50%;" />
-        </div>
+  <header class="header">
+    <div class="logo">AchieveHub</div>
+    <div class="nav-container">
+      <nav class="nav-menu">
+        <a href="student-dashboard.html" class="nav-button">หน้าแรก</a>
+        <a href="recommend-activities.html" class="nav-button">กิจกรรมที่แนะนำ</a>
+        <a href="calendar.html" class="nav-button">ปฏิทินกิจกรรม</a>
+        <a href="my-activities.html" class="nav-button active">กิจกรรมของฉัน</a>
+        <a href="current-skill.html" class="nav-button">ทักษะปัจจุบัน</a>
+      </nav>
+      <div class="logout-icon" id="user-icon" onclick="logout()">
+        <img src="./Image/LogOut.png" />
       </div>
-    </header>
-    
-    <!-- ส่วนยืนยันการเข้าร่วม -->
-    <div class="confirm-box">
-      <div class="confirm-title">ยืนยันการเข้าร่วม</div>
-      <button class="scan-btn" onclick="openCodeInput()">ใส่รหัสกิจกรรม</button>
     </div>
-    
-    <!-- ส่วนกิจกรรมของฉัน -->
-    <div class="activities-section">
-      <div class="activities-title">กิจกรรมของฉัน</div>
-      
-      <div id="activities-list">
-        <div class="loading">กำลังโหลดข้อมูล...</div>
-      </div>
+  </header>
+
+  <div class="tab-buttons">
+    <button class="tab-btn active" data-filter="registered">กิจกรรมที่ดำเนินการ</button>
+    <button class="tab-btn" data-filter="history">กิจกรรมที่กำลังจะถึง</button>
+    <button class="tab-btn" data-filter="history">กิจกรรมที่ทำไปแล้ว</button>
+  </div>
+
+  <div class="activities-container">
+    <div id="activities-list">
+      <div class="loading">กำลังโหลดข้อมูล...</div>
     </div>
   </div>
 
-  <!-- ส่วนท้าย -->
-    <footer class="footer">
-      <p>AchieveHub ©2025<br>CS232 | Group 8</p>
-      <small>ภูริต เฟื่องฟู 6609650038 ปิยะชาติ สลางสิงห์ 6609650061 ธวัลหทัย เทียมทอง 6609650111 กชมนต์ บริบูรณ์ 6609650145 ธีรัตม์ ศรีสุโข 6609650442 ปริญ จิระมหาโภคี 6609650475 พรธีรา เสาวรส 6609650517 อัฐภิญญา กำหนด 6609650749</small>
-    </footer>
+  <footer>
+    <p>AchieveHub ©2025<br>CS361</p>
+    <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194
+      นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
+  </footer>
 
-  <!-- Modal สำหรับใส่รหัส -->
-  <div id="code-modal" class="modal">
-    <div class="modal-content">
-      <h2 class="modal-title">ใส่รหัสยืนยันการเข้าร่วมกิจกรรม</h2>
-      
-      <div class="code-input-area">
-        <input 
-          type="text" 
-          id="activity-code" 
-          class="code-input" 
-          placeholder="ใส่รหัสกิจกรรม (เช่น ACT001QR4T25X)"
-          maxlength="20"
-        >
-      </div>
-      
-      <div class="code-examples">
-        <h4>ตัวอย่างรหัสกิจกรรม:</h4>
-        <ul>
-          <li>ACT001QR4T25X - สัมมนาด้านความปลอดภัยไซเบอร์</li>
-          <li>ACT002QR5T27X - Workshop การเขียนโปรแกรมขั้นพื้นฐาน</li>
-          <li>ACT003QR6T01X - กิจกรรมประยุกต์ใช้งาน Web & App Development</li>
-          <li>ACT004QR6T10X - สัมมนาแนวคิดผู้ประกอบการ</li>
-          <li>ACT005QR6T15X - อบรมทักษะการสื่อสารองค์กร</li>
-        </ul>
-        <p style="margin-top: 10px; font-size: 0.8rem; color: #666;">
-          💡 <strong>หมายเหตุ:</strong> รหัสเหล่านี้จะได้รับจากผู้จัดกิจกรรมในวันเข้าร่วมกิจกรรม
-        </p>
-      </div>
-      
-      <div id="status-message" class="status-message" style="display: none;"></div>
-      
-      <div class="modal-buttons">
-        <button class="submit-btn" onclick="submitActivityCode()">ยืนยัน</button>
-        <button class="close-btn" onclick="closeCodeInput()">ปิด</button>
-      </div>
-    </div>
-  </div>
-  
   <script src="../JS/my-activities.js"></script>
 </body>
+
 </html>

@@ -1,113 +1,166 @@
+@font-face {
+  font-family: 's';
+  src: url('../Fonts/s.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 's';
+  src: url('../Fonts/sbold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+}
+
+
+* {
+  box-sizing: border-box;
+  font-family: 's';
+}
+
+/*พื้นหลัง*/
 body {
-            margin: 0;
-            font-family: "Prompt", sans-serif;
-            background: linear-gradient(to bottom, #7bd4d4, #a0d9ef);
-        }
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to bottom, #80CEC7, #93B8D2);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            padding: 20px 40px;
-            align-items: center;
-            background-color: transparent;
-            width: 70%;
-            margin: 0 auto;
-        }
+/*แถบนำทางด้านบน*/
+.header {
+  text-align: center;
+  padding: 30px 20px;
+}
 
-        header h1 {
-            color: white;
-            font-size: 24px;
-        }
+/* Logo AchieveHub */
+.logo {
+  font-size: 45px;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 10px;
+  /* ให้เว้นระหว่างโลโก้กับปุ่ม */
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
 
-        nav button {
-            margin: 0 10px;
-            transition: all 0.3s ease;
-            padding: 10px 20px;
-            border-radius: 20px;
-            border: none;
-            background-color: rgba(255, 255, 255, 0.8);
-            font-weight: bold;
-            cursor: pointer;
-        }
+}
 
-        nav {
-            display: flex;
-            align-items: center;
-        }
+.nav-container {
+  display: flex;
+  justify-content: center;
+  /* ให้เมนูอยู่กลาง */
+  align-items: center;
+  gap: 15px;
+  /* เว้นช่องว่างระหว่างกรอบปุ่มกับไอคอน */
+}
 
-        .profile-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: white;
-            margin-left: 10px;
-        }
+.nav-menu {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 40px;
+  font-size: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
 
-        .container {
-            background: white;
-            border-radius: 20px;
-            margin: 40px auto;
-            padding: 30px;
-            width: 1150px;
-            max-width: 1150px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
+.nav-button {
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  padding: 10px 18px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: 0.3s;
+  color: #000;
+}
 
-        .container h2 {
-            margin-bottom: 20px;
-            color: #006666;
-        }
+.nav-button.active,
+.nav-button:hover {
+  background: white;
+  font-weight: bold;
+  color: #37798B;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
 
-        .student-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            margin: 10px 0;
-            border-bottom: 1px solid #ddd;
-        }
+.logout-icon img {
+  width: 40px;
+  height: 40px;
+  border-radius: 27%;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
 
-        .student-info {
-            display: flex;
-            align-items: center;
-        }
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
 
-        .avatar {
-            width: 40px;
-            height: 40px;
-            background-color: #eee;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 20px;
-            margin-right: 15px;
-        }
+.container {
+    background: white;
+    border-radius: 20px;
+    margin: 40px auto;
+    padding: 30px;
+    width: 1150px;
+    max-width: 1150px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
 
-        .student-text {
-            line-height: 1.4;
-        }
+.container h2 {
+    margin-bottom: 20px;
+    color: #006666;
+}
 
-        .view-btn {
-            background: linear-gradient(to right, #4fe5a3, #38c6a0);
-            border: none;
-            border-radius: 20px;
-            padding: 10px 25px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+.student-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
 
-        footer {
-            background: rgba(255, 255, 255, 0.25); /* สีขาวจาง ๆ */
-            backdrop-filter: blur(12px);          /* ทำให้พื้นหลังเบลอ */
-            -webkit-backdrop-filter: blur(12px);  /* Safari รองรับ */ 
-            text-align: center;
-            color: #333;
-            font-size: 0.9rem;
-            padding: 1.25rem;
-            border-radius: 16px 16px 0 0;
-            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
-            width: 100%;
-            }
+.student-info {
+    display: flex;
+    align-items: center;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #eee;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    margin-right: 15px;
+}
+
+.student-text {
+    line-height: 1.4;
+}
+
+.view-btn {
+    background: linear-gradient(to right, #4fe5a3, #38c6a0);
+    border: none;
+    border-radius: 20px;
+    padding: 10px 25px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+footer {
+    background: rgba(255, 255, 255, 0.25);
+    /* สีขาวจาง ๆ */
+    backdrop-filter: blur(12px);
+    /* ทำให้พื้นหลังเบลอ */
+    -webkit-backdrop-filter: blur(12px);
+    /* Safari รองรับ */
+    text-align: center;
+    color: #333;
+    font-size: 0.9rem;
+    padding: 1.25rem;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+    width: 100%;
+}
