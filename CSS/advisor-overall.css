@@ -1,57 +1,47 @@
-@font-face {
-  font-family: 's';
-  src: url('../Fonts/s.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 's';
-  src: url('../Fonts/sbold.woff') format('woff');
-  font-weight: bold;
-  font-style: normal;
-}
-
-
+/* ======= RESET & BASE STYLES ======= */
 * {
   box-sizing: border-box;
-  font-family: 's';
-}
-
-/*พื้นหลัง*/
-body {
   margin: 0;
   padding: 0;
-  background: linear-gradient(to bottom, #80CEC7, #93B8D2);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
 }
 
-/*แถบนำทางด้านบน*/
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Sarabun', sans-serif;
+  /* <-- ใช้ฟอนต์ Sarabun */
+  background: linear-gradient(to bottom, #80CEC7, #93B8D2);
+  display: flex;
+  flex-direction: column;
+  color: #3B3B3B;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+
+/* ======= HEADER & NAVIGATION ======= */
 .header {
   text-align: center;
   padding: 30px 20px;
 }
 
-/* Logo AchieveHub */
 .logo {
   font-size: 45px;
   font-weight: bold;
   color: white;
   margin-bottom: 10px;
-  /* ให้เว้นระหว่างโลโก้กับปุ่ม */
   text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
-
 }
 
 .nav-container {
   display: flex;
   justify-content: center;
-  /* ให้เมนูอยู่กลาง */
   align-items: center;
   gap: 15px;
-  /* เว้นช่องว่างระหว่างกรอบปุ่มกับไอคอน */
 }
 
 .nav-menu {
@@ -91,121 +81,71 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/**/
-/* ======= RESET & BASE ======= */
-* {
-  box-sizing: border-box;
-  font-family: s;
-  margin: 0;
-  padding: 0;
-}
 
-html,
-body {
-  height: 100%;
-}
-
-body {
-  background: linear-gradient(to bottom, #80CEC7, #93B8D2);
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: #3B3B3B;
-  width: 100%;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-size: cover;
-  margin: 0;
-}
-
-nav button {
-  margin: 0 10px;
-  transition: all 0.3s ease;
-  padding: 10px 20px;
-  border-radius: 20px;
-  border: none;
-  background-color: rgba(255, 255, 255, 0.8);
-  font-weight: bold;
-  cursor: pointer;
-}
-
-nav {
-  display: flex;
-  align-items: center;
-}
-
-
-/* ======= MAIN CONTAINER ======= */
+/* ======= MAIN CONTENT ======= */
 main {
+  flex: 1;
   display: flex;
   justify-content: center;
-  flex: 1;
   padding: 2rem 1rem;
-  flex-direction: column;
-  align-items: center;
 }
 
-/* ======= BACK BUTTON ======= */
-.back-button-container {
+/* --- Positioning Wrapper --- */
+.content-wrapper {
+  position: relative;
+  /* <-- จุดอ้างอิงสำหรับ Back Button */
   width: 100%;
   max-width: 960px;
-  margin-bottom: 1rem;
 }
 
-.back-icon {
-  width: 40px;
-  height: 40px;
+/* --- Back Button --- */
+.back-button-container {
+  position: absolute;
+  z-index: 10;
+  width: 50px;
+  height: 50px;
+  background-color: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  top: -15px;
+  left: -15px;
+
+  /* จัดให้ไอคอนอยู่ตรงกลางพื้นที่นี้ */
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease;
+  /* transition เฉพาะ scale ตอน hover */
 }
 
-.back-icon:hover {
-  transform: scale(1.1);
+.back-button-container:hover {
+  transform: scale(1.05);
 }
 
-/* ======= STUDENT CARD BOX ======= */
+/* --- Back Icon Styles (ใส่เงาที่นี่) --- */
+.back-icon {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
+  /* <-- เพิ่มเงาให้ตัวรูปภาพโดยตรง */
+  transition: filter 0.2s ease;
+  /* เพิ่ม transition ให้เงาหากมีการเปลี่ยนแปลง */
+}
+
+/* --- Student Card --- */
 .student-card {
   background: #f2fcff;
   width: 100%;
-  max-width: 960px;
   border-radius: 20px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   padding: 2rem;
 }
 
-/* ======= HEADER IN CARD ======= */
 .card-header {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* เพิ่มบรรทัดนี้ */
+  justify-content: space-between;
   margin-bottom: 1.5rem;
 }
 
@@ -219,12 +159,48 @@ main {
   word-break: break-word;
 }
 
-/* ======= CONTENT SECTIONS ======= */
+
+/* --- Action Buttons (Delete, Edit) --- */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.action-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.delete-btn {
+  background-color: #EF7777;
+}
+
+.delete-btn:hover {
+  background-color: #E25B5B;
+}
+
+.edit-btn {
+  background-color: #B0B7C6;
+}
+
+.edit-btn:hover {
+  background-color: #9DA6B6;
+}
+
+
+/* --- Card Content Sections --- */
 .skill-section {
   margin-bottom: 2rem;
 }
 
-.skill-section h3 {
+.skill-section h3,
+.participant-section h3 {
   font-size: 1.2rem;
   margin-bottom: 1rem;
   color: #2e7d32;
@@ -239,143 +215,23 @@ main {
   border-left: 4px solid #4CAF50;
 }
 
-.skill-list p {
-  margin: 0.5rem 0;
-  line-height: 1.6;
-}
-
-.participant-section {
-  margin-top: 2rem;
-}
-
-.participant-count {
-  margin-bottom: 1.5rem;
-}
-
-.additional-info {
-  margin-top: 1.5rem;
-}
-
-/* ======= LOADING & ERROR STATES ======= */
 .loading {
   text-align: center;
-  padding: 2rem;
+  padding: 1rem;
   color: #666;
   font-style: italic;
 }
 
-.error-message {
-  background: #ffebee;
-  color: #c62828;
-  padding: 1rem;
-  border-radius: 10px;
-  border-left: 4px solid #f44336;
-  margin: 1rem 0;
-}
 
-/* ======= FOOTER ======= */
-footer {
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  text-align: center;
-  color: #333;
-  font-size: 0.9rem;
-  padding: 1.25rem;
-  border-radius: 16px 16px 0 0;
-  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
-  margin-top: 3rem;
-  line-height: 1.5;
-}
-
-/* ======= RESPONSIVE DESIGN ======= */
-@media (max-width: 768px) {
-  header {
-    padding: 1rem;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .nav-container {
-    justify-content: center;
-  }
-
-  main {
-    padding: 1rem 0.5rem;
-  }
-
-  .student-card {
-    padding: 1.5rem;
-  }
-
-  .card-header h2 {
-    font-size: 1.2rem;
-    padding: 0.6rem 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  header {
-    padding: 0.5rem;
-  }
-
-  .student-card {
-    padding: 1rem;
-  }
-
-  .card-header h2 {
-    font-size: 1.1rem;
-    padding: 0.5rem 0.8rem;
-  }
-}
-
-/* --- Action Button Styles --- */
-.action-buttons {
-  display: flex;
-  gap: 10px; /* ระยะห่างระหว่างปุ่ม */
-}
-
-.action-buttons button {
-  padding: 10px 20px; /* เพิ่ม padding เพื่อให้ปุ่มดูใหญ่ขึ้น */
-  border: none;
-  border-radius: 20px; /* ปรับ border-radius ให้ปุ่มโค้งมน */
-  font-size: 1.1rem; /* เพิ่มขนาด font */
-  /*font-weight: bold; /* ทำให้ตัวอักษรหนาขึ้น */
-  font-family: 'Sarabun', sans-serif; /* ใช้ Font Sarabun */
-  cursor: pointer;
-  transition: all 0.3s ease; /* ปรับ transition ให้ราบรื่นขึ้น */
-  color: white;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* เพิ่มเงาให้ปุ่มมีมิติ */
-}
-
-/* --- Delete Button Style (สีแดง) --- */
-.delete-btn {
-  background-color: #EF7777; /* สีแดงอ่อน ตามรูป */
-}
-
-.delete-btn:hover {
-  background-color: #E25B5B; /* สีแดงเข้มขึ้นเมื่อ hover */
-}
-
-/* --- Edit Button Style (สีม่วงเทา) --- */
-.edit-btn {
-  background-color: #B0B7C6; /* สีม่วงเทา */
-}
-
-.edit-btn:hover {
-  background-color: #9DA6B6; /* สีม่วงเทาเข้มขึ้นเมื่อ hover */
-}
-
-/* === POP-UP (MODAL) STYLES === */
+/* ======= DELETE MODAL (POP-UP) ======= */
 .modal-overlay {
-  display: none; /* ซ่อนไว้เป็นค่าเริ่มต้น */
+  display: none;
   position: fixed;
   z-index: 1000;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  overflow: auto;
   background-color: rgba(0, 0, 0, 0.5);
   justify-content: center;
   align-items: center;
@@ -389,19 +245,17 @@ footer {
   width: 90%;
   max-width: 450px;
   text-align: center;
-  font-family: 'Sarabun', sans-serif;
-}
-
-.modal-icon {
-  width: 60px;
-  margin-bottom: 20px;
 }
 
 .modal-content h2 {
   margin-top: 0;
   margin-bottom: 15px;
-  color: #333;
   font-size: 1.5rem;
+}
+
+.highlight-title {
+  color: #d32525;
+  font-weight: bold;
 }
 
 .modal-content p {
@@ -445,7 +299,34 @@ footer {
   background-color: #d32525;
 }
 
-.highlight-title {
-  color: #d32525; 
-  font-weight:bold;
+
+/* ======= FOOTER ======= */
+.footer {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  text-align: center;
+  color: #333;
+  font-size: 0.9rem;
+  padding: 1.25rem;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+  margin-top: 3rem;
+  line-height: 1.5;
+}
+
+
+/* ======= RESPONSIVE DESIGN ======= */
+@media (max-width: 768px) {
+  main {
+    padding: 1rem 0.5rem;
+  }
+
+  .student-card {
+    padding: 1.5rem;
+  }
+
+  .card-header h2 {
+    font-size: 1.2rem;
+  }
 }

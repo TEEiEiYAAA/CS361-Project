@@ -2,82 +2,90 @@
 <html lang="th">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>รายละเอียดกิจกรรม - AchieveHub</title>
-  <link rel="stylesheet" href="./CSS/advisor-overall.css"> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายละเอียดกิจกรรม - AchieveHub</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="./CSS/advisor-overall.css">
 </head>
 
 <body>
-  <div class="main-container">
-    <header class="header">
-      <div class="logo">AchieveHub</div>
-      <div class="nav-container">
-        <nav class="nav-menu">
-          <a href="advisor-dashboard.html" class="nav-button">หน้าแรก</a>
-          <a href="advisor-activities.html" class="nav-button">ตรวจสอบกิจกรรม</a>
-          <a href="" class="nav-button">ปฏิทินกิจกรรม</a>
-          <a href="" class="nav-button">เพิ่มกิจกรรม</a>
-        </nav>
-        <div class="logout-icon" id="user-icon" onclick="logout()">
-          <img src="./Image/LogOut.png" />
-        </div>
-      </div>
-    </header>
-
-      <main>
-        <div class="back-button-container">
-          <img src="../Image/Backward.png" class="back-icon" alt="ย้อนกลับ" onclick="goBack()">
-        </div>
-
-        <div class="student-card">
-          <div class="card-header">
-            <h2 class="activity-title">กำลังโหลดข้อมูล...</h2>
-            
-              <div class="action-buttons">
-                <button class="delete-btn">ลบ</button>
-                <button class="edit-btn">แก้ไข</button>
-              </div>
+    <div class="main-container">
+        <header class="header">
+            <div class="logo">AchieveHub</div>
+            <div class="nav-container">
+                <nav class="nav-menu">
+                    <a href="advisor-dashboard.html" class="nav-button">หน้าแรก</a>
+                    <a href="advisor-activities.html" class="nav-button">ตรวจสอบกิจกรรม</a>
+                    <a href="" class="nav-button">ปฏิทินกิจกรรม</a>
+                    <a href="" class="nav-button">เพิ่มกิจกรรม</a>
+                </nav>
+                <div class="logout-icon" id="user-icon" onclick="logout()">
+                    <img src="./Image/LogOut.png" alt="Logout">
+                </div>
             </div>
+        </header>
 
-          <div class="skill-section">
-            <h3>ทักษะที่ได้รับ</h3>
-            <div class="skill-list">
-              <div class="loading">กำลังโหลดข้อมูลทักษะ...</div>
+        <main>
+            <div class="content-wrapper">
+
+                <div class="back-button-container" onclick="goBack()">
+                    <img src="./Image/Backward.png" class="back-icon" alt="ย้อนกลับ">
+                </div>
+
+                <div class="student-card">
+                    <div class="card-header">
+                        <h2 class="activity-title">กำลังโหลดข้อมูล...</h2>
+                        <div class="action-buttons">
+                            <button class="delete-btn">ลบ</button>
+                            <button class="edit-btn">แก้ไข</button>
+                        </div>
+                    </div>
+
+                    <div class="skill-section">
+                        <h3>ทักษะที่ได้รับ</h3>
+                        <div class="skill-list">
+                            <div class="loading">กำลังโหลดข้อมูลทักษะ...</div>
+                        </div>
+                    </div>
+
+                    <div class="participant-section">
+                        <h3>สถิติการเข้าร่วม</h3>
+                        <div class="participant-count">
+                            <div class="loading">กำลังโหลดข้อมูลผู้เข้าร่วม...</div>
+                        </div>
+                    </div>
+
+                    <div class="additional-info">
+                    </div>
+                </div>
+
             </div>
-          </div>
-
-          <div class="participant-section">
-            <h3>สถิติการเข้าร่วม</h3>
-            <div class="participant-count">
-              <div class="loading">กำลังโหลดข้อมูลผู้เข้าร่วม...</div>
-            </div>
-          </div>
-
-          <div class="additional-info">
-          </div>
-        </div>
-      </main>
+        </main>
     </div>
 
     <div id="delete-modal" class="modal-overlay">
-      <div class="modal-content">
-        <h2><span class="highlight-title">ลบกิจกรรม</span></h2>
-        <p>ท่านต้องการลบกิจกรรมนี้หรือไม่ ? <br> (การกระทำนี้ไม่สามารถย้อนกลับได้)</p>
-        <div class="modal-buttons">
-          <button id="confirm-delete-btn" class="confirm-button">ยืนยันการลบ</button>
-          <button id="cancel-btn" class="cancel-button">ยกเลิก</button>
+        <div class="modal-content">
+            <h2><span class="highlight-title">ลบกิจกรรม</span></h2>
+            <p>ท่านต้องการลบกิจกรรมนี้หรือไม่ ? <br> (การกระทำนี้ไม่สามารถย้อนกลับได้)</p>
+            <div class="modal-buttons">
+                <button id="confirm-delete-btn" class="confirm-button">ยืนยันการลบ</button>
+                <button id="cancel-btn" class="cancel-button">ยกเลิก</button>
+            </div>
         </div>
     </div>
-  </div>
 
-  <footer class="footer">
-    <p>AchieveHub ©2025<br>CS361</p>
-    <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194
-      นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
-  </footer>
+    <footer class="footer">
+        <p>AchieveHub ©2025<br>CS361</p>
+        <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194
+            นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
+    </footer>
 
-  <script src="../JS/advisor-overall.js"></script>
+    <script src="../JS/advisor-overall.js"></script>
 </body>
 
 </html>

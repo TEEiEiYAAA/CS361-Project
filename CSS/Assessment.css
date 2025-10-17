@@ -1,29 +1,15 @@
-@font-face {
-  font-family: 's';
-  src: url('../Fonts/s.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 's';
-  src: url('../Fonts/sbold.woff') format('woff');
-  font-weight: bold;
-  font-style: normal;
-}
-
+/* ======= RESET & BASE STYLES ======= */
 * {
   box-sizing: border-box;
-  font-family: s;
   margin: 0;
   padding: 0;
 }
 
 body {
+  font-family: 'Sarabun', sans-serif;
+  /* <-- Set Sarabun as default font */
   background: linear-gradient(to bottom, #80CEC7, #93B8D2);
   min-height: 100vh;
-  margin: 0;
-  padding: 0;
   display: flex;
   flex-direction: column;
 }
@@ -38,13 +24,13 @@ body {
   padding: 20px 0;
 }
 
-/* Header */
+/* ======= HEADER ======= */
 .header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  /* <-- Center the logo */
   align-items: center;
   padding: 1rem 2rem;
-  background-color: transparent;
   margin-bottom: 20px;
 }
 
@@ -52,29 +38,57 @@ body {
   color: white;
   font-size: 1.8rem;
   font-weight: bold;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
 }
 
-.back-button {
-  background-color: rgba(255, 255, 255, 0.8);
-  border: none;
-  border-radius: 20px;
-  padding: 0.5rem 1.2rem;
-  color: #333;
-  font-weight: 500;
+
+/* ======= CONTENT & NEW BACK BUTTON ======= */
+
+/* --- Positioning Wrapper --- */
+.content-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* --- Back Button --- */
+.back-button-container {
+  position: absolute;
+  z-index: 10;
+  width: 50px;
+  height: 50px;
+  background-color: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  top: -15px;
+  left: -15px;
+
+  /* จัดให้ไอคอนอยู่ตรงกลางพื้นที่นี้ */
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  display: inline-block;
+  transition: transform 0.2s ease;
+  /* transition เฉพาะ scale ตอน hover */
 }
 
-.back-button:hover {
-  background-color: white;
-  transform: translateY(-2px);
+.back-button-container:hover {
+  transform: scale(1.05);
 }
 
-/* Assessment Container */
+/* --- Back Icon Styles (ใส่เงาที่นี่) --- */
+.back-icon {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
+  /* <-- เพิ่มเงาให้ตัวรูปภาพโดยตรง */
+  transition: filter 0.2s ease;
+  /* เพิ่ม transition ให้เงาหากมีการเปลี่ยนแปลง */
+}
+
+
+/* ======= ASSESSMENT CONTAINER ======= */
 .assessment-container {
-  background-color: white;
+  background: #f2fcff;
   border-radius: 20px;
   padding: 2rem;
   margin-bottom: 20px;
@@ -91,11 +105,13 @@ body {
 }
 
 .activity-info {
-  background-color: #f8f9fa;
-  padding: 1rem;
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #444;
+  border-left: 5px solid #37798B;
+  padding: 15px;
   margin-bottom: 2rem;
-  border-left: 4px solid #4CAF50;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .activity-name {
@@ -110,7 +126,7 @@ body {
   color: #666;
 }
 
-/* Form Styles */
+/* ======= FORM STYLES ======= */
 .question-group {
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
@@ -170,7 +186,7 @@ body {
   border: 2px solid #ddd;
   border-radius: 10px;
   font-size: 1rem;
-  font-family: s;
+  font-family: 'Sarabun', sans-serif;
   resize: vertical;
   min-height: 100px;
   margin-top: 0.5rem;
@@ -181,7 +197,7 @@ body {
   border-color: #4CAF50;
 }
 
-/* Submit Button */
+/* ======= SUBMIT BUTTON ======= */
 .submit-container {
   text-align: center;
   margin-top: 2rem;
@@ -190,7 +206,7 @@ body {
 }
 
 .submit-btn {
-  background-color: #4CAF50;
+  background-image: linear-gradient(to right, #09C58C, #27C4B7);
   color: white;
   border: none;
   border-radius: 25px;
@@ -203,7 +219,7 @@ body {
 }
 
 .submit-btn:hover {
-  background-color: #45a049;
+  background-image: linear-gradient(to right, #0da678, #229e94);
   transform: translateY(-2px);
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
@@ -215,7 +231,7 @@ body {
   box-shadow: none;
 }
 
-/* Status Messages */
+/* ======= STATUS MESSAGES & SPINNER ======= */
 .status-message {
   padding: 1rem;
   border-radius: 10px;
@@ -243,7 +259,6 @@ body {
   border: 1px solid #ffeaa7;
 }
 
-/* Loading Spinner */
 .loading-spinner {
   border: 3px solid #f3f3f3;
   border-radius: 50%;
@@ -265,24 +280,7 @@ body {
   }
 }
 
-/* Footer */
-.footer {
-  background-color: rgba(255, 255, 255, 0.25);
-  padding: 1rem;
-  text-align: center;
-  color: #333;
-  font-size: 0.9rem;
-  margin-top: auto;
-  border-radius: 10px;
-}
-
-.footer small {
-  display: block;
-  font-size: 0.75rem;
-  margin-top: 0.5rem;
-}
-
-/* Responsive */
+/* ======= RESPONSIVE ======= */
 @media (max-width: 768px) {
   .container {
     width: 98%;
