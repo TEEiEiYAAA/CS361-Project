@@ -1,230 +1,215 @@
-/* --- FONT & GENERAL STYLES --- */
 @font-face {
-  font-family: 's';
-  src: url('../Fonts/s.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
+    font-family: 's';
+    src: url('../Fonts/s.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
 }
 
 @font-face {
-  font-family: 's';
-  src: url('../Fonts/sbold.woff') format('woff');
-  font-weight: bold;
-  font-style: normal;
+    font-family: 's';
+    src: url('../Fonts/sbold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
 }
+
 
 * {
-  box-sizing: border-box;
-  font-family: 's', sans-serif;
+    box-sizing: border-box;
+    font-family: 's', 'Sarabun', sans-serif; /* เพิ่ม Sarabun เป็น Fallback */
 }
 
-/* --- BACKGROUND --- */
+/* === พื้นหลัง === */
 body {
-  margin: 0;
-  padding: 0;
-  background: linear-gradient(to bottom, #80CEC7, #93B8D2);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom, #80CEC7, #93B8D2);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-/* --- HEADER & NAVIGATION --- */
+/* === แถบนำทางด้านบน (Header) === */
 .header {
-  text-align: center;
-  padding: 30px 20px;
+    text-align: center;
+    padding: 30px 20px;
 }
 
+/* Logo AchieveHub */
 .logo {
-  font-size: 45px;
-  font-weight: bold;
-  color: white;
-  margin-bottom: 10px;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
+    font-size: 45px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
 }
 
 .nav-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
 }
 
 .nav-menu {
-  display: inline-flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 40px;
-  font-size: 16px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 40px;
+    font-size: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .nav-button {
-  text-decoration: none;
-  background: transparent;
-  border: none;
-  font-size: 16px;
-  padding: 10px 18px;
-  border-radius: 25px;
-  cursor: pointer;
-  transition: 0.3s;
-  color: #000;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    padding: 10px 18px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: 0.3s;
+    color: #000;
 }
 
+/* ปุ่มที่ถูกเลือก หรือ Hover */
 .nav-button.active,
 .nav-button:hover {
-  background: white;
-  font-weight: bold;
-  color: #37798B;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background: white;
+    font-weight: bold;
+    color: #37798B;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .logout-icon img {
-  width: 40px;
-  height: 40px;
-  border-radius: 27%;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    width: 40px;
+    height: 40px;
+    border-radius: 27%;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* --- MAIN CONTAINER --- */
-.main-container {
-  flex: 1;
-  width: 100%;
-  max-width: 70%;
-  margin: 0 auto;
-  padding: 0 2rem 2rem 2rem; /* Adjusted padding */
+/* === กล่องเนื้อหาหลัก === */
+.content-container, .received-skills-section {
+    width: 100%;
+    max-width: 70%;
+    margin: 0 auto 2rem auto; /* เว้นระยะห่างด้านล่าง */
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* --- REQUIREMENT NOTICE --- */
+/* === ข้อความแจ้งเงื่อนไข === */
 .requirement-notice {
-  background: rgba(255, 255, 255, 0.7);
-  color: #444;
-  border-left: 5px solid #37798B;
-  padding: 15px;
-  margin-bottom: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 70%;
+    margin: 0 auto 2rem auto;
+    background: rgba(255, 255, 255, 0.7);
+    color: #444;
+    border-left: 5px solid #37798B;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* --- SECTION TITLE --- */
+/* === หัวข้อหลักของแต่ละกล่อง === */
 .section-title {
-  color: white;
-  text-align: left;
-  margin-bottom: 1rem;
-  font-size: 28px;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 2rem;
+    color: #333;
 }
 
-/* --- PROFILE SECTION --- */
+/* === ส่วนข้อมูลโปรไฟล์นักศึกษา === */
 .profile-section {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 12px;
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    margin-bottom: 2.5rem; /* เพิ่มระยะห่างจากส่วนถัดไป */
 }
 
 .profile-icon {
-  font-size: 48px;
-  color: #37798B;
+    font-size: 48px;
+    color: #37798B;
 }
 
-.profile-info h3,
-.profile-info p {
-  margin: 0;
-  color: #333;
-}
 .profile-info h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.profile-info p {
+    margin: 0;
+    font-size: 1rem;
+    color: #555;
+}
+
+/* === ส่วนแสดงทักษะ === */
+.skills-section {
+    margin-bottom: 2rem;
+}
+
+.skills-section h3 {
+    font-size: 1.3rem;
     font-weight: bold;
-    margin-bottom: 5px;
+    margin-bottom: 1rem;
+    color: #333;
+    padding-bottom: 0.5rem;
 }
 
-/* --- SKILLS SECTIONS (BOX STYLE APPLIED) --- */
-.skills-section,
-.received-skills-section {
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-}
-
-/* --- SECTION HEADERS (H2, H3) --- */
-.skills-section h3,
-.received-skills-section .section-title {
-  margin-top: 0;
-  color: #004D40; /* Matched color */
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(0, 77, 64, 0.2); /* Softer border */
-}
-
-/* --- SKILL LISTS & CARDS --- */
-#completed-skills,
-#pending-skills,
-#optional-completed-skills,
-#optional-pending-skills,
-#all-skills-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
-
-.skill-card {
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 15px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.skill-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.skill-card h4 {
-  margin: 0 0 10px 0;
-  color: #333;
-  font-weight: bold;
-}
-
-.progress-bar-container {
-  background-color: #e0e0e0;
-  border-radius: 20px;
-  height: 10px;
-  width: 100%;
-  overflow: hidden;
-}
-
-.progress-bar {
-  background-color: #4CAF50;
-  height: 100%;
-  border-radius: 20px;
-  text-align: center;
-  color: white;
-  line-height: 10px;
-}
-
+/* === ข้อความ Loading === */
 .loading {
-  color: #555;
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    font-style: italic;
+}
+
+/* === ส่วนท้ายเว็บ (Footer) === */
+footer {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    text-align: center;
+    color: #333;
+    font-size: 0.9rem;
+    padding: 1.25rem;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    margin-top: auto; /* ดัน footer ให้อยู่ด้านล่างสุด */
 }
 
 
-/* --- FOOTER --- */
-footer {
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  text-align: center;
-  color: #333;
-  font-size: 0.9rem;
-  padding: 1.25rem;
-  border-radius: 16px 16px 0 0;
-  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
-  width: 100%;
-  margin-top: auto; /* Push footer to the bottom */
+/* === Responsive สำหรับจอเล็ก === */
+@media (max-width: 768px) {
+    .content-container, 
+    .received-skills-section, 
+    .requirement-notice {
+        max-width: 95%;
+        padding: 1.5rem;
+    }
+
+    .nav-menu {
+        font-size: 14px;
+        padding: 0 5px;
+    }
+
+    .nav-button {
+        padding: 8px 12px;
+    }
+
+    .profile-section {
+        gap: 15px;
+    }
+
+    .profile-icon {
+        font-size: 40px;
+    }
+
+    .profile-info h3 {
+        font-size: 1.2rem;
+    }
 }
