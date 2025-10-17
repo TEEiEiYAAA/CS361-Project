@@ -10,18 +10,17 @@
 
 <body>
   <div class="main-container">
-    <!-- Header -->
     <header class="header">
       <div class="logo">AchieveHub</div>
-      <div class="nav-container">
-        <nav class="nav-menu">
-          <button class="nav-button active" onclick="navigateTo('student-dashboard.html')">หน้าแรก</button>
-          <button class="nav-button" onclick="navigateTo('recommend-activities.html')">กิจกรรมที่แนะนำ</button>
-          <button class="nav-button" onclick="navigateTo('calendar.html')">ปฏิทินกิจกรรม</button>
-          <button class="nav-button" onclick="navigateTo('my-activities.html')">กิจกรรมของฉัน</button>
-          <a href="current-skill.html" class="nav-button" onclick="navigateTo('current-skill.html')">ทักษะปัจจุบัน</button>
-        </nav>
-        <div class="logout-icon" id="user-icon" onclick="logout()">
+        <div class="nav-container">
+          <nav class="nav-menu">
+            <a href="student-dashboard.html" class="nav-button">หน้าแรก</a>
+            <a href="recommend-activities.html" class="nav-button">กิจกรรมที่แนะนำ</a>
+            <a href="calendar.html" class="nav-button">ปฏิทินกิจกรรม</a>
+            <a href="my-activities.html" class="nav-button active">กิจกรรมของฉัน</a>
+            <a href="current-skill.html" class="nav-button">ทักษะปัจจุบัน</a>
+          </nav>
+          <div class="logout-icon" id="user-icon" onclick="logout()">
           <img src="./Image/LogOut.png" />
         </div>
       </div>

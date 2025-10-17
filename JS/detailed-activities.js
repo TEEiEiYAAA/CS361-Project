@@ -141,7 +141,7 @@
       const studentId = currentUser.studentId || currentUser.userId;
       const registerBtn = document.getElementById('registerBtn');
       
-      if (!confirm(`ต้องการสมัครเข้าร่วมกิจกรรม "${currentActivity.name}" หรือไม่?`)) {
+      if (!confirm(`ต้องการสมัครเข้าร่วมกิจกรรม "${currentActivity.name}" หรือไม่ ?`)) {
         return;
       }
       
