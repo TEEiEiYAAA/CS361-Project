@@ -54,6 +54,29 @@
                 });
             });
         }
+
+        // รองรับทั้ง array, string JSON ["PLO1","PLO2"] และ string "PLO1,PLO2"
+        function extractPLOs(activity) {
+            const raw = activity.plo || activity.plos || activity.PLO || activity.PLOs || [];
+            if (Array.isArray(raw)) return raw.map(x => String(x).trim().toUpperCase());
+        
+            if (typeof raw === 'string') {
+            const s = raw.trim();
+            try {
+                const parsed = JSON.parse(s);
+                if (Array.isArray(parsed)) return parsed.map(x => String(x).trim().toUpperCase());
+            } catch (_) {}
+            return s.split(',').map(x => x.trim().toUpperCase()).filter(Boolean);
+            }
+            return [];
+        }
+        
+        function matchesPLO(activity, ploCode) {
+            if (!ploCode || ploCode === 'all') return true;
+            const plos = extractPLOs(activity);
+            return plos.includes(String(ploCode).toUpperCase());
+        }
+        
         
         // Load activities from API
         async function loadActivities(skillType = null) {
@@ -68,8 +91,8 @@
                 
                 // Add skill type filter if specified
                 if (skillType && skillType !== 'all') {
-                    apiUrl += `?skillType=${encodeURIComponent(skillType)}`;
-                }
+                    apiUrl += `?plo=${encodeURIComponent(skillType)}`;
+                  }
                 
                 // Make API request
                 const response = await fetch(apiUrl, {
@@ -84,8 +107,14 @@
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
-                const activities = await response.json();
-                
+                //const activities = await response.json();
+                let activities = await response.json();
+
+                // ถ้าเลือก PLO (ไม่ใช่ all) ให้ฟิลเตอร์แบบ "contains"
+                if (currentFilter && currentFilter !== 'all') {
+                activities = activities.filter(a => matchesPLO(a, currentFilter));
+                }
+
                 console.log('Activities loaded:', activities.length);
                 
                 // Store activities globally
@@ -239,3 +268,4 @@
                 window.location.href = "login.html";
             }
         }
+        

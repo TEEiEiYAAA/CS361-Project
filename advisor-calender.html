@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>เว็บปฏิทิน</title>
+  <link rel="stylesheet" href="./CSS/calendar.css" />
+</head>
+<body>
+    <header class="header">
+        <div class="logo">AchieveHub</div>
+        <div class="nav-container">
+            <nav class="nav-menu">
+                <a href="advisor-dashboard.html" class="nav-button">หน้าแรก</a>
+                <a href="advisor-activities.html" class="nav-button">ตรวจสอบกิจกรรม</a>
+                <a href="" class="nav-button active">ปฏิทินกิจกรรม</a>
+                <a href="" class="nav-button">เพิ่มกิจกรรม</a>
+            </nav>
+            <div class="logout-icon" id="user-icon" onclick="logout()">
+                <img src="./Image/LogOut.png" />
+            </div>
+        </div>
+    </header>
+
+  <main>
+    <!-- เปลี่ยน src ให้เป็น Calendar ของคุณ -->
+    <iframe 
+      src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=Asia%2FBangkok&showPrint=0&title&src=dGVlcmF0LnNyaXNAZG9tZS50dS5hYy50aA&src=ZW4udGgjaG9saWRheUBncm91cC52LmNhbGVuZGFyLmdvb2dsZS5jb20&color=%23039be5&color=%230b8043"
+      frameborder="0"
+      scrolling="no">
+    </iframe>
+  </main>
+  <footer>
+    <p>AchieveHub ©2025<br>CS361</p>
+    <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194 นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
+    </footer>
+</body>
+</html>

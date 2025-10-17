@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./css/style.css">
     <title>AchieveHub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./CSS/advisor-dashboard.css">
 </head>
-
 <body>
-
-    <header>
-        <h1>AchieveHub</h1>
-        <nav>
-            <button style="font-weight: bold;" onclick="navigateTo('advisor-dashboard.html')">หน้าแรก</button>
-            <button style="font-weight: bold;" onclick="navigateTo('advisor-activities.html')">ตรวจสอบกิจกรรม</button>
+    <header class="header">
+        <div class="logo">AchieveHub</div>
+        <div class="nav-container">
+            <nav class="nav-menu">
+                <a href="advisor-dashboard.html" class="nav-button active">หน้าแรก</a>
+                <a href="advisor-activities.html" class="nav-button">ตรวจสอบกิจกรรม</a>
+                <a href="" class="nav-button">ปฏิทินกิจกรรม</a>
+                <a href="" class="nav-button">เพิ่มกิจกรรม</a>
+            </nav>
             <div class="logout-icon" id="user-icon" onclick="logout()">
-                <img src="./Image/LogOut.png" alt="User Profile"
-                    style="margin-left: 10px;  width: 40px; height: 40px; border-radius: 50%;" />
+                <img src="./Image/LogOut.png" />
             </div>
-        </nav>
+        </div>
     </header>
 
     <div class="container">
