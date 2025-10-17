@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ข้อมูลนักศึกษา</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./CSS/my-students.css" />
 </head>
 
@@ -12,25 +13,24 @@
   <div class="main-container">
     <!-- Header -->
     <header class="header">
-      <button class="back-btn" onclick="goBack()">
-        <img src="../Image/Backward.png" alt="ย้อนกลับ">
-      </button>
-
       <div class="logo">AchieveHub</div>
-      <div class="nav-menu">
-        <a href="advisor-dashboard.html" class="nav-button">หน้าแรก</a>
-        <a href="advisor-activities.html" class="nav-button">ตรวจสอบกิจกรรม</a>
-        <div class="logout-icon" id="user-icon" onclick="logout()">
-          <img src="../Image/LogOut.png" alt="User Profile"
-            style="margin-left: 10px; width: 40px; height: 40px; border-radius: 50%;" />
-        </div>
+      <div class="nav-container">
+          <nav class="nav-menu">
+              <a href="advisor-dashboard.html" class="nav-button">หน้าแรก</a>
+              <a href="advisor-activities.html" class="nav-button">ตรวจสอบกิจกรรม</a>
+              <a href="" class="nav-button">ปฏิทินกิจกรรม</a>
+              <a href="" class="nav-button">เพิ่มกิจกรรม</a>
+          </nav>
+          <div class="logout-icon" id="user-icon" onclick="logout()">
+              <img src="./Image/LogOut.png" />
+          </div>
       </div>
-    </header>
-
+  </header>
     <!-- Dashboard Section -->
-    <div class="dashboard-container">
+    <div class="">
       <div class="info-skill-container">
-        <section class="student-info-box">
+        <section class="skill-box">
+          <h2>ข้อมูลนักศึกษา</h2>
           <div class="student-profile">
             <div class="profile-icon">👤</div>
             <div class="student-details">
@@ -47,8 +47,8 @@
           <div class="skill-stats">
             <div class="circle-progress">
               <svg width="100" height="100" id="progress-circle">
-                <circle cx="50" cy="50" r="45" stroke="#D3EAD7" stroke-width="10" fill="none" />
-                <circle id="progress-indicator" cx="50" cy="50" r="45" stroke="#4CAF50" stroke-width="10" fill="none"
+                <circle cx="50" cy="50" r="45" stroke="#FFFFFF" stroke-width="10" fill="none" />
+                <circle id="progress-indicator" cx="50" cy="50" r="45" stroke="#0E8C7D" stroke-width="10" fill="none"
                   stroke-dasharray="282.74" stroke-dashoffset="141.37" transform="rotate(-90 50 50)" />
               </svg>
               <div class="circle-text" id="progress-text">0/0</div>
@@ -57,11 +57,11 @@
               <p>ทักษะบังคับที่ผ่านแล้ว: <strong id="completed-required-skills">0</strong></p>
               <p>ทักษะบังคับที่ยังไม่ผ่าน: <strong id="pending-required-skills">0</strong></p>
               <p>ทักษะเพิ่มเติมที่ได้รับ: <strong id="completed-optional-skills">0</strong></p>
+              <p>. . .</p>
             </div>
           </div>
         </section>
       </div>
-    </div>
 
     <!-- Requirement Notice -->
     <div class="requirement-notice">
@@ -90,6 +90,7 @@
       </div>
     </div>
   </div>
+</div>
 
   <footer>
     <p>AchieveHub ©2025<br>CS361</p>
