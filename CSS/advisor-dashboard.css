@@ -1,7 +1,6 @@
 /* --- Global Styles & Font Definition --- */
 * {
     box-sizing: border-box;
-    /* เปลี่ยน font เป็น Sarabun */
     font-family: 'Sarabun', sans-serif;
 }
 
