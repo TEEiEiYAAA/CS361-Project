@@ -1,83 +1,75 @@
-@font-face {
-  font-family: 's';
-  src: url('../Fonts/s.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
+/* --- ส่วนของการนำเข้าฟอนต์ --- */
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
+
+/* --- การตั้งค่าเริ่มต้น --- */
+* {
+    box-sizing: border-box;
 }
 
-@font-face {
-  font-family: 's';
-  src: url('../Fonts/sbold.woff') format('woff');
-  font-weight: bold;
-  font-style: normal;
-}
-
+/* --- การตั้งค่าพื้นหลังและโครงหน้าเว็บหลัก --- */
 body {
-  background-image: url('../Image/Login Background.png');
-  /* หรือ .jpg ตามชื่อไฟล์จริง */
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  font-family: s;
-  height: 100vh;
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    background-image: url('../Image/Login Background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    font-family: 'Sarabun', sans-serif; /* <-- เปลี่ยนมาใช้ Sarabun ที่นี่ */
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
+/* --- กล่องล็อกอิน (Glassmorphism) --- */
 .login-box {
-  background: rgba(255, 255, 255, 0.2);
-  /* โปร่งใสจริง */
-  backdrop-filter: blur(10px);
-  /* เบลอพื้นหลังที่ลอดมา */
-  border-radius: 20px;
-  padding: 2rem;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  color: white;
-  text-align: center;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    color: white;
+    text-align: center;
 }
 
 .login-box h2 {
-  margin-bottom: 2rem;
+    margin-bottom: 2rem;
 }
 
+/* --- ช่องกรอกข้อมูล --- */
 input[type="text"],
 input[type="password"] {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  /* เพิ่ม padding ด้านข้าง */
-  margin-bottom: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  font-size: 1rem;
-  backdrop-filter: blur(5px);
-  box-sizing: border-box;
-  /* ทำให้ padding ไม่ดันขอบกล่องเกิน */
+    width: 100%;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    font-size: 1rem;
+    backdrop-filter: blur(5px);
+    box-sizing: border-box;
 }
-
 
 input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.7);
 }
 
+/* --- ปุ่มล็อกอิน --- */
 button {
-  width: 100%;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 12px;
-  background-image: linear-gradient(to right, #09C58C, #27C4B7);
-  color: white;
-  font-weight: bold;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.3s ease;
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 12px;
+    background-image: linear-gradient(to right, #09C58C, #27C4B7);
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
 }
 
 button:hover {
-  background-image: linear-gradient(to right, #0da678, #229e94);
+    background-image: linear-gradient(to right, #0da678, #229e94);
 }

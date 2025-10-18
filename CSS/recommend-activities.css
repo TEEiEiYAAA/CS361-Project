@@ -75,6 +75,10 @@ body {
 }
 
 /* --- ส่วนเนื้อหาหลัก (Container) --- */
+.main-content {
+    flex: 1;
+}
+
 .container {
     flex: 1;
     width: 100%;

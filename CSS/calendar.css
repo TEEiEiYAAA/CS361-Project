@@ -1,40 +1,36 @@
-@font-face {
-    font-family: 's';
-    src: url('../Fonts/s.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 's';
-    src: url('../Fonts/sbold.woff') format('woff');
-    font-weight: bold;
-    font-style: normal;
-}
-
+/* นำเข้า Font Sarabun จาก Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
 * {
     box-sizing: border-box;
-    font-family: 's';
+    font-family: 'Sarabun', sans-serif;
 }
 
 /*พื้นหลัง*/
-    body {
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(to bottom, #80CEC7, #93B8D2);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;   /* จัดให้อยู่กลางแนวตั้ง */
-      align-items: center;       /* จัดให้อยู่กลางแนวนอน */
-      font-family: 'Sarabun', sans-serif;
-    }
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom, #80CEC7, #93B8D2);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* เพิ่มส่วนนี้เพื่อทำให้เนื้อหาหลัก (main) ขยายตัว และจัดปฏิทินให้อยู่ตรงกลาง */
+main {
+    flex: 1; 
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    padding: 20px; 
+}
+
 
 /*แถบนำทางด้านบน*/
 .header {
     text-align: center;
     padding: 30px 20px;
+    width: 100%;
 }
 
 /* Logo AchieveHub */
@@ -43,18 +39,14 @@
     font-weight: bold;
     color: white;
     margin-bottom: 10px;
-    /* ให้เว้นระหว่างโลโก้กับปุ่ม */
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
-
 }
 
 .nav-container {
     display: flex;
     justify-content: center;
-    /* ให้เมนูอยู่กลาง */
     align-items: center;
     gap: 15px;
-    /* เว้นช่องว่างระหว่างกรอบปุ่มกับไอคอน */
 }
 
 .nav-menu {
@@ -94,23 +86,22 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-
+/* ปฏิทิน */
 iframe {
-    width: 700px;
-    height: 700px;
+    width: 90vw; /* ใช้ vw เพื่อให้ยืดหยุ่นตามขนาดหน้าจอ */
+    max-width: 900px; /* กำหนดความกว้างสูงสุด */
+    height: 80vh; /* ใช้ vh เพื่อให้ยืดหยุ่นตามขนาดหน้าจอ */
+    max-height: 700px; /* กำหนดความสูงสูงสุด */
     border: 0;
     border-radius: 12px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
 }
 
+/* footer */
 footer {
     background: rgba(255, 255, 255, 0.25);
-    /* สีขาวจาง ๆ */
     backdrop-filter: blur(12px);
-    /* ทำให้พื้นหลังเบลอ */
     -webkit-backdrop-filter: blur(12px);
-    /* Safari รองรับ */
-
     text-align: center;
     color: #333;
     font-size: 0.9rem;
