@@ -4,8 +4,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ข้อมูลนักศึกษา</title>
+  <title>ข้อมูลนักศึกษา - AchieveHub</title>
+
+  <!-- Google Fonts: Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Your CSS file -->
   <link rel="stylesheet" href="./CSS/my-students.css" />
 </head>
 
@@ -15,82 +21,92 @@
     <header class="header">
       <div class="logo">AchieveHub</div>
       <div class="nav-container">
-          <nav class="nav-menu">
-              <a href="advisor-dashboard.html" class="nav-button">หน้าแรก</a>
-              <a href="advisor-activities.html" class="nav-button">ตรวจสอบกิจกรรม</a>
-              <a href="" class="nav-button">ปฏิทินกิจกรรม</a>
-              <a href="" class="nav-button">เพิ่มกิจกรรม</a>
-          </nav>
-          <div class="logout-icon" id="user-icon" onclick="logout()">
-              <img src="./Image/LogOut.png" />
-          </div>
-      </div>
-  </header>
-    <!-- Dashboard Section -->
-    <div class="">
-      <div class="info-skill-container">
-        <section class="skill-box">
-          <h2>ข้อมูลนักศึกษา</h2>
-          <div class="student-profile">
-            <div class="profile-icon">👤</div>
-            <div class="student-details">
-              <p>ชื่อ: <span id="student-name">-</span></p>
-              <p>ชั้นปีที่กำลังศึกษา: <span id="student-year">-</span></p>
-              <p>คณะ: <span id="student-faculty">-</span></p>
-              <p>สาขา: <span id="student-department">-</span></p>
-            </div>
-          </div>
-        </section>
-
-        <section class="skill-box">
-          <h2>ทักษะปัจจุบัน</h2>
-          <div class="skill-stats">
-            <div class="circle-progress">
-              <svg width="100" height="100" id="progress-circle">
-                <circle cx="50" cy="50" r="45" stroke="#FFFFFF" stroke-width="10" fill="none" />
-                <circle id="progress-indicator" cx="50" cy="50" r="45" stroke="#0E8C7D" stroke-width="10" fill="none"
-                  stroke-dasharray="282.74" stroke-dashoffset="141.37" transform="rotate(-90 50 50)" />
-              </svg>
-              <div class="circle-text" id="progress-text">0/0</div>
-            </div>
-            <div class="skill-detail">
-              <p>ทักษะบังคับที่ผ่านแล้ว: <strong id="completed-required-skills">0</strong></p>
-              <p>ทักษะบังคับที่ยังไม่ผ่าน: <strong id="pending-required-skills">0</strong></p>
-              <p>ทักษะเพิ่มเติมที่ได้รับ: <strong id="completed-optional-skills">0</strong></p>
-              <p>. . .</p>
-            </div>
-          </div>
-        </section>
-      </div>
-
-    <!-- Requirement Notice -->
-    <div class="requirement-notice">
-      <strong>📋 เงื่อนไขการนับทักษะ:</strong>
-      กิจกรรมจะนับเข้าทักษะเมื่อ <strong>ยืนยันการเข้าร่วม</strong> และ <strong>ทำแบบประเมินเสร็จสิ้น</strong> เท่านั้น
-    </div>
-
-    <!-- Skills Detail Section -->
-    <div class="skills-detail-container">
-      <h2 class="section-title">ทักษะที่ได้รับ</h2>
-
-      <!-- ทักษะที่ได้ผ่านการทดสอบแล้ว -->
-      <div class="skills-section">
-        <h3>ทักษะที่ได้ผ่านการทดสอบแล้ว</h3>
-        <div id="completed-skills">
-          <div class="loading">กำลังโหลดข้อมูล...</div>
+        <nav class="nav-menu">
+          <a href="advisor-dashboard.html" class="nav-button">หน้าแรก</a>
+          <a href="advisor-activities.html" class="nav-button">ตรวจสอบกิจกรรม</a>
+          <a href="" class="nav-button">ปฏิทินกิจกรรม</a>
+          <a href="" class="nav-button">เพิ่มกิจกรรม</a>
+        </nav>
+        <div class="logout-icon" id="user-icon" onclick="logout()">
+          <img src="./Image/LogOut.png" />
         </div>
       </div>
+    </header>
 
-      <!-- ทักษะที่ยังไม่ได้ทำการทดสอบ -->
-      <div class="skills-section">
-        <h3>ทักษะที่ยังไม่ได้ทำการทดสอบ</h3>
-        <div id="pending-skills">
-          <div class="loading">กำลังโหลดข้อมูล...</div>
+    <!-- Main Content Area -->
+    <main>
+      <div class="content-wrapper">
+
+        <!-- Back button with history.back() functionality -->
+        <div class="back-button-container" onclick="location.href='advisor-dashboard.html'">
+          <img src="./Image/Backward.png" class="back-icon" alt="ย้อนกลับ">
+        </div>
+
+        <!-- Dashboard Section -->
+        <div class="info-skill-container">
+          <section class="skill-box">
+            <h2>ข้อมูลนักศึกษา</h2>
+            <div class="student-profile">
+              <div class="profile-icon">👤</div>
+              <div class="student-details">
+                <p>ชื่อ: <span id="student-name">-</span></p>
+                <p>ชั้นปีที่กำลังศึกษา: <span id="student-year">-</span></p>
+                <p>คณะ: <span id="student-faculty">-</span></p>
+                <p>สาขา: <span id="student-department">-</span></p>
+              </div>
+            </div>
+          </section>
+
+          <section class="skill-box">
+            <h2>ทักษะปัจจุบัน</h2>
+            <div class="skill-stats">
+              <div class="circle-progress">
+                <svg width="100" height="100" id="progress-circle">
+                  <circle cx="50" cy="50" r="45" stroke="#FFFFFF" stroke-width="10" fill="none" />
+                  <circle id="progress-indicator" cx="50" cy="50" r="45" stroke="#0E8C7D" stroke-width="10" fill="none"
+                    stroke-dasharray="282.74" stroke-dashoffset="141.37" transform="rotate(-90 50 50)" />
+                </svg>
+                <div class="circle-text" id="progress-text">0/0</div>
+              </div>
+              <div class="skill-detail">
+                <p>ทักษะบังคับที่ผ่านแล้ว: <strong id="completed-required-skills">0</strong></p>
+                <p>ทักษะบังคับที่ยังไม่ผ่าน: <strong id="pending-required-skills">0</strong></p>
+                <p>ทักษะเพิ่มเติมที่ได้รับ: <strong id="completed-optional-skills">0</strong></p>
+                <p>...</p>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Requirement Notice -->
+        <div class="requirement-notice">
+          <strong>📋 เงื่อนไขการนับทักษะ:</strong>
+          กิจกรรมจะนับเข้าทักษะเมื่อ <strong>ยืนยันการเข้าร่วม</strong> และ <strong>ทำแบบประเมินเสร็จสิ้น</strong>
+          เท่านั้น
+        </div>
+
+        <!-- Skills Detail Section -->
+        <div class="skills-detail-container">
+          <h2 class="section-title">ทักษะที่นักศึกษาได้รับ</h2>
+
+          <!-- Skills section -->
+          <div class="skills-section">
+            <h3>ทักษะที่ได้ผ่านการทดสอบแล้ว</h3>
+            <div id="completed-skills">
+              <div class="loading">กำลังโหลดข้อมูล...</div>
+            </div>
+          </div>
+
+          <div class="skills-section">
+            <h3>ทักษะที่ยังไม่ได้ทำการทดสอบ</h3>
+            <div id="pending-skills">
+              <div class="loading">กำลังโหลดข้อมูล...</div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </main>
   </div>
-</div>
 
   <footer>
     <p>AchieveHub ©2025<br>CS361</p>
@@ -99,7 +115,6 @@
   </footer>
 
   <script src="../JS/my-students.js"></script>
-  
 </body>
 
 </html>

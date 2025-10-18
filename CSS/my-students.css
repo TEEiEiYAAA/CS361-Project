@@ -1,383 +1,267 @@
-@font-face {
-  font-family: 's';
-  src: url('../Fonts/s.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 's';
-  src: url('../Fonts/sbold.woff') format('woff');
-  font-weight: bold;
-  font-style: normal;
-}
-
-
+/* ======= RESET & BASE STYLES ======= */
 * {
-  box-sizing: border-box;
-  font-family: 's';
+    box-sizing: border-box;
+    font-family: 'Sarabun', sans-serif; /* <-- Set Sarabun as default font */
 }
 
-/*พื้นหลัง*/
 body {
-  margin: 0;
-  padding: 0;
-  background: linear-gradient(to bottom, #80CEC7, #93B8D2);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom, #80CEC7, #93B8D2);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-/*แถบนำทางด้านบน*/
+
+/* ======= HEADER & NAVIGATION ======= */
 .header {
-  text-align: center;
-  padding: 30px 20px;
+    text-align: center;
+    padding: 30px 20px;
 }
 
-/* Logo AchieveHub */
 .logo {
-  font-size: 45px;
-  font-weight: bold;
-  color: white;
-  margin-bottom: 10px;
-  /* ให้เว้นระหว่างโลโก้กับปุ่ม */
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
-
+    font-size: 45px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
 }
 
 .nav-container {
-  display: flex;
-  justify-content: center;
-  /* ให้เมนูอยู่กลาง */
-  align-items: center;
-  gap: 15px;
-  /* เว้นช่องว่างระหว่างกรอบปุ่มกับไอคอน */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
 }
 
 .nav-menu {
-  display: inline-flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 40px;
-  font-size: 16px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 40px;
+    font-size: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .nav-button {
-  text-decoration: none;
-  background: transparent;
-  border: none;
-  font-size: 16px;
-  padding: 10px 18px;
-  border-radius: 25px;
-  cursor: pointer;
-  transition: 0.3s;
-  color: #000;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    padding: 10px 18px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: 0.3s;
+    color: #000;
 }
 
 .nav-button.active,
 .nav-button:hover {
-  background: white;
-  font-weight: bold;
-  color: #37798B;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background: white;
+    font-weight: bold;
+    color: #37798B;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .logout-icon img {
-  width: 40px;
-  height: 40px;
-  border-radius: 27%;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    width: 40px;
+    height: 40px;
+    border-radius: 27%;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-/*CENTER PLEASE*/
-/*CENTER PLEASE*/
-/*CENTER PLEASE*/
-/*CENTER PLEASE*/
-/*CENTER PLEASE*/
 
-.container {
-  flex: 1;
-  /* ขยายให้เต็มพื้นที่ก่อน footer */
-  width: 100%;
-  max-width: 70%;
-  margin: 0 auto;
-  padding: 2rem;
-  background: transparent;
-}
-
+/* ======= MAIN LAYOUT & CONTENT ======= */
 .main-container {
-  max-width: 70%;
-  width: 100%;
-  margin: 0 auto;
+    max-width: 70%;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* Allow container to grow */
 }
 
-/* Dashboard Section */
-.dashboard-container {
-  padding: 0rem 2rem 0rem 4rem;
-  margin: 1rem 0;
+main {
+    flex: 1;
 }
 
+.content-wrapper {
+    position: relative; /* <-- Positioning context for the back button */
+    padding-top: 1rem; /* Add some space for the back button */
+}
+
+/* --- Back Button --- */
+.back-button-container {
+    position: absolute;
+    z-index: 10;
+    width: 50px;
+    height: 50px;
+    background-color: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    top: 0px;  /* Adjust position to be relative to content */
+    left: -25px; /* Adjust position */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.back-button-container:hover {
+    transform: scale(1.05);
+}
+
+.back-icon {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
+    transition: filter 0.2s ease;
+}
+
+
+/* --- Dashboard Section --- */
 .info-skill-container {
-  display: flex;
-  gap: 2rem;
-  margin-bottom: 2rem;
-}
-
-.student-info-box {
-  flex: 1;
-  background-color: white;
-  border-radius: 15px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.student-profile {
-  display: flex;
-  gap: 25px;
-}
-
-.profile-icon {
-  font-size: 48px;
-  color: #4CAF50;
-  margin-top: 4px;
-}
-
-.student-details p {
-  margin: 8px 0;
-  font-weight: normal;
-  color: #333;
-}
-
-.student-details span {
-  font-weight: bold;
-  color: #333;
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
 }
 
 .skill-box {
-  flex: 1;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  height: fit-content;
+    flex: 1;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    height: fit-content;
 }
 
 .skill-box h2 {
-  color: #333;
-  margin-bottom: 1rem;
-  font-size: 1.3rem;
+    color: #004D40;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    margin-top: 0;
+}
+
+.student-profile {
+    display: flex;
+    gap: 25px;
+}
+
+.profile-icon {
+    font-size: 48px;
+    color: #4CAF50;
+    margin-top: 4px;
+}
+
+.student-details p {
+    margin: 8px 0;
+    color: #333;
+}
+
+.student-details span {
+    font-weight: bold;
 }
 
 .skill-stats {
-  display: flex;
-  gap: 2rem;
-  align-items: center;
-  margin-top: 1rem;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    margin-top: 1rem;
 }
 
 .circle-progress {
-  position: relative;
-  width: 100px;
-  height: 100px;
+    position: relative;
+    width: 100px;
+    height: 100px;
 }
 
 .circle-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 1.2rem;
-  font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2rem;
+    font-weight: bold;
 }
 
 .skill-detail p {
-  margin: 0.5rem 0;
+    margin: 0.5rem 0;
 }
 
-.skill-box h2 {
-  margin-top: 0;
-  /* ลบระยะห่างด้านบนของ h2 เพื่อให้ชิดขอบกล่อง */
-  color: #004D40;
-  /* สีตัวอักษร */
+
+/* --- Requirement Notice --- */
+.requirement-notice {
+    background: rgba(255, 255, 255, 0.7);
+    color: #444;
+    border-left: 5px solid #37798B;
+    padding: 15px;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+
+/* --- Skills Detail Section --- */
+.skills-detail-container {
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    padding: 2rem;
+    margin: 1rem 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .section-title {
-  font-size: 1.8rem;
-  font-weight: bold;
-  margin-bottom: 2rem;
-  color: #333;
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: #333;
 }
 
 .skills-section {
-  margin-bottom: 2rem;
+    margin-bottom: 2rem;
 }
 
 .skills-section h3 {
-  font-size: 1.3rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-  color: #333;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #333;
 }
 
-.skill-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-  margin-bottom: 0.8rem;
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.skill-left {
-  display: flex;
-  align-items: center;
-  flex: 1;
-}
-
-.skill-checkbox {
-  width: 20px;
-  height: 20px;
-  margin-right: 1rem;
-  accent-color: #4CAF50;
-}
-
-.skill-info {
-  flex: 1;
-}
-
-.skill-name {
-  font-weight: bold;
-  font-size: 1.1rem;
-  color: #333;
-  margin-bottom: 0.3rem;
-}
-
-.skill-description {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.skill-status {
-  font-size: 0.8rem;
-  color: #888;
-  margin-top: 0.2rem;
-  font-style: italic;
-}
-
-/* Skills Detail Section */
-.skills-detail-container {
-  background-color: rgba(255, 255, 255, 0.6);
-  border-radius: 20px;
-  padding: 2rem 2rem 2rem 4rem;
-  margin: 1rem 0;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.activity-count {
-  background-color: #f0f0f0;
-  border: 2px solid #ddd;
-  border-radius: 25px;
-  padding: 0.5rem 1rem;
-  font-weight: bold;
-  font-size: 1rem;
-  min-width: 60px;
-  text-align: center;
-}
-
-.activity-count.completed {
-  background-color: #4CAF50;
-  color: white;
-  border-color: #4CAF50;
-}
-
-.activity-count.in-progress {
-  background-color: #FF9800;
-  color: white;
-  border-color: #FF9800;
-}
-
-/* Loading & Error States */
 .loading {
-  text-align: center;
-  padding: 2rem;
-  color: #666;
-  font-style: italic;
-}
-
-.error-message {
-  color: #f44336;
-  background-color: #ffebee;
-  padding: 1rem;
-  border-radius: 10px;
-  text-align: center;
-  margin: 1rem 0;
-}
-
-.empty-message {
-  text-align: center;
-  padding: 2rem;
-  color: #666;
-  font-style: italic;
-}
-
-/* Requirement notice */
-.requirement-notice {
-  background: rgba(255, 255, 255, 0.7);
-  color: #444;
-  border-left: 5px solid #37798B;
-  padding: 15px;
-  margin-bottom: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-/* Footer */
-footer {
-  background: rgba(255, 255, 255, 0.25);
-  /* สีขาวจาง ๆ */
-  backdrop-filter: blur(12px);
-  /* ทำให้พื้นหลังเบลอ */
-  -webkit-backdrop-filter: blur(12px);
-  /* Safari รองรับ */
-
-  text-align: center;
-  color: #333;
-  font-size: 0.9rem;
-  padding: 1.25rem;
-  border-radius: 16px 16px 0 0;
-  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
-  width: 100%;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .main-container {
-    max-width: 95%;
-    padding: 0 10px;
-  }
-
-  .dashboard-container,
-  .skills-detail-container {
-    padding: 1.5rem;
-  }
-
-  .info-skill-container {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .skill-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-
-  .activity-count {
-    align-self: stretch;
     text-align: center;
-  }
+    padding: 2rem;
+    color: #666;
+    font-style: italic;
+}
+
+
+/* ======= FOOTER ======= */
+footer {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    text-align: center;
+    color: #333;
+    font-size: 0.9rem;
+    padding: 1.25rem;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+    width: 100%;
+}
+
+
+/* ======= RESPONSIVE ======= */
+@media (max-width: 768px) {
+    .main-container {
+        max-width: 95%;
+    }
+
+    .info-skill-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
 }

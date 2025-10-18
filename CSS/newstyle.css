@@ -1,226 +1,167 @@
-@font-face {
-  font-family: 's';
-  src: url('../Fonts/s.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-}
+/* --- ส่วนของการนำเข้าฟอนต์ --- */
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
-@font-face {
-  font-family: 's';
-  src: url('../Fonts/sbold.woff') format('woff');
-  font-weight: bold;
-  font-style: normal;
-}
-
-
+/* --- การตั้งค่าเริ่มต้นสำหรับทุกองค์ประกอบ --- */
 * {
-  box-sizing: border-box;
-  font-family: 's';
+    box-sizing: border-box;
+    font-family: 'Sarabun', sans-serif;
 }
 
-/*พื้นหลัง*/
+/* --- การตั้งค่าพื้นหลังและโครงหน้าเว็บหลัก --- */
 body {
-  margin: 0;
-  padding: 0;
-  background: linear-gradient(to bottom, #80CEC7, #93B8D2);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom, #80CEC7, #93B8D2);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-/*แถบนำทางด้านบน*/
+/* --- ส่วนหัวของเว็บ (Header) --- */
 .header {
-  text-align: center;
-  padding: 30px 20px;
+    text-align: center;
+    padding: 30px 20px;
 }
 
-/* Logo AchieveHub */
 .logo {
-  font-size: 45px;
-  font-weight: bold;
-  color: white;
-  margin-bottom: 10px;
-  /* ให้เว้นระหว่างโลโก้กับปุ่ม */
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
-
+    font-size: 45px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
 }
 
 .nav-container {
-  display: flex;
-  justify-content: center;
-  /* ให้เมนูอยู่กลาง */
-  align-items: center;
-  gap: 15px;
-  /* เว้นช่องว่างระหว่างกรอบปุ่มกับไอคอน */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
 }
 
 .nav-menu {
-  display: inline-flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 40px;
-  font-size: 16px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 40px;
+    font-size: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .nav-button {
-  text-decoration: none;
-  background: transparent;
-  border: none;
-  font-size: 16px;
-  padding: 10px 18px;
-  border-radius: 25px;
-  cursor: pointer;
-  transition: 0.3s;
-  color: #000;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: 0.3s;
+    color: #000;
 }
 
 .nav-button.active,
 .nav-button:hover {
-  background: white;
-  font-weight: bold;
-  color: #37798B;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background: white;
+    font-weight: bold;
+    color: #37798B;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .logout-icon img {
-  width: 40px;
-  height: 40px;
-  border-radius: 27%;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    width: 40px;
+    height: 40px;
+    border-radius: 27%;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-/*CENTER PLEASE*/
-/*CENTER PLEASE*/
-/*CENTER PLEASE*/
-/*CENTER PLEASE*/
-/*CENTER PLEASE*/
-
-.container {
-  flex: 1;
-  /* ขยายให้เต็มพื้นที่ก่อน footer */
-  width: 100%;
-  max-width: 70%;
-  margin: 0 auto;
-  padding: 2rem;
-  background: transparent;
-}
-
+/* --- ส่วนเนื้อหาหลัก (Container) --- */
 .main-container {
-  max-width: 70%;
-  width: 100%;
-  margin: 0 auto;
+    max-width: 70%;
+    width: 100%;
+    margin: 0 auto;
 }
 
-/*BOXXXXX PAGE1*/
-/*BOXXXXX PAGE1*/
-/*BOXXXXX PAGE1*/
-/*BOXXXXX PAGE1*/
-/*BOXXXXX PAGE1*/
 
+/* --- กล่องข้อมูลในหน้าแรก --- */
 .info-skill-container {
-  display: flex;
-  gap: 30px;
-  margin-bottom: 2rem;
+    display: flex;
+    gap: 30px;
+    margin-bottom: 2rem;
 }
-
-.student-info-box {
-  flex: 0 0 auto;
-  max-width: 400px;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 12px;
-  padding: 20px 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: flex-start;
-  height: fit-content !important;
-}
-
 
 .student-profile {
-  display: flex;
-  gap: 25px;
+    display: flex;
+    gap: 25px;
 }
 
 .profile-icon {
-  font-size: 48px;
-  color: #4CAF50;
-  margin-top: 4px;
+    font-size: 48px;
+    color: #4CAF50;
+    margin-top: 4px;
 }
 
 .student-details p {
-  margin: 8px 0;
-  font-weight: normal;
-  color: #333;
+    margin: 8px 0;
+    font-weight: normal;
+    color: #333;
 }
 
 .student-details span {
-  font-weight: bold;
-  color: #333;
+    font-weight: bold;
+    color: #333;
 }
 
 .skill-box {
-  flex: 1;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  height: fit-content;
-}
-
-.skill-stats {
-  display: flex;
-  gap: 2rem;
-  align-items: center;
-  margin-top: 1rem;
-}
-
-.circle-progress {
-  position: relative;
-  width: 100px;
-  height: 100px;
-}
-
-.circle-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
-.skill-detail p {
-  margin: 0.5rem 0;
+    flex: 1;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    height: fit-content;
 }
 
 .skill-box h2 {
-  margin-top: 0;
-  /* ลบระยะห่างด้านบนของ h2 เพื่อให้ชิดขอบกล่อง */
-  color: #004D40;
-  /* สีตัวอักษร */
+    margin-top: 0;
+    color: #004D40;
 }
 
-/*FOOTER*/
-/*FOOTER*/
-/*FOOTER*/
-/*FOOTER*/
-/*FOOTER*/
+.skill-stats {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    margin-top: 1rem;
+}
 
+.circle-progress {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+
+.circle-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.skill-detail p {
+    margin: 0.5rem 0;
+}
+
+/* --- ส่วนท้ายของเว็บ (Footer) --- */
 footer {
-  background: rgba(255, 255, 255, 0.25);
-  /* สีขาวจาง ๆ */
-  backdrop-filter: blur(12px);
-  /* ทำให้พื้นหลังเบลอ */
-  -webkit-backdrop-filter: blur(12px);
-  /* Safari รองรับ */
-
-  text-align: center;
-  color: #333;
-  font-size: 0.9rem;
-  padding: 1.25rem;
-  border-radius: 16px 16px 0 0;
-  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
-  width: 100%;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    text-align: center;
+    color: #333;
+    font-size: 0.9rem;
+    padding: 1.25rem;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+    width: 100%;
 }
+

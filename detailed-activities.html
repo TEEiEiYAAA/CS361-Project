@@ -2,43 +2,55 @@
 <html lang="th">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>รายละเอียดกิจกรรม</title>
-  <link rel="stylesheet" href="./CSS/detailed-activities.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>รายละเอียดกิจกรรม</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="./CSS/detailed-activities.css" />
 </head>
 
 <body>
-  <div class="main-container">
-    <header class="header">
-      <div class="logo">AchieveHub</div>
-        <div class="nav-container">
-          <nav class="nav-menu">
-            <a href="student-dashboard.html" class="nav-button">หน้าแรก</a>
-            <a href="recommend-activities.html" class="nav-button">กิจกรรมที่แนะนำ</a>
-            <a href="calendar.html" class="nav-button">ปฏิทินกิจกรรม</a>
-            <a href="my-activities.html" class="nav-button active">กิจกรรมของฉัน</a>
-            <a href="current-skill.html" class="nav-button">ทักษะปัจจุบัน</a>
-          </nav>
-          <div class="logout-icon" id="user-icon" onclick="logout()">
-          <img src="./Image/LogOut.png" />
+    <div class="main-container">
+        <header class="header">
+            <div class="logo">AchieveHub</div>
+            <div class="nav-container">
+                <nav class="nav-menu">
+                    <a href="student-dashboard.html" class="nav-button">หน้าแรก</a>
+                    <a href="recommend-activities.html" class="nav-button">กิจกรรมที่แนะนำ</a>
+                    <a href="calendar.html" class="nav-button">ปฏิทินกิจกรรม</a>
+                    <a href="my-activities.html" class="nav-button">กิจกรรมของฉัน</a>
+                    <a href="current-skill.html" class="nav-button">ทักษะปัจจุบัน</a>
+                </nav>
+                <div class="logout-icon" id="user-icon" onclick="logout()">
+                    <img src="./Image/LogOut.png" />
+                </div>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+
+            <div class="back-button-container" onclick="location.href='recommend-activities.html'">
+                <img src="./Image/Backward.png" class="back-icon" alt="ย้อนกลับ">
+            </div>
+
+            <div class="content-container" id="main-content">
+                <div class="loading">กำลังโหลดรายละเอียดกิจกรรม...</div>
+            </div>
+
         </div>
-      </div>
-    </header>
-
-    <!-- Main Content -->
-    <div class="content-container" id="main-content">
-      <div class="loading">กำลังโหลดรายละเอียดกิจกรรม...</div>
     </div>
-  </div>
 
-  <footer>
-    <p>AchieveHub ©2025<br>CS361</p>
-    <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194
-      นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
-  </footer>
+    <footer>
+        <p>AchieveHub ©2025<br>CS361</p>
+        <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194
+            นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
+    </footer>
 
-  <script src="../JS/detailed-activities.js"></script>
+    <script src="../JS/detailed-activities.js"></script>
 </body>
 
 </html>

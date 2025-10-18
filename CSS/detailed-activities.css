@@ -1,33 +1,21 @@
-@font-face {
-  font-family: 's';
-  src: url('../Fonts/s.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 's';
-  src: url('../Fonts/sbold.woff') format('woff');
-  font-weight: bold;
-  font-style: normal;
-}
-
+/* ======= RESET & BASE STYLES ======= */
 * {
   box-sizing: border-box;
-  font-family: s;
   margin: 0;
   padding: 0;
 }
 
 body {
+  font-family: 'Sarabun', sans-serif;
+  /* <-- Set Sarabun as default font */
   background: linear-gradient(to bottom, #80CEC7, #93B8D2);
   min-height: 100vh;
-  margin: 0;
-  padding: 0;
   display: flex;
   flex-direction: column;
 }
 
+
+/* ======= MAIN LAYOUT & HEADER ======= */
 .main-container {
   max-width: 70%;
   width: 100%;
@@ -37,6 +25,7 @@ body {
   flex-direction: column;
   padding: 0 20px;
   position: relative;
+  /* This can be the positioning context */
 }
 
 .header {
@@ -88,38 +77,6 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.user-icon {
-  background-color: white;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  font-size: 1.2rem;
-}
-
-.back-btn {
-  background-color: white;
-  border-radius: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  border: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: absolute;
-  top: 4rem;
-  left: 4px;
-  z-index: 20;
-}
-
-.back-btn img {
-  width: 45px;
-  height: 45px;
-}
-
 .logout-icon img {
   width: 40px;
   height: 40px;
@@ -128,17 +85,57 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* Main Content */
-.content-container {
-  background-color: rgba(240, 240, 240, 0.95);
-  border-radius: 20px;
-  padding: 2rem 2rem 2rem 4rem;
-  margin: 1rem 0;
+/* ======= CONTENT & BACK BUTTON ======= */
+
+/* --- Wrapper for positioning --- */
+.content-wrapper {
+  position: relative;
   flex: 1;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  /* Make wrapper fill available space */
+  display: flex;
+  flex-direction: column;
 }
 
-/* เพิ่ม CSS สำหรับ loading และ error states */
+/* --- Back Button (As requested) --- */
+.back-button-container {
+  position: absolute;
+  z-index: 10;
+  width: 50px;
+  height: 50px;
+  background-color: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  top: -6px;
+  left: -20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.back-button-container:hover {
+  transform: scale(1.05);
+}
+
+.back-icon {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
+  transition: filter 0.2s ease;
+}
+
+
+/* --- Main Content Box --- */
+.content-container {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  padding: 20px 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 1rem 0;
+  flex: 1;
+}
+
 .loading,
 .error-message {
   text-align: center;
@@ -147,46 +144,12 @@ body {
   font-size: 1.1rem;
 }
 
-.error-message {
-  color: #f44336;
-  background-color: #ffebee;
-  border-radius: 10px;
-  margin: 1rem 0;
-}
-
-.retry-btn {
-  margin-top: 1rem;
-  padding: 10px 20px;
-  background: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-.retry-btn:hover {
-  background: #45a049;
-}
-
+/* Other detailed styles... */
 .skill-image {
   width: 100%;
   height: 200px;
   object-fit: cover;
   border-radius: 10px;
-  margin-bottom: 1rem;
-}
-
-.img-placeholder {
-  width: 100%;
-  height: 200px;
-  background-color: #f0f0f0;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3rem;
-  color: #999;
   margin-bottom: 1rem;
 }
 
@@ -209,37 +172,6 @@ body {
   color: #4CAF50;
   margin-bottom: 0.5rem;
   font-size: 1.3rem;
-}
-
-.activity-info p {
-  margin: 0.3rem 0;
-  line-height: 1.5;
-  color: #333;
-}
-
-.skill-detail {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  color: #666;
-  margin-bottom: 1.5rem;
-}
-
-.skill-badge {
-  display: inline-block;
-  padding: 5px 12px;
-  border-radius: 15px;
-  font-size: 0.8rem;
-  font-weight: bold;
-  color: white;
-  margin: 0.5rem 0;
-}
-
-.skill-badge.soft-skill {
-  background-color: #FF6B6B;
-}
-
-.skill-badge.hard-skill {
-  background-color: #4ECDC4;
 }
 
 .join-button {
@@ -265,14 +197,12 @@ body {
   cursor: not-allowed;
 }
 
-/* Footer */
+
+/* ======= FOOTER ======= */
 footer {
   background: rgba(255, 255, 255, 0.25);
-  /* สีขาวจาง ๆ */
   backdrop-filter: blur(12px);
-  /* ทำให้พื้นหลังเบลอ */
   -webkit-backdrop-filter: blur(12px);
-  /* Safari รองรับ */
   text-align: center;
   color: #333;
   font-size: 0.9rem;
@@ -282,7 +212,7 @@ footer {
   width: 100%;
 }
 
-/* Responsive */
+/* ======= RESPONSIVE ======= */
 @media (max-width: 768px) {
   .main-container {
     max-width: 95%;
@@ -295,9 +225,5 @@ footer {
 
   .activity-name {
     font-size: 1.5rem;
-  }
-
-  .back-btn {
-    top: 7rem;
   }
 }
