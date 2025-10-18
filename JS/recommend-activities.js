@@ -136,48 +136,126 @@
             
             activitiesList.innerHTML = html;
         }
+
+        // ==== PLO full-name map ====
+        const PLO_NAME_MAP = {
+            PLO1: 'ความรู้พื้นฐานด้านการเขียนโปรแกรม',
+            PLO2: 'ทักษะการพัฒนาและออกแบบระบบ',
+            PLO3: 'ความรับผิดชอบและจริยธรรมวิชาชีพ',
+            PLO4: 'การทำงานร่วมกับผู้อื่นและภาวะผู้นำ',
+        };
+        
+        // ดึง PLO จาก activity (รองรับ array, JSON string, "PLO1,PLO2")
+        function extractPLOs(activity) {
+            const raw = activity.plo || activity.plos || activity.PLO || activity.PLOs || [];
+            if (Array.isArray(raw)) return raw.map(x => String(x).trim().toUpperCase());
+            if (typeof raw === 'string') {
+            const s = raw.trim();
+            try { const parsed = JSON.parse(s); if (Array.isArray(parsed)) return parsed.map(x => String(x).trim().toUpperCase()); } catch(_) {}
+            return s.split(',').map(x => x.trim().toUpperCase()).filter(Boolean);
+            }
+            return [];
+        }
+        
+        function getPloFullNames(plos) {
+            return plos.map(code => PLO_NAME_MAP[code] || code);
+        }
+        
+        // แสดงชื่อระดับบน badge
+        function getLevelDisplay(levelRaw) {
+            const level = (levelRaw || '').trim();
+            if (!level) return '';
+            return level === 'กลาง' ? 'ปานกลาง' : level; // ให้ขึ้นคำว่า “ปานกลาง”
+        }
+        function getLevelClass(levelRaw) {
+            const l = (levelRaw || '').trim();
+            if (l === 'พื้นฐาน') return 'level-basic';
+            if (l === 'กลาง')    return 'level-medium';
+            if (l === 'ขั้นสูง')  return 'level-advanced';
+            return '';
+        }
+        
         
         // Create individual activity card HTML
         function createActivityCard(activity) {
-            // Format date and time
-            const formattedDate = formatDateTime(activity.startDateTime);
-            
-            // Determine skill badge
+            // ==== เวลา/ปุ่มสมัคร ====
+            const now   = new Date();
+            const start = activity.startDateTime ? new Date(activity.startDateTime) : null;
+            const end   = activity.endDateTime ? new Date(activity.endDateTime)   : null;
+        
+            let btnText = 'สมัครเข้าร่วม';
+            let btnDisabled = false;
+            if (start && now >= start) {
+            btnDisabled = true;
+            btnText = (end && now <= end) ? 'กำลังจัดกิจกรรม' : 'ปิดรับสมัครแล้ว';
+            }
+        
+            // ==== วันที่ ====
+            const formattedStart = formatDateTime(activity.startDateTime);
+            const formattedEnd   = formatDateTime(activity.endDateTime);
+            const dateRange = activity.endDateTime ? `${formattedStart} – ${formattedEnd}` : formattedStart;
+        
+            // ==== Badge หมวดทักษะ ====
             const skillCategory = activity.skillCategory || '';
             const skillBadgeClass = skillCategory.toLowerCase().replace(' ', '-');
-            const skillDisplayName = skillCategory === 'soft skill' ? 'Soft Skill' : 
-                                   skillCategory === 'hard skill' ? 'Hard Skill' : 
-                                   'ทักษะทั่วไป';
-            
-            // Create image HTML
+            const skillDisplayName =
+            skillCategory === 'soft skill' ? 'Soft Skill' :
+            skillCategory === 'hard skill' ? 'Hard Skill' :
+            skillCategory === 'multi-skill' ? 'Multi-Skill' : 'ทักษะทั่วไป';
+
+            // ==== Badge ระดับ ====
+            const levelDisplay = getLevelDisplay(activity.level);
+            const levelClass   = getLevelClass(activity.level);
+            const levelBadge   = levelDisplay ? `<div class="level-badge ${levelClass}">${levelDisplay}</div>` : '';
+
+        
+            // ==== รูป ====
             const imageUrl = activity.imageUrl || null;
-            const imageHtml = imageUrl ? 
-                `style="background-image: url('${imageUrl}')"` : 
-                '';
+            const imageHtml = imageUrl ? `style="background-image: url('${imageUrl}')"` : '';
             const placeholderIcon = imageUrl ? '' : '🖼️';
-            
-            return `
-                <div class="activity-card" onclick="viewActivityDetail('${activity.activityId}')" style="cursor: pointer;">
-                    <div class="activity-image" ${imageHtml}>
-                        ${placeholderIcon}
-                        ${skillCategory ? `<div class="skill-badge ${skillBadgeClass}">${skillDisplayName}</div>` : ''}
-                    </div>
-                    <div class="activity-content">
-                        <h3 class="activity-title">${activity.name || 'ไม่มีชื่อกิจกรรม'}</h3>
-                        <p class="activity-description">${activity.description || 'ไม่มีคำอธิบาย'}</p>
-                        <div class="activity-meta">
-                            <div class="activity-date">📅 ${formattedDate}</div>
-                            <div class="activity-location">📍 ${activity.location || 'ไม่ระบุสถานที่'}</div>
-                            ${activity.skillName ? `<div class="activity-skill">🎯 ${activity.skillName}</div>` : ''}
-                        </div>
-                        <button class="register-btn" onclick="event.stopPropagation(); registerForActivity('${activity.activityId}', '${activity.name}')">
-                            สมัครเข้าร่วม
-                        </button>
-                    </div>
+        
+            // ==== ทักษะที่ได้รับ (PLO → ชื่อเต็ม) ====
+            const plos = extractPLOs(activity);
+            const ploFullNames = getPloFullNames(plos);
+            const ploHtml = ploFullNames.length
+            ? `<div class="plo-section">
+                <div class="plo-title">ทักษะที่ได้รับ:</div>
+                <div class="plo-values">
+                    ${ploFullNames.map(n => `<div class="plo-item">• ${n}</div>`).join('')}
                 </div>
+                </div>`
+            : '';
+        
+            // ==== ปุ่มสมัคร ====
+            const buttonHtml = btnDisabled
+            ? `<button class="register-btn disabled" disabled>${btnText}</button>`
+            : `<button class="register-btn" onclick="event.stopPropagation(); registerForActivity('${activity.activityId}', '${activity.name}')">${btnText}</button>`;
+        
+            return `
+            <div class="activity-card" onclick="viewActivityDetail('${activity.activityId}')" style="cursor: pointer;">
+                <div class="activity-image" ${imageHtml}>
+                ${placeholderIcon}
+                ${levelBadge}
+                ${skillCategory ? `<div class="skill-badge ${skillBadgeClass}">${skillDisplayName}</div>` : ''}
+                </div>
+                <div class="activity-content">
+                <h3 class="activity-title">${activity.name || 'ไม่มีชื่อกิจกรรม'}</h3>
+                <p class="activity-description">${activity.description || 'ไม่มีคำอธิบาย'}</p>
+        
+                <div class="activity-meta">
+                    <div class="activity-date">📅 ${dateRange}</div>
+                    <div class="activity-location">📍 ${activity.location || 'ไม่ระบุสถานที่'}</div>
+                    ${activity.skillName ? `<div class="activity-skill">🎯 ${activity.skillName}</div>` : ''}
+
+                    ${ploHtml}
+                </div>
+        
+                ${buttonHtml}
+                </div>
+            </div>
             `;
         }
-        
+                
         // Format date and time
         function formatDateTime(dateTimeString) {
             if (!dateTimeString) return 'ไม่ระบุเวลา';
