@@ -9,6 +9,28 @@
     
     // Global variables
     let currentUser = null;
+
+    let allActivities = [];         // ✅ เก็บทั้งหมดไว้
+    let currentFilter = 'upcoming'; // ✅ ค่าเริ่มต้นแท็บ
+
+    // สถานะวงจรชีวิตของกิจกรรม (จากกิจกรรมจริง + การเข้าร่วมของผู้ใช้)
+    function getLifecycleState(a) {
+      const now = new Date();
+      const start = a.startDateTime ? new Date(a.startDateTime) : null;
+      const end   = a.endDateTime ? new Date(a.endDateTime)   : null;
+
+      // ยังไม่เริ่ม
+      if (start && now < start) return 'UPCOMING';
+
+      // เริ่มแล้ว (กำลังจัด)
+      if (start && now >= start && (!end || now <= end)) {
+        return 'IN_PROGRESS';
+      }
+
+      // จบแล้ว
+      return 'ENDED';
+    }
+
     
     // Initialize application
     document.addEventListener('DOMContentLoaded', function() {
@@ -17,17 +39,28 @@
     
     // Initialize the application
     function initializeApp() {
-      // Check login status
       currentUser = JSON.parse(localStorage.getItem('userData') || '{}');
-      
       if (!currentUser.studentId && !currentUser.userId) {
         redirectToLogin();
         return;
       }
-      
+      setupTabButtons(); // ✅ new
       const studentId = currentUser.studentId || currentUser.userId;
       loadUserActivities(studentId);
     }
+    
+    function setupTabButtons() {
+      const tabButtons = document.querySelectorAll('.tab-btn');
+      tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          tabButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentFilter = btn.dataset.filter; // 'upcoming' | 'inprogress' | 'done'
+          filterAndRender(); // ✅ render ใหม่ตามแท็บ
+        });
+      });
+    }
+    
     
     // Redirect to login page
     function redirectToLogin() {
@@ -36,7 +69,55 @@
     
     // Load user activities from API
     async function loadUserActivities(studentId) {
-      const activitiesList = document.getElementById('activities-list');
+      const list = document.getElementById('activities-list');
+      try {
+        list.innerHTML = '<div class="loading">กำลังโหลดข้อมูล...</div>';
+        const apiUrl = CONFIG.API_BASE_URL + CONFIG.ENDPOINTS.STUDENT_ACTIVITIES.replace('{studentId}', studentId);
+        const resp = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+        const activities = await resp.json();
+    
+        allActivities = activities || [];          // ✅ เก็บไว้ก่อน
+        filterAndRender();                         // ✅ เรนเดอร์ตามแท็บ
+    
+      } catch (err) {
+        console.error('Error loading activities:', err);
+        showError(err.message, studentId);
+      }
+    }
+    
+    // กรองตามแท็บ + เรนเดอร์
+    function filterAndRender() {
+      const list = document.getElementById('activities-list');
+      list.innerHTML = '';
+    
+      // แยกกิจกรรมตามสถานะเวลา + ค่าสถานะผู้ใช้
+      const items = allActivities.filter(a => {
+        const life = getLifecycleState(a); // UPCOMING/IN_PROGRESS/ENDED
+        if (currentFilter === 'upcoming') {
+          return life === 'UPCOMING';
+        } else if (currentFilter === 'inprogress') {
+          return life === 'IN_PROGRESS';
+        } else {
+          // done tab: เงื่อนไขคือ "จบแล้ว" + "ทำแบบทดสอบแล้ว"
+          return life === 'ENDED' && !!a.quizCompleted;
+        }
+      });
+    
+      if (items.length === 0) {
+        list.innerHTML = `<div class="empty-message">ไม่มีรายการในหมวดนี้</div>`;
+        return;
+      }
+    
+      items.forEach(a => list.appendChild(createActivityElement(a)));
+    }
+    
       
       try {
         // Show loading state
@@ -71,7 +152,6 @@
         console.error('Error loading activities:', error);
         showError(error.message, studentId);
       }
-    }
     
     // Display activities list
     function displayActivities(activities) {
@@ -148,29 +228,45 @@
     }
     
     // Get button state based on activity status
-    function getButtonState(activity) {
-      if (activity.isConfirmed) {
-        if (activity.surveyCompleted) {
-          return {
-            class: 'activity-button',
-            text: 'ทำแบบประเมินแล้ว',
-            disabled: true
-          };
-        } else {
-          return {
-            class: 'activity-button active',
-            text: 'ทำแบบประเมิน',
-            disabled: false
-          };
-        }
-      } else {
-        return {
-          class: 'activity-button',
-          text: 'โปรดยืนยันการเข้าร่วมก่อน',
-          disabled: false
-        };
+    function getButtonState(a) {
+      const life = getLifecycleState(a); // UPCOMING / IN_PROGRESS / ENDED
+      const isConfirmed     = !!a.isConfirmed;
+      const surveyCompleted = !!a.surveyCompleted;
+      const quizCompleted   = !!a.quizCompleted;
+    
+      // 1) ยังไม่เริ่ม → "สมัครเข้าร่วมแล้ว" (disabled)
+      if (life === 'UPCOMING') {
+        return { class: 'activity-button', text: 'สมัครเข้าร่วมแล้ว', disabled: true, action: 'none' };
       }
+    
+      // 2) ระหว่างจัด → ถ้ายังไม่ยืนยัน ให้กด "กดเพื่อยืนยันเข้าร่วม"
+      if (life === 'IN_PROGRESS') {
+        if (!isConfirmed) {
+          return { class: 'activity-button active', text: 'กดเพื่อยืนยันเข้าร่วม', disabled: false, action: 'confirm' };
+        }
+        // ยืนยันแล้วระหว่างจัด: ยังรอสิ้นสุดกิจกรรม
+        return { class: 'activity-button', text: 'ยืนยันแล้ว (รอสิ้นสุดกิจกรรม)', disabled: true, action: 'none' };
+      }
+    
+      // 3) จบแล้ว → ตามขั้น
+      if (life === 'ENDED') {
+        if (!isConfirmed) {
+          // จบแล้วแต่ยังไม่ยืนยัน → ไม่สามารถยืนยันย้อนหลัง
+          return { class: 'activity-button', text: 'หมดเวลายืนยันเข้าร่วม', disabled: true, action: 'none' };
+        }
+        if (!surveyCompleted) {
+          return { class: 'activity-button active', text: 'ทำแบบประเมิน', disabled: false, action: 'survey' };
+        }
+        if (!quizCompleted) {
+          return { class: 'activity-button active', text: 'ทำแบบทดสอบ', disabled: false, action: 'quiz' };
+        }
+        // ทั้งหมดเสร็จ
+        return { class: 'activity-button', text: 'เสร็จสิ้น', disabled: true, action: 'none' };
+      }
+    
+      return { class: 'activity-button', text: 'ไม่ทราบสถานะ', disabled: true, action: 'none' };
     }
+    
     
     // ⭐ MAIN FUNCTION: Handle activity button click
     function handleActivityAction(activityId) {
