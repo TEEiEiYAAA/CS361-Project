@@ -84,20 +84,23 @@ body {
 
 /* --- Content Box --- */
 .container {
-    background: rgba(255, 255, 255, 0.961);
+    background: white;
     border-radius: 20px;
-    /* margin: 40px auto; <-- นำออก เพราะ .main-content จัดการตำแหน่งแล้ว */
+    margin: 40px auto;          /* ✅ เอากลับมา */
     padding: 30px;
-    width: 100%; /* ทำให้ container ขยายเต็ม .main-content */
+    width: 1150px;              /* ✅ เอากลับมา */
     max-width: 1150px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
+  }
 
-.container h2 {
-    margin-top: 0; /* เอา margin ด้านบนออกเพื่อให้ชิดขอบ container */
+  .container h2 {
+    margin-top: 0;
     margin-bottom: 20px;
     color: #006666;
-}
+    font-size: 24px;       /* ✅ ตั้งขนาดหัวข้อ */
+    font-weight: 700;
+  }
+  
 
 /* --- Student List Styling --- */
 .student-card {
@@ -154,3 +157,38 @@ footer {
     box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
     width: 100%;
 }
+
+/* จัดหัวข้อซ้าย – ตัวกรองขวา */
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+/* ซ่อน label เพื่อการเข้าถึง (ยังคงอยู่ให้ screen reader) */
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+/* สไตล์ dropdown ให้เข้ากับ UI */
+.filter-container select#year-filter {
+  padding: 15px 25px;
+  border-radius: 999px;
+  border: 1.5px solid #000000;
+  background: #fff;
+  font-weight: 1000;
+  color: #000000;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0);
+}
+
+/* รองรับจอแคบ: ให้ dropdown ลงบรรทัดใหม่ */
+@media (max-width: 640px) {
+  .list-header { flex-wrap: wrap; }
+}
+

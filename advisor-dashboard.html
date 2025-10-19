@@ -22,14 +22,30 @@
             </div>
         </div>
     </header>
+    <div class="container">
 
-    <main class="main-content">
-        <div class="container">
+        <div class="list-header">
             <h2>นักศึกษาในที่ปรึกษา</h2>
-            <p>อาจารย์ที่ปรึกษา: <span id="user-name"></span></p>
-            <div id="students-list" class="loading">กำลังโหลดข้อมูล...</div>
-        </div>
-    </main>
+          
+            <!-- ► Dropdown อยู่มุมขวาบน -->
+            <div class="filter-container">
+              <label for="year-filter" class="visually-hidden">กรองตามชั้นปี</label>
+              <select id="year-filter" onchange="filterByYearDropdown()">
+                <option selected disabled>ระดับชั้นปี</option>
+                <option value="all">ทั้งหมด</option>
+                <option value="1">ปี 1</option>
+                <option value="2">ปี 2</option>
+                <option value="3">ปี 3</option>
+                <option value="4">ปี 4</option>
+              </select>
+            </div>
+          </div>
+          
+          <p>อาจารย์ที่ปรึกษา: <span id="user-name"></span></p>
+        <div id="students-list" class="loading">กำลังโหลดข้อมูล...</div>
+    </div>
+
+    </div>
     <footer>
         <p>AchieveHub ©2025<br>CS361</p>
         <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194
@@ -39,3 +55,4 @@
     <script src="../JS/advisor-dashboard.js"></script>
 </body>
 </html>
+
