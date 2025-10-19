@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ปฏิทิน</title>
+  <link rel="stylesheet" href="./CSS/calendar.css" />
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js'></script>
+</head>
+<body>
+      <header class="header">
+      <div class="logo">AchieveHub</div>
+      <div class="nav-container">
+        <nav class="nav-menu">
+          <a href="student-dashboard.html" class="nav-button">หน้าแรก</a>
+          <a href="recommend-activities.html" class="nav-button">กิจกรรมที่แนะนำ</a>
+          <a href="calendar.html" class="nav-button active">ปฏิทินกิจกรรม</a>
+          <a href="my-activities.html" class="nav-button">กิจกรรมของฉัน</a>
+          <a href="current-skill.html" class="nav-button">ทักษะปัจจุบัน</a>
+        </nav>
+        <div class="logout-icon" id="user-icon" onclick="logout()">
+          <img src="./Image/LogOut.png" />
+        </div>
+      </div>
+    </header>
+
+  <main>
+    <div id="calendar"></div>
+  </main>
+  
+  <footer>
+    <p>AchieveHub ©2025<br>CS361</p>
+    <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194 นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calendarEl = document.getElementById('calendar');
+      
+      // --- ★★★★★ ใส่ Invoke URL ของ API Gateway ที่คุณคัดลอกมาตรงนี้ ★★★★★ ---
+      const API_URL = 'YOUR_API_GATEWAY_INVOKE_URL_HERE'; 
+
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth', // มุมมองเริ่มต้นเป็นรายเดือน
+        locale: 'th', // ตั้งค่าภาษาไทย
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,listWeek'
+        },
+        
+        // ดึงข้อมูลกิจกรรมจาก API ของเรา
+        events: API_URL,
+
+        // ฟังก์ชันที่จะทำงานเมื่อคลิกที่กิจกรรม
+        eventClick: function(info) {
+          alert('กิจกรรม: ' + info.event.title + '\n' +
+                'ประเภท: ' + (info.event.extendedProps.skillType || 'ไม่ระบุ') + '\n' +
+                'รายละเอียด: ' + (info.event.extendedProps.description || 'ไม่มี'));
+          
+          // ในอนาคต คุณสามารถเปลี่ยนจาก alert เป็นการเปิดหน้าใหม่ได้
+          // window.location.href = '/activity-details.html?id=' + info.event.extendedProps.activityId;
+        }
+      });
+
+      calendar.render();
+    });
+  </script>
+</body>
+</html>
