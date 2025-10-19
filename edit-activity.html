@@ -3,25 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>เพิ่มกิจกรรม</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="CSS/edit-activity.css" />
+    <title>AchieveHub – เพิ่มกิจกรรม</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="test01.css" />
   </head>
 
   <body>
     <header class="header">
-        <div class="logo">AchieveHub</div>
-        <div class="nav-container">
-            <nav class="nav-menu">
-                <a href="advisor-dashboard.html" class="nav-button">หน้าแรก</a>
-                <a href="advisor-activities.html" class="nav-button">ตรวจสอบกิจกรรม</a>
-                <a href="advisor-calender.html" class="nav-button">ปฏิทินกิจกรรม</a>
-                <a href="edit-activity.html" class="nav-button active">เพิ่มกิจกรรม</a>
-            </nav>
-            <div class="logout-icon" id="user-icon" onclick="logout()">
-                <img src="./Image/LogOut.png" />
-            </div>
-        </div>
+      <div class="logo">AchieveHub</div>
+      <div class="nav-container">
+          <nav class="nav-menu">
+              <a href="advisor-dashboard.html" class="nav-button">หน้าแรก</a>
+              <a href="advisor-activities.html" class="nav-button">ตรวจสอบกิจกรรม</a>
+              <a href="advisor-calender.html" class="nav-button">ปฏิทินกิจกรรม</a>
+              <a href="edit-activity.html" class="nav-button active">เพิ่มกิจกรรม</a>
+          </nav>
+          <div class="logout-icon" id="user-icon" onclick="logout()">
+              <img src="./Image/LogOut.png" />
+          </div>
+      </div>
     </header>
 
     <!-- Title -->
@@ -67,7 +68,7 @@
           <!-- กลุ่มกิจกรรม / ระดับ -->
           <div class="pair">
             <label for="group">กลุ่มกิจกรรม</label>
-            <select id="group">
+            <select id="group" required>
               <option value="" selected>กรุณาเลือกกลุ่มของกิจกรรม</option>
               <option>วิชาการ</option>
               <option>จิตอาสา</option>
@@ -86,8 +87,8 @@
           <!-- ชั้นปี / กิจกรรมที่ต้องเข้าร่วม -->
           <div class="pair">
             <label for="year">เหมาะสำหรับชั้นปี</label>
-            <select id="year">
-              <option value="">เลือกชั้นปีที่เหมาะสม</option>
+            <select id="year" required>
+              <option value="" selected>เลือกชั้นปีที่เหมาะสม</option>
               <option>ปี 1</option>
               <option>ปี 2</option>
               <option>ปี 3</option>
@@ -106,8 +107,8 @@
           <div class="skill-row fixed">
             <div class="inline">
               <div>
-                <label for="skill-plo-1">ทักษะที่ได้รับ</label>
-                <select id="skill-plo-1" class="skill-plo">
+                <label class="skill-plo-label" for="skill-plo-1">ทักษะที่ได้รับ</label>
+                <select id="skill-plo-1" class="skill-plo" required>
                   <option value="" disabled selected hidden>เลือก PLO</option>
                   <option value="PLO1">PLO1</option>
                   <option value="PLO2">PLO2</option>
@@ -117,7 +118,7 @@
               </div>
 
               <div>
-                <label for="skill-desc-1">คำอธิบายทักษะ</label>
+                <label class="skill-desc-label" for="skill-desc-1">คำอธิบายทักษะ</label>
                 <input id="skill-desc-1" type="text" class="skill-desc">
               </div>
 
