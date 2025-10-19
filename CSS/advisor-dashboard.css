@@ -84,7 +84,7 @@ body {
 
 /* --- Content Box --- */
 .container {
-    background: white;
+    background: rgba(255, 255, 255, 0.961);
     border-radius: 20px;
     /* margin: 40px auto; <-- นำออก เพราะ .main-content จัดการตำแหน่งแล้ว */
     padding: 30px;

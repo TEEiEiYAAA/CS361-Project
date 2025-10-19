@@ -3,31 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>AchieveHub – เพิ่มกิจกรรม</title>
-
-    <!-- ✅ เชื่อมต่อไฟล์ CSS -->
+    <title>เพิ่มกิจกรรม</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="CSS/edit-activity.css" />
   </head>
 
   <body>
     <header class="header">
-      <div class="logo">AchieveHub</div>
-
-      <div class="nav-container">
-        <nav class="nav-menu">
-          <a href="-" class="nav-button">หน้าแรก</a>
-          <a href="-" class="nav-button">ตรวจสอบกิจกรรม</a>
-          <a href="calendar.html" class="nav-button">ปฏิทินกิจกรรม</a>
-          <a href="edit-activity.html" class="nav-button active">เพิ่มกิจกรรม</a>
-        </nav>
-        <div class="logout-icon" id="user-icon" onclick="logout()">
-          <img src="./Image/LogOut.png" />
+        <div class="logo">AchieveHub</div>
+        <div class="nav-container">
+            <nav class="nav-menu">
+                <a href="advisor-dashboard.html" class="nav-button">หน้าแรก</a>
+                <a href="advisor-activities.html" class="nav-button">ตรวจสอบกิจกรรม</a>
+                <a href="advisor-calender.html" class="nav-button">ปฏิทินกิจกรรม</a>
+                <a href="edit-activity.html" class="nav-button active">เพิ่มกิจกรรม</a>
+            </nav>
+            <div class="logout-icon" id="user-icon" onclick="logout()">
+                <img src="./Image/LogOut.png" />
+            </div>
         </div>
-      </div>
     </header>
 
     <!-- Title -->
-    <h2 class="page-title">เพิ่มกิจกรรม</h2>
+    <h2 class="page-title">เพิ่ม/แก้ไขกิจกรรม</h2>
     <div class="card-container">
       <div class="card">
 
@@ -153,9 +151,11 @@
       </div>
     </div>
     
-    <footer>
-      <div class="footnote">AchieveHub ©2025</div>
-    </footer>
+  <footer>
+    <p>AchieveHub ©2025<br>CS361</p>
+    <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194
+      นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
+  </footer>
     
   </body>
 </html>
