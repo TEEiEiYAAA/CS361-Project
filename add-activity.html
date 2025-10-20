@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>AchieveHub – เพิ่มกิจกรรม</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/CSS/edit-activity.css" />
+  </head>
+
+  <body>
+    <header class="header">
+      <div class="logo">AchieveHub</div>
+      <div class="nav-container">
+          <nav class="nav-menu">
+              <a href="advisor-dashboard.html" class="nav-button">หน้าแรก</a>
+              <a href="advisor-activities.html" class="nav-button">ตรวจสอบกิจกรรม</a>
+              <a href="advisor-calender.html" class="nav-button">ปฏิทินกิจกรรม</a>
+              <a href="edit-activity.html" class="nav-button active">เพิ่มกิจกรรม</a>
+          </nav>
+          <div class="logout-icon" id="user-icon" onclick="logout()">
+              <img src="./Image/LogOut.png" />
+          </div>
+      </div>
+    </header>
+
+    <!-- Title -->
+    <h2 class="page-title">เพิ่มกิจกรรม</h2>
+    <div class="card-container">
+      <div class="card">
+
+        <!-- Upload Card -->
+          <div class="upload-area">
+            <span class="hint">เพิ่มรูปภาพกิจกรรม</span>
+            <input type="file" name="cover" accept="image/*" />
+          </div>
+        <form>
+          <!-- ชื่อกิจกรรม -->
+          <div class="full">
+            <label for="title">ชื่อกิจกรรม</label>
+            <input id="title" type="text">
+          </div>
+
+          <!-- รายละเอียด -->
+          <div class="full">
+            <label for="desc">รายละเอียด</label>
+            <textarea id="desc"></textarea>
+          </div>
+
+          <!-- วันที่ / เวลา / สถานที่ / ผู้จัด -->
+          <div class="pair">
+            <label for="start">เวลาเริ่มจัดกิจกรรม</label>
+            <input id="start" type="datetime-local">
+
+            <label for="end">เวลาสิ้นสุดกิจกรรม</label>
+            <input id="end" type="datetime-local">
+          </div>
+
+          <div class="pair">
+            <label for="place">สถานที่</label>
+            <input id="place" type="text" placeholder="เช่น ห้องประชุม 301, อาคารเรียนรวม">
+
+            <label for="host">ผู้จัด</label>
+            <input id="host" type="text" placeholder="ชมรม/หน่วยงานผู้รับผิดชอบ">
+          </div>
+
+          <!-- กลุ่มกิจกรรม / ระดับ -->
+          <div class="pair">
+            <label for="group">กลุ่มกิจกรรม</label>
+            <select id="group" required>
+              <option value="" selected>กรุณาเลือกกลุ่มของกิจกรรม</option>
+              <option>วิชาการ</option>
+              <option>จิตอาสา</option>
+              <option>กีฬา/สันทนาการ</option>
+              <option>ประกวด/แข่งขัน</option>
+            </select>
+
+            <label>ระดับ</label>
+            <div class="level">
+              <label><input type="radio" name="level"> พื้นฐาน</label>
+              <label><input type="radio" name="level"> กลาง</label>
+              <label><input type="radio" name="level"> สูงสุด</label>
+            </div>
+          </div>
+
+          <!-- ชั้นปี / กิจกรรมที่ต้องเข้าร่วม -->
+          <div class="pair">
+            <label for="year">เหมาะสำหรับชั้นปี</label>
+            <select id="year" required>
+              <option value="" selected>เลือกชั้นปีที่เหมาะสม</option>
+              <option>ปี 1</option>
+              <option>ปี 2</option>
+              <option>ปี 3</option>
+              <option>ปี 4</option>
+              <option>ทุกชั้นปี</option>
+            </select>
+
+            <label for="required">กิจกรรมที่ต้องเข้าร่วม</label>
+            <input id="required" type="text" placeholder="เช่น ปฐมนิเทศ, Workshop A">
+          </div>
+        </form>
+      </div>
+      
+      <section class="card inner-card">
+        <div id="skill-rows">
+          <div class="skill-row fixed">
+            <div class="inline">
+              <div>
+                <label class="skill-plo-label" for="skill-plo-1">ทักษะที่ได้รับ</label>
+                <select id="skill-plo-1" class="skill-plo" required>
+                  <option value="" disabled selected hidden>เลือก PLO</option>
+                  <option value="PLO1">PLO1</option>
+                  <option value="PLO2">PLO2</option>
+                  <option value="PLO3">PLO3</option>
+                  <option value="PLO4">PLO4</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="skill-desc-label" for="skill-desc-1">คำอธิบายทักษะ</label>
+                <input id="skill-desc-1" type="text" class="skill-desc">
+              </div>
+
+              <div class="delete-col">
+                <label>&nbsp;</label>
+                <button type="button" class="btn-delete">-</button>
+              </div>
+            </div>
+            <button type="button" id="add-skill" class="btn-add">เพิ่มทักษะ</button>
+          </div>
+        </div>
+
+        <!-- ปุ่มเพิ่มทักษะ + หมวดหมู่ -->
+        <div class="bottom-row">
+          <div class="category-box">
+            <label for="skillCategory">หมวดหมู่</label>
+            <div class="pill-input">
+              <input id="skillCategory" name="skillCategory" type="text" readonly>
+            </div>
+          </div>
+        </div>
+
+        <input type="hidden" id="plo" name="plo" value="[]">
+        <input type="hidden" id="ploDescriptions" name="ploDescriptions" value="[]">
+      </section>
+
+
+      <div class="actions">
+        <button type="submit" class="btn-primary">บันทึก</button>
+        <button type="reset" class="btn-ghost">ยกเลิก</button>
+      </div>
+    </div>
+    
+  <footer>
+    <p>AchieveHub ©2025<br>CS361</p>
+    <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194
+      นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
+  </footer>
+    
+  </body>
+</html>
