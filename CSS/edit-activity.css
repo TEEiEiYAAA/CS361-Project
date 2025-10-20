@@ -228,6 +228,11 @@ textarea {
   color: #111827;
 }
 
+#skill-rows {
+  display: grid;
+  gap: 12px;     
+}
+
 .skill-plo,
 .skill-desc {
   height: 40px;
@@ -285,7 +290,7 @@ label[for="skill-desc-1"] {
   transform: scale(1.05); 
 } 
 
-.btn-add {
+/*.btn-add {
   background: linear-gradient(90deg, #FFCD58 0%, #E8A424 100%);
   width: 12%;
   color: #000000;
@@ -300,6 +305,29 @@ label[for="skill-desc-1"] {
 }
 
 .btn-add:hover {
+  background: linear-gradient(90deg, #F9C63F 0%, #D8911A 100%);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+}*/
+
+#add-skill-wrap { 
+  margin-top: 12px; 
+}
+
+.btn-add-skill {
+  background: linear-gradient(90deg, #FFCD58 0%, #E8A424 100%);
+  width: 12%;
+  color: #000000;
+  font-size: 16px;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 16px;
+  margin-top: 20px;   
+  padding-top: 8px;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0,0,0,.12);
+}
+
+.btn-add-skill:hover {
   background: linear-gradient(90deg, #F9C63F 0%, #D8911A 100%);
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
 }
@@ -317,6 +345,13 @@ label[for="skill-desc-1"] {
   display: flex;
   align-items: center;
   gap: 12px;                  
+}
+
+#skillCategory {
+  display: flex;            
+  justify-content: center;  
+  align-items: center;        
+  text-align: center;        
 }
 
 .pill-input input {
