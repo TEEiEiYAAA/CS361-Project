@@ -16,7 +16,7 @@
                     role: userData.role 
                 });
                 // ถ้าไม่ได้ล็อกอินหรือไม่ใช่อาจารย์ ให้กลับไปหน้าล็อกอิน
-                window.location.href = "index.html";
+                window.location.href = "login.html";
                 return;
             }
             
