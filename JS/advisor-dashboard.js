@@ -1,3 +1,4 @@
+let allStudents = []; // เก็บข้อมูลนักศึกษาทั้งหมดไว้ใช้กรอง
 // ตรวจสอบการล็อกอิน
         document.addEventListener('DOMContentLoaded', function() {
             // แสดง debug info ในกรณีที่มีปัญหา
@@ -64,11 +65,17 @@
                 `;
             }
         }
+
+        function displayStudents(students) {
+            allStudents = students; // ✅ เก็บข้อมูลทั้งหมดไว้สำหรับ filter
+            renderStudentList(students);
+        }
+        
         
         // ฟังก์ชันแสดงข้อมูลนักศึกษา
-        function displayStudents(students) {
+        function renderStudentList(students) {
             const studentsList = document.getElementById('students-list');
-            
+        
             if (!students || students.length === 0) {
                 studentsList.innerHTML = `
                     <div class="no-students">
@@ -77,38 +84,37 @@
                 `;
                 return;
             } 
-            
+        
             let html = '';
-            
+        
             students.forEach(student => {
-                // คำนวณความก้าวหน้า
                 const completedSkills = student.completedSkills || 0;
-                const requiredSkills = student.requiredSkills || 8; // ค่าเริ่มต้นถ้าไม่มี
+                const requiredSkills = student.requiredSkills || 8;
                 const progress = Math.round((completedSkills / requiredSkills) * 100);
-                
+        
                 html += `
                     <div class="student-card">
-  <div class="student-info">
-    <div class="avatar">${student.name?.charAt(0) || '?'}</div>
-    <div class="student-text">
-      <h3>${student.name || 'ไม่ระบุชื่อ'}</h3>
-      <p>รหัสนักศึกษา: ${student.studentId}</p>
-      <p>ชั้นปี: ${student.yearLevel || '-'} | ภาควิชา: ${student.department || '-'}</p>
-    </div>
-  </div>
-  <div class="progress-section">
-    <div class="progress-bar">
-      <div class="progress" style="width: ${progress}%"></div>
-    </div>
-    <p>${progress}% (${completedSkills}/${requiredSkills} ทักษะ)</p>
-    <button class="view-btn" onclick="viewStudentDetails('${student.studentId}')">ตรวจสอบ</button>
-  </div>
-</div>
+                        <div class="student-info">
+                            <div class="avatar">${student.name?.charAt(0) || '?'}</div>
+                            <div class="student-text">
+                                <h3>${student.name || 'ไม่ระบุชื่อ'}</h3>
+                                <p>รหัสนักศึกษา: ${student.studentId}</p>
+                                <p>ชั้นปี: ${student.yearLevel || '-'} | ภาควิชา: ${student.department || '-'}</p>
+                            </div>
+                        </div>
+                        <div class="progress-section">
+                            <div class="progress-bar">
+                                <div class="progress" style="width: ${progress}%"></div>
+                            </div>
+                            <p>${progress}% (${completedSkills}/${requiredSkills} ทักษะ)</p>
+                            <button class="view-btn" onclick="viewStudentDetails('${student.studentId}')">ตรวจสอบ</button>
+                        </div>
+                    </div>
                 `;
             });
-            
+        
             studentsList.innerHTML = html;
-        }
+        }        
         
         // ฟังก์ชันดูรายละเอียดนักศึกษา
         function viewStudentDetails(studentId) {
@@ -141,3 +147,21 @@
         window.location.href = "login.html";
       }
     }
+
+    function filterByYearDropdown() {
+        const selected = document.getElementById('year-filter').value;
+    
+        // ยังไม่ได้เลือกจริง (อยู่ที่ "ระดับชั้นปี")
+        if (!selected) return;
+    
+        if (selected === 'all') {
+            renderStudentList(allStudents);
+        } else {
+            const y = parseInt(selected, 10);
+            const filtered = allStudents.filter(
+                s => parseInt(s.yearLevel, 10) === y
+            );
+            renderStudentList(filtered);
+        }
+    }
+    

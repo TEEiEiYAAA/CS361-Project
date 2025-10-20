@@ -15,7 +15,7 @@
                 <a href="advisor-dashboard.html" class="nav-button active">หน้าแรก</a>
                 <a href="advisor-activities.html" class="nav-button">ตรวจสอบกิจกรรม</a>
                 <a href="advisor-calender.html" class="nav-button">ปฏิทินกิจกรรม</a>
-                <a href="edit-activity.html" class="nav-button">เพิ่มกิจกรรม</a>
+                <a href="add-activity.html" class="nav-button">เพิ่มกิจกรรม</a>
             </nav>
             <div class="logout-icon" id="user-icon" onclick="logout()">
                 <img src="./Image/LogOut.png" />
@@ -31,7 +31,7 @@
             <div class="filter-container">
               <label for="year-filter" class="visually-hidden">กรองตามชั้นปี</label>
               <select id="year-filter" onchange="filterByYearDropdown()">
-                <option selected disabled>ระดับชั้นปี</option>
+                <option value="" selected disabled>ระดับชั้นปี</option>
                 <option value="all">ทั้งหมด</option>
                 <option value="1">ปี 1</option>
                 <option value="2">ปี 2</option>
