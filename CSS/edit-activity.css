@@ -151,7 +151,7 @@ select,
 textarea {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid rgba(0,0,0,0.12);
+  border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 15px;
   background: #f6fbff;
   box-sizing: border-box;
@@ -226,14 +226,6 @@ textarea {
   white-space: nowrap;                 
   font-size: 16px;
   color: #111827;
-}
-
-label.skill-plo-label {
-  color: #35505d !important; 
-}
-
-label.skill-desc-label {
-  color: #35505d !important; 
 }
 
 .skill-plo,
