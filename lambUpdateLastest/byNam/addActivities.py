@@ -66,8 +66,7 @@ def lambda_handler(event, context):
         # ===== Validate ข้อมูลพื้นฐาน =====
         name = (body.get('name') or '').strip()
         startDateTime = (body.get('startDateTime') or '').strip()
-        endDateTime = (body.get('endDateTime') or '').strip()  # ✅ เพิ่ม endDateTime
-
+        endDateTime = (body.get('endDateTime') or '').strip()
         if not name:
             return json_response(400, {'error': 'name is required'})
         if not startDateTime:
@@ -75,7 +74,6 @@ def lambda_handler(event, context):
         if not endDateTime:
             return json_response(400, {'error': 'endDateTime is required (ISO string)'})
 
-        # ✅ ตรวจสอบรูปแบบและลำดับเวลา
         try:
             start_dt = datetime.datetime.fromisoformat(startDateTime.replace('Z','+00:00'))
             end_dt = datetime.datetime.fromisoformat(endDateTime.replace('Z','+00:00'))
@@ -87,6 +85,10 @@ def lambda_handler(event, context):
         description = (body.get('description') or '').strip()
         location = (body.get('location') or '').strip()
         imageUrl = (body.get('imageUrl') or '').strip()
+
+        # ✅ new: รองรับ locationId/locationName สำหรับระบบพิกัด
+        locationId = (body.get('locationId') or '').strip() or None
+        locationName = (body.get('locationName') or '').strip() or None
 
         # ===== PLO =====
         plos = body.get('plo') or []
@@ -103,14 +105,11 @@ def lambda_handler(event, context):
         if not isinstance(ploDescriptions, list):
             ploDescriptions = []
 
-        # ===== UI fields =====
         level = (body.get('level') or '').strip() or None
         if level and level not in ALLOWED_LEVELS:
             return json_response(400, {'error': f'level must be one of {sorted(ALLOWED_LEVELS)}'})
 
-        suitableYearLevel = body.get('suitableYearLevel')
-        suitableYearLevel = _parse_int(suitableYearLevel, default=None)
-
+        suitableYearLevel = _parse_int(body.get('suitableYearLevel'), default=None)
         prerequisiteActivities = body.get('prerequisiteActivities') or []
         if isinstance(prerequisiteActivities, str):
             prerequisiteActivities = [x.strip() for x in prerequisiteActivities.split(',') if x.strip()]
@@ -131,15 +130,12 @@ def lambda_handler(event, context):
                 return json_response(500, {'error': 'Skills lookup failed', 'detail': str(e)})
 
             if sk:
-                skillName = sk.get('name') or None
-                # ✅ ใช้ subcategory ของ Skill เป็น activityGroup
+                skillName = sk.get('name')
                 if not activityGroup:
-                    activityGroup = sk.get('subcategory') or None
-                # ✅ ถ้าไม่ระบุ suitableYearLevel ให้ใช้จาก Skills
+                    activityGroup = sk.get('subcategory')
                 if suitableYearLevel is None and sk.get('yearLevel') is not None:
-                    suitableYearLevel = _parse_int(sk.get('yearLevel'), default=None)
-                # ✅ ดึง requiredActivities จาก Skills
-                requiredActivities = _parse_int(sk.get('requiredActivities'), default=None)
+                    suitableYearLevel = _parse_int(sk.get('yearLevel'))
+                requiredActivities = _parse_int(sk.get('requiredActivities'))
 
         # ===== สร้าง record =====
         activityId = 'A' + uuid.uuid4().hex[:7].upper()
@@ -148,37 +144,31 @@ def lambda_handler(event, context):
             'name': name,
             'description': description,
             'location': location,
+            'locationId': locationId,
+            'locationName': locationName or location,
             'startDateTime': startDateTime,
-            'endDateTime': endDateTime,  # ✅ เพิ่มฟิลด์นี้
+            'endDateTime': endDateTime,
             'imageUrl': imageUrl,
-
             'skillId': skillId,
             'skillName': skillName,
-            'skillCategory': skillCategory,  # คำนวณจาก PLO
-
+            'skillCategory': skillCategory,
             'plo': plos,
             'ploDescriptions': ploDescriptions,
-
-            'activityGroup': activityGroup,  # = subcategory จาก Skills
+            'activityGroup': activityGroup,
             'level': level,
             'suitableYearLevel': suitableYearLevel,
             'prerequisiteActivities': prerequisiteActivities,
             'requiredActivities': requiredActivities,
-
             'createdAt': _now_iso(),
         }
 
-        # ✅ เพิ่ม createdBy (จาก token ถ้ามี)
         try:
             claims = (event.get('requestContext') or {}).get('authorizer', {}).get('claims', {})
             item['createdBy'] = claims.get('cognito:username') or claims.get('email') or None
         except Exception:
             item['createdBy'] = None
 
-        # ลบค่าที่เป็น None/ว่าง เพื่อให้ DynamoDB ไม่ error
         item = {k: v for k, v in item.items() if v not in (None, [], '')}
-
-        # ===== บันทึกลง DynamoDB =====
         table = dynamodb.Table(ACTIVITIES_TABLE)
         table.put_item(Item=item)
 

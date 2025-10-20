@@ -105,8 +105,8 @@
         } else if (currentFilter === 'inprogress') {
           return life === 'IN_PROGRESS';
         } else {
-          // done tab: เงื่อนไขคือ "จบแล้ว" + "ทำแบบทดสอบแล้ว"
-          return life === 'ENDED' && !!a.quizCompleted;
+          // done tab: เงื่อนไขคือ "จบแล้ว" + "ทำแบบประเมินแล้ว"
+          return life === 'ENDED' && !!a.surveyCompleted;
         }
       });
     
@@ -198,14 +198,15 @@
           <div class="activity-date">${formattedDate}</div>
           <div class="activity-location">📍 ${activity.location || 'ไม่ระบุสถานที่'}</div>
         </div>
-        <button class="${buttonState.class}" 
-                data-activity-id="${activity.activityId}" 
+        <button class="${buttonState.class}"
+                data-activity-id="${activity.activityId}"
+                data-action="${buttonState.action}"
                 onclick="handleActivityAction('${activity.activityId}')"
                 ${buttonState.disabled ? 'disabled' : ''}>
           ${buttonState.text}
         </button>
       `;
-      
+            
       return element;
     }
     
@@ -255,13 +256,11 @@
           return { class: 'activity-button', text: 'หมดเวลายืนยันเข้าร่วม', disabled: true, action: 'none' };
         }
         if (!surveyCompleted) {
+          // จบแล้วและยืนยันแล้ว แต่ยังไม่ทำแบบประเมิน → ทำแบบประเมิน
           return { class: 'activity-button active', text: 'ทำแบบประเมิน', disabled: false, action: 'survey' };
         }
-        if (!quizCompleted) {
-          return { class: 'activity-button active', text: 'ทำแบบทดสอบ', disabled: false, action: 'quiz' };
-        }
-        // ทั้งหมดเสร็จ
-        return { class: 'activity-button', text: 'เสร็จสิ้น', disabled: true, action: 'none' };
+        // ทำแบบประเมินแล้ว → ให้ “รับเกียรติบัตร” (ปุ่มนี้กดได้ตลอด)
+        return { class: 'activity-button active', text: 'รับเกียรติบัตร', disabled: false, action: 'certificate' };
       }
     
       return { class: 'activity-button', text: 'ไม่ทราบสถานะ', disabled: true, action: 'none' };
@@ -271,22 +270,29 @@
     // ⭐ MAIN FUNCTION: Handle activity button click
     function handleActivityAction(activityId) {
       const button = document.querySelector(`button[data-activity-id="${activityId}"]`);
-      
-      if (button.disabled) {
+      if (!button || button.disabled) return;
+    
+      const action = button.dataset.action; // 'confirm' | 'survey' | 'certificate' | 'none'
+    
+      if (action === 'confirm') {
+        // เดิม: เปิด modal/Popup เพื่อยืนยันเข้าร่วม
+        openCodeInput(activityId);
         return;
       }
-      
-      const isConfirmed = button.classList.contains('active');
-      
-      if (isConfirmed) {
-        // 🎯 Go to assessment page
-        console.log(`Navigating to assessment page for activity: ${activityId}`);
+    
+      if (action === 'survey') {
+        // ไปหน้าแบบประเมิน
         window.location.href = `Assessment.html?id=${activityId}`;
-      } else {
-        // Open code input modal for confirmation
-        openCodeInput(activityId);
+        return;
       }
-    }
+    
+      if (action === 'certificate') {
+        // ไปหน้า/ลิงก์รับเกียรติบัตร (จะสร้างหน้า certificate เองเมื่อพร้อม)
+        window.location.href = `certificate.html?id=${activityId}`;
+        return;
+      }
+    
+    }    
     
     // Open code input modal
     function openCodeInput(activityId = null) {

@@ -9,10 +9,7 @@ dynamodb = boto3.resource('dynamodb')
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, decimal.Decimal):
-            if o % 1 > 0:
-                return float(o)
-            else:
-                return int(o)
+            return float(o) if o % 1 > 0 else int(o)
         return super(DecimalEncoder, self).default(o)
 
 def lambda_handler(event, context):
@@ -21,7 +18,7 @@ def lambda_handler(event, context):
         'Access-Control-Allow-Headers': 'Content-Type,Authorization',
         'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
     }
-    
+
     if event.get('httpMethod') == 'OPTIONS':
         return {'statusCode': 200, 'headers': headers, 'body': ''}
 
@@ -36,15 +33,11 @@ def lambda_handler(event, context):
         activities_table = dynamodb.Table('Activities')
         skills_table = dynamodb.Table('Skills')
         
-        activities_response = activities_table.scan()
-        activities = activities_response.get('Items', [])
-        print(f'Found {len(activities)} total activities')
-        
-        skills_response = skills_table.scan()
-        skills = skills_response.get('Items', [])
+        activities = activities_table.scan().get('Items', [])
+        skills = skills_table.scan().get('Items', [])
         
         skill_category_map = {s['skillId']: s.get('category', '') for s in skills}
-        skill_sub_map = {s['skillId']: s.get('subcategory', '') for s in skills}  # ✅ เพิ่ม mapping subcategory
+        skill_sub_map = {s['skillId']: s.get('subcategory', '') for s in skills}
         
         filtered_activities = []
 
@@ -52,7 +45,7 @@ def lambda_handler(event, context):
             skill_id = activity.get('skillId')
             skill_category = skill_category_map.get(skill_id, '')
             skill_subcategory = skill_sub_map.get(skill_id, '')
-            
+
             # ✅ กรองตาม PLO
             if plo_filter and plo_filter.lower() != 'all':
                 raw_plos = activity.get('plo') or []
@@ -66,7 +59,7 @@ def lambda_handler(event, context):
                 if plo_filter.upper() not in plos_list:
                     continue
             
-            # ✅ กรองตาม activityGroup (ใช้ subcategory เดิมด้วย)
+            # ✅ กรองตาม activityGroup
             if activity_group and activity_group.lower() != 'all':
                 group_value = (
                     activity.get('activityGroup') or
@@ -76,17 +69,24 @@ def lambda_handler(event, context):
                 if str(group_value).lower() != activity_group.lower():
                     continue
             
-            # ✅ กรองตาม skillType (ของนักศึกษา)
+            # ✅ กรองตาม skillType (ใช้ skillCategory จาก activity ถ้าไม่มี skillId)
             if skill_type and skill_type.lower() != 'all':
-                if not skill_category or skill_category.lower() != skill_type.lower():
+                activity_cat = (activity.get('skillCategory') or '').lower()
+                mapped_cat = (skill_category or '').lower()
+                if activity_cat != skill_type.lower() and mapped_cat != skill_type.lower():
                     continue
             
             # ✅ เติมข้อมูล skill ลงในกิจกรรม
             if skill_id:
                 skill_info = next((s for s in skills if s['skillId'] == skill_id), {})
-                activity['skillCategory'] = skill_category
+                activity['skillCategory'] = skill_category or activity.get('skillCategory')
                 activity['skillName'] = skill_info.get('name', '')
                 activity['skillSubcategory'] = skill_info.get('subcategory', '')
+            else:
+                # ไม่มี skillId ก็เก็บค่าเดิมไว้
+                activity['skillCategory'] = activity.get('skillCategory', '')
+                activity['skillName'] = ''
+                activity['skillSubcategory'] = ''
             
             if is_upcoming_activity(activity.get('startDateTime')):
                 filtered_activities.append(activity)
