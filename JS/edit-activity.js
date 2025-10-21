@@ -490,4 +490,3 @@ skillRowsEl.addEventListener('change', e => clearValidity(e.target));
     renderPreview(file);
   });
 })();
-
