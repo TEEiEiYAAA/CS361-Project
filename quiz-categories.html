@@ -9,7 +9,35 @@
 </head>
 
 <body>
-  
+  <header class="header">
+        <div class="logo">AchieveHub</div>
+        <div class="nav-container">
+            <nav class="nav-menu">
+                <a href="student-dashboard.html" class="nav-button">หน้าแรก</a>
+                <a href="recommend-activities.html" class="nav-button">กิจกรรมที่แนะนำ</a>
+                <a href="calendar.html" class="nav-button">ปฏิทินกิจกรรม</a>
+                <a href="my-activities.html" class="nav-button">กิจกรรมของฉัน</a>
+                <a href="current-skill.html" class="nav-button">ทักษะปัจจุบัน</a>
+                <a href="quiz-categories.html" class="nav-button active">แบบทดสอบ</a>
+            </nav>
+            <div class="logout-icon" id="user-icon" onclick="logout()">
+                <img src="./Image/LogOut.png" />
+            </div>
+        </div>
+  </header>
+
+  <main class="main-content">
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-filter="available">แบบทดสอบที่เปิดให้ทำ</button>
+            <button class="tab-btn" data-filter="done">แบบทดสอบที่ทำไปแล้ว</button>
+        </div>
+
+        <div class="quiz-container">
+            <div id="quiz-list">
+            </div>
+        </div>
+    </main>
+
   <footer>
     <p>AchieveHub ©2025<br>CS361</p>
     <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194
