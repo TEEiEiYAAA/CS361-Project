@@ -183,6 +183,13 @@ footer {
     box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
     width: 100%;
 }
+/* --- PopUp --- */
+.popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;justify-content:center;align-items:center}
+.popup-content{background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:20px;max-width:420px;width:92%}
+.btn-confirm,.btn-close{padding:10px 16px;border:none;border-radius:8px;cursor:pointer;margin:0 6px;font-size:15px}
+.btn-confirm{background:#4caf50;color:#fff}
+.btn-close{background:#e74c3c;color:#fff}
+
 
 /* --- Responsive Design --- */
 @media (max-width: 768px) {
