@@ -13,12 +13,12 @@ function computeCategory(plos) {
 // ===== DOM refs (ต้องมี element เหล่านี้ใน HTML) =====
 const skillRowsEl        = document.getElementById('skill-rows');
 const addSkillBtn        = document.getElementById('add-skill-btn');
-const addSkillWrap       = document.getElementById('add-skill-wrap'); // wrapper ของปุ่ม
+const addSkillWrap       = document.getElementById('add-skill-wrap'); 
 const skillCategoryInput = document.getElementById('skillCategory');
 const ploHidden          = document.getElementById('plo');
 const ploDescHidden      = document.getElementById('ploDescriptions');
 
-const MAX_ROWS = 4; // รวมแถวแรก (fixed)
+const MAX_ROWS = 4; 
 
 // ===== Utils =====
 function recalcCategory() {
@@ -65,7 +65,6 @@ function wireRowEvents(row) {
   row.querySelector('.btn-delete')?.addEventListener('click', () => {
     const totalRows = skillRowsEl.querySelectorAll('.skill-row').length;
     if (totalRows <= 1) {
-      // กันไม่ให้ลบจนเหลือ 0 แถว
       alert('ต้องมีแถวทักษะอย่างน้อย 1 แถว');
       return;
     }
@@ -188,65 +187,6 @@ if (form && !window.__ACHV_bindSubmit__) {
 // เคลียร์ error อัตโนมัติเมื่อผู้ใช้แก้ไข
 skillRowsEl.addEventListener('input',  e => clearValidity(e.target));
 skillRowsEl.addEventListener('change', e => clearValidity(e.target));
-
-// ==========================
-// 1) Preview รูปใน .upload-area
-// ==========================
-(function setupImagePreview() {
-  const uploadArea = document.querySelector('.upload-area');
-  const fileInput  = uploadArea?.querySelector('input[type="file"]');
-  const hintEl     = uploadArea?.querySelector('.hint');
-
-  if (!uploadArea || !fileInput) return;
-
-  // สร้าง/อัปเดตรูป preview
-  function renderPreview(file) {
-    // ลบรูปเดิมถ้ามี
-    const old = uploadArea.querySelector('.upload-preview');
-    if (old) old.remove();
-
-    if (!file) {
-      // ไม่มีไฟล์ -> คืนค่า UI เดิม
-      if (hintEl) hintEl.style.display = '';
-      return;
-    }
-
-    // เงื่อนไข: ต้องเป็นไฟล์รูปภาพ
-    if (!file.type.startsWith('image/')) {
-      alert('กรุณาเลือกเฉพาะไฟล์รูปภาพ');
-      fileInput.value = '';
-      if (hintEl) hintEl.style.display = '';
-      return;
-    }
-
-    // สร้าง <img> แสดงตัวอย่าง
-    const img = document.createElement('img');
-    img.className = 'upload-preview';
-    Object.assign(img.style, {
-      maxWidth: '100%',
-      maxHeight: '100%',
-      objectFit: 'cover',
-      position: 'absolute',
-      inset: '0',
-      margin: 'auto',
-      borderRadius: '16px'
-    });
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      img.src = reader.result;
-      uploadArea.appendChild(img);
-      if (hintEl) hintEl.style.display = 'none'; // ซ่อน hint
-    };
-    reader.readAsDataURL(file);
-  }
-
-  // เปลี่ยนไฟล์ -> แสดง preview
-  fileInput.addEventListener('change', () => {
-    const file = fileInput.files && fileInput.files[0];
-    renderPreview(file);
-  });
-})();
 
 // ==========================================
 // 2) ตรวจสอบ input ทุกฟิลด์ + สรุปข้อที่ขาด
@@ -455,35 +395,41 @@ skillRowsEl.addEventListener('change', e => clearValidity(e.target));
   });
 
   // แสดงรูป preview แต่ "ไม่ซ่อน" ปุ่ม hint
-  function renderPreview(file) {
-    const old = uploadArea.querySelector('.upload-preview');
-    if (old) old.remove();
+function renderPreview(file) {
+  // เคลียร์ <img> เดิมถ้ามี
+  const old = uploadArea.querySelector('.upload-preview');
+  if (old) old.remove();
 
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      alert('กรุณาเลือกเฉพาะไฟล์รูปภาพ');
-      fileInput.value = '';
-      return;
-    }
-
-    const img = document.createElement('img');
-    img.className = 'upload-preview';
-    Object.assign(img.style, {
-      position: 'absolute', inset: 0, margin: 'auto',
-      maxWidth: '100%', maxHeight: '100%',
-      objectFit: 'cover', borderRadius: '16px',
-      zIndex: 1 // ใต้ปุ่ม hint
-    });
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      img.src = reader.result;
-      uploadArea.appendChild(img);
-      // ✅ ไม่ซ่อน hintEl — ปล่อยให้ลอยอยู่ด้านบนตลอด
-    };
-    reader.readAsDataURL(file);
+  // ถ้าไม่มีไฟล์ → ล้างพื้นหลัง
+  if (!file) {
+    uploadArea.style.backgroundImage = '';
+    uploadArea.style.backgroundSize = '';
+    uploadArea.style.backgroundPosition = '';
+    uploadArea.style.backgroundRepeat = '';
+    return;
   }
+
+  // ต้องเป็นรูปภาพเท่านั้น
+  if (!file.type || !file.type.startsWith('image/')) {
+    alert('กรุณาเลือกเฉพาะไฟล์รูปภาพ');
+    fileInput.value = '';
+    uploadArea.style.backgroundImage = '';
+    uploadArea.style.backgroundSize = '';
+    uploadArea.style.backgroundPosition = '';
+    uploadArea.style.backgroundRepeat = '';
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    uploadArea.style.backgroundImage = `url(${reader.result})`;
+    uploadArea.style.backgroundSize = `cover`;        
+    uploadArea.style.backgroundPosition = 'center';   
+    uploadArea.style.backgroundRepeat = 'no-repeat';  
+  };
+  reader.readAsDataURL(file);
+}
+
 
   fileInput.addEventListener('change', () => {
     const file = fileInput.files && fileInput.files[0];
