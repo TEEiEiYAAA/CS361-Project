@@ -2,14 +2,13 @@
 const API_BASE_URL = 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod';
 const REQUIRED_ACTIVITIES_COUNT = 3;
 
-// ⭐️ MODIFIED: ห่อหุ้ม Logic หลักไว้ใน initializeStudentDashboard
-// ฟังก์ชันนี้จะถูกเรียกโดย auth-check.js เมื่อ Authentication ผ่านแล้ว
+// ⭐️ MODIFIED: ฟังก์ชันหลักที่ถูกเรียกโดย auth-check.js
 function initializeStudentDashboard() {
-    // ⭐️ MODIFIED: ตรวจสอบ Role เฉพาะหน้า
+    // ⭐️ ตรวจสอบ Role
     if (!window.userData || window.userData.role !== 'student') {
         console.error('Authentication failed - not a student:', window.userData.role);
         alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
-        // ใช้ navigateTo ที่ไม่มี data=... (อยู่ใน auth-check.js)
+        // ใช้ navigateTo ที่อยู่ใน auth-check.js
         if (typeof navigateTo === 'function') {
             navigateTo("login.html");
         } else {
@@ -18,10 +17,11 @@ function initializeStudentDashboard() {
         return;
     }
 
-    // แสดงชื่อผู้ใช้ (user-icon title ถูกอัพเดทโดย updateBasicUserInfo ใน auth-check.js แล้ว)
+    // ⭐️ DELETED: Logic การแสดงผลข้อมูลส่วนตัวถูกลบออก (ย้ายไป auth-check.js)
     
     // ดึงข้อมูลทักษะจาก API
-    const studentId = window.userData.studentId || window.userData.userId;
+    const studentInfo = window.userData;
+    const studentId = studentInfo.userId || studentInfo.userId;
     loadAllSkillData(studentId);
 }
 
@@ -29,13 +29,13 @@ function initializeStudentDashboard() {
 window.initializePage = initializeStudentDashboard;
 
 
-// ฟังก์ชันดึงข้อมูลทักษะทั้งหมด
+// ฟังก์ชันดึงข้อมูลทักษะทั้งหมด (unchanged)
 async function loadAllSkillData(studentId) {
     try {
         // 1. ดึงข้อมูลทักษะที่นักศึกษามี
         const skillResponse = await fetchAllSkillsFromAPI(studentId);
         
-        // 2. ดึงข้อมูลกิจกรรมที่เข้าร่วม
+        // 2. ดึงข้อมูลกิจกรรมที่เข้าร่วม (ใช้ mock data เดิม)
         const activityResponse = await fetchStudentActivities(studentId);
         
         // 3. แสดงผลทักษะ
@@ -51,7 +51,7 @@ async function loadAllSkillData(studentId) {
     }
 }
 
-// ฟังก์ชันเรียก API ดึงข้อมูลทักษะ
+// ฟังก์ชันเรียก API ดึงข้อมูลทักษะ (unchanged, relies on global window.userToken)
 async function fetchAllSkillsFromAPI(studentId) {
     const response = await fetch(`${API_BASE_URL}/student/skills`, {
         method: 'POST',
@@ -68,20 +68,19 @@ async function fetchAllSkillsFromAPI(studentId) {
     return response.json();
 }
 
-// ฟังก์ชันเรียก API ดึงข้อมูลกิจกรรม
+// ฟังก์ชันเรียก API ดึงข้อมูลกิจกรรม (unchanged)
 async function fetchStudentActivities(studentId) {
     // โค้ดสำหรับเรียกข้อมูลกิจกรรม
     // ... (สมมติว่า API นี้คืนค่า { data: { completedActivities: 5 } } )
     return { data: { completedActivities: 5 } };
 }
 
-// ฟังก์ชันแสดงผลความคืบหน้าทักษะ
+// ฟังก์ชันแสดงผลความคืบหน้าทักษะ (unchanged)
 function displaySkillProgress(skillData, activityData) {
     const totalRequiredSkills = skillData.totalRequiredSkills || 0;
     const completedRequiredSkills = skillData.completedRequiredSkills || 0;
     const completedOptionalSkills = skillData.completedOptionalSkills || 0;
     
-    // คำนวณความคืบหน้า (ใช้ 282.74 คือเส้นรอบวงของวงกลมรัศมี 45)
     const progressPercent = totalRequiredSkills > 0 ? (completedRequiredSkills / totalRequiredSkills) : 0;
     const offset = 282.74 - (282.74 * progressPercent);
     
@@ -92,12 +91,11 @@ function displaySkillProgress(skillData, activityData) {
     document.getElementById('pending-required-skills').textContent = totalRequiredSkills - completedRequiredSkills;
     document.getElementById('completed-optional-skills').textContent = completedOptionalSkills;
     
-    // อัปเดทจำนวนกิจกรรม
     const activityCount = activityData.completedActivities || 0;
     document.getElementById('activity-progress').textContent = `${activityCount}/${REQUIRED_ACTIVITIES_COUNT}`;
 }
 
-// ฟังก์ชันแสดงผลแบบทดสอบ
+// ฟังก์ชันแสดงผลแบบทดสอบ (unchanged)
 function displayQuizzes(pendingSkills) {
     const quizContainer = document.getElementById('quiz-container');
     quizContainer.innerHTML = '';
@@ -140,12 +138,9 @@ function startQuiz(skillId) {
     if (confirmStart) {
         // ⭐️ MODIFIED: ใช้ navigateTo (ที่อยู่ใน auth-check.js) และไม่ส่ง data=...
         if (typeof navigateTo === 'function') {
-            navigateTo(`quiz.html?skillId=${skillId}`);
+            navigateTo(`quiz.html?skillId=${skillId}`); 
         } else {
-            // Fallback
             window.location.href = `quiz.html?skillId=${skillId}`;
         }
     }
 }
-
-// ⭐️ MODIFIED: ลบฟังก์ชัน navigateTo และ logout (เพราะอยู่ใน auth-check.js แล้ว)

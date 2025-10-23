@@ -1,6 +1,23 @@
 // ========================================
-// Authentication Check Script
-// เพิ่ม script นี้ในทุกหน้าที่ต้องการ login
+// Helper: Calculate Year Level
+// ========================================
+function calculateYearLevel(userId) {
+    if (!userId || userId.length < 2) return 'N/A';
+    const admissionYear = userId.substring(0, 2);
+    
+    // กฎการเทียบปี: 68=ปี 1, 67=ปี 2, 66=ปี 3, 65=ปี 4
+    switch (admissionYear) {
+        case '68': return 'ปี 1';
+        case '67': return 'ปี 2';
+        case '66': return 'ปี 3';
+        case '65': return 'ปี 4';
+        default: return 'N/A';
+    }
+}
+
+
+// ========================================
+// Authentication Check Script (Global)
 // ========================================
 
 (function() {
@@ -17,10 +34,8 @@
     }
     
     try {
-        // ⭐️ MODIFIED: ใช้ข้อมูลจาก Session Storage
         const sessionData = JSON.parse(storedData);
         
-        // ตรวจสอบความถูกต้องของข้อมูล
         if (!sessionData.user || !sessionData.token) {
             throw new Error('Invalid session data structure');
         }
@@ -30,27 +45,25 @@
         window.userToken = sessionData.token;
         
         console.log('✅ User authenticated:', window.userData.name || window.userData.userId);
-        console.log('   Role:', window.userData.role);
         
-        // เรียกฟังก์ชัน initializePage ถ้ามี
+        // ⭐️ MODIFIED: อัปเดตข้อมูลพื้นฐานทันทีที่ Session ถูกโหลด
+        updateBasicUserInfo();
+        
+        // เรียกฟังก์ชัน initializePage ถ้ามี (จะถูกกำหนดในไฟล์ Dashboard)
         if (typeof initializePage === 'function') {
             initializePage();
         }
         
-        // อัพเดทข้อมูลพื้นฐาน (ถ้ามี element)
-        updateBasicUserInfo();
-        
     } catch (error) {
         console.error('❌ Error loading session data:', error);
-        // ⭐️ MODIFIED: ลบข้อมูลที่เสียหายก่อน Redirect
-        sessionStorage.removeItem('AchieveHubUser');
-        alert('เกิดข้อผิดพลาดในการโหลดข้อมูล กรุณา Login ใหม่');
+        sessionStorage.removeItem('AchieveHubUser'); // Clear corrupted data
+        alert('ข้อมูล Session ไม่ถูกต้อง กรุณา Login ใหม่');
         window.location.href = 'login.html';
     }
 })();
 
 // ========================================
-// Navigation Function
+// Navigation Function (Global)
 // ========================================
 function navigateTo(page) {
     if (!window.userToken || !window.userData) {
@@ -59,14 +72,13 @@ function navigateTo(page) {
         return;
     }
 
-    // ⭐️ MODIFIED: ไม่ต้องเข้ารหัสข้อมูล session และส่ง data=... อีก
-    // หน้าปลายทางจะตรวจสอบ Session Storage เอง
+    // ⭐️ MODIFIED: Navigate โดยไม่ต้องมี ?data=...
     console.log('📍 Navigating to:', page);
     window.location.href = page;
 }
 
 // ========================================
-// Logout Function
+// Logout Function (Global)
 // ========================================
 function logout() {
     const confirmLogout = confirm('ต้องการออกจากระบบหรือไม่?');
@@ -83,28 +95,40 @@ function logout() {
 }
 
 // ========================================
-// Update Basic User Info (Unchanged)
+// ⭐️ MODIFIED: Update Basic User Info (จัดการการแสดงผลข้อมูลนักศึกษา)
 // ========================================
 function updateBasicUserInfo() {
     if (!window.userData) return;
     
-    // ... (unchanged logic)
+    const isStudent = window.userData.role === 'student';
+    
+    // 1. กำหนดค่าเริ่มต้นสำหรับ Element ทั้งหมด
     const elements = {
+        // สำหรับ Header/Advisor Dashboard
         'user-name': window.userData.name || window.userData.userId,
-        'student-name': window.userData.name || '-',
-        'user-email': window.userData.email || '-',
-        'user-faculty': window.userData.faculty || '-',
-        'user-department': window.userData.department || '-',
         'user-role': window.userData.role === 'student' ? 'นักศึกษา' : 'อาจารย์'
     };
     
+    // 2. ถ้าเป็นนักศึกษา, เพิ่มข้อมูลส่วนตัวที่ต้องแสดงบน student-dashboard.html
+    if (isStudent) {
+        const yearLevel = calculateYearLevel(window.userData.userId);
+        
+        // ⭐️ ใช้ ID และคีย์ที่ถูกต้องตาม TU API และ HTML ที่คุณแจ้ง
+        elements['student-name'] = window.userData.name || window.userData.userId;
+        elements['student-year'] = yearLevel;
+        elements['student-faculty'] = window.userData.faculty || '-';
+        elements['student-department'] = window.userData.department || '-';
+    }
+    
+    // 3. วนลูปเพื่ออัปเดต Element ใน DOM
     Object.keys(elements).forEach(id => {
         const element = document.getElementById(id);
         if (element) {
             element.textContent = elements[id];
         }
     });
-    
+
+    // อัพเดท title ของ user icon (ถ้ามี)
     const userIcon = document.getElementById('user-icon');
     if (userIcon) {
         userIcon.title = `สวัสดี, ${window.userData.name || window.userData.userId}`;
