@@ -6,11 +6,10 @@
 (function() {
     console.log('🔐 Checking authentication...');
     
-    // ดึงข้อมูลจาก URL parameter
-    const urlParams = new URLSearchParams(window.location.search);
-    const dataParam = urlParams.get('data');
+    // ⭐️ MODIFIED: ดึงข้อมูลจาก Session Storage แทน URL parameter
+    const storedData = sessionStorage.getItem('AchieveHubUser');
     
-    if (!dataParam) {
+    if (!storedData) {
         console.error('❌ No session data found - redirecting to login');
         alert('กรุณาเข้าสู่ระบบ');
         window.location.href = 'login.html';
@@ -18,9 +17,8 @@
     }
     
     try {
-        // ถอดรหัสข้อมูลจาก URL
-        const decodedData = decodeURIComponent(atob(dataParam));
-        const sessionData = JSON.parse(decodedData);
+        // ⭐️ MODIFIED: ใช้ข้อมูลจาก Session Storage
+        const sessionData = JSON.parse(storedData);
         
         // ตรวจสอบความถูกต้องของข้อมูล
         if (!sessionData.user || !sessionData.token) {
@@ -33,17 +31,8 @@
         
         console.log('✅ User authenticated:', window.userData.name || window.userData.userId);
         console.log('   Role:', window.userData.role);
-        console.log('   Type:', window.userData.type);
         
-        // ตรวจสอบ role ถ้าจำเป็น (สำหรับหน้าเฉพาะ)
-        // ตัวอย่าง: ถ้าหน้านี้เฉพาะ student
-        // if (window.userData.role !== 'student') {
-        //     alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
-        //     window.location.href = 'login.html';
-        //     return;
-        // }
-        
-        // เรียกฟังก์ชัน initialize ถ้ามี
+        // เรียกฟังก์ชัน initializePage ถ้ามี
         if (typeof initializePage === 'function') {
             initializePage();
         }
@@ -53,6 +42,8 @@
         
     } catch (error) {
         console.error('❌ Error loading session data:', error);
+        // ⭐️ MODIFIED: ลบข้อมูลที่เสียหายก่อน Redirect
+        sessionStorage.removeItem('AchieveHubUser');
         alert('เกิดข้อผิดพลาดในการโหลดข้อมูล กรุณา Login ใหม่');
         window.location.href = 'login.html';
     }
@@ -68,16 +59,10 @@ function navigateTo(page) {
         return;
     }
 
-    // เข้ารหัสข้อมูล session เพื่อส่งต่อ
-    const sessionData = {
-        token: window.userToken,
-        user: window.userData
-    };
-    const userDataEncoded = btoa(encodeURIComponent(JSON.stringify(sessionData)));
-
-    // Navigate พร้อมส่งข้อมูล
+    // ⭐️ MODIFIED: ไม่ต้องเข้ารหัสข้อมูล session และส่ง data=... อีก
+    // หน้าปลายทางจะตรวจสอบ Session Storage เอง
     console.log('📍 Navigating to:', page);
-    window.location.href = `${page}?data=${userDataEncoded}`;
+    window.location.href = page;
 }
 
 // ========================================
@@ -87,7 +72,8 @@ function logout() {
     const confirmLogout = confirm('ต้องการออกจากระบบหรือไม่?');
     if (confirmLogout) {
         console.log('👋 Logging out...');
-        // ลบข้อมูล session
+        // ⭐️ MODIFIED: ลบข้อมูล session จาก Session Storage
+        sessionStorage.removeItem('AchieveHubUser');
         window.userData = null;
         window.userToken = null;
         
@@ -97,12 +83,12 @@ function logout() {
 }
 
 // ========================================
-// Update Basic User Info
+// Update Basic User Info (Unchanged)
 // ========================================
 function updateBasicUserInfo() {
     if (!window.userData) return;
     
-    // อัพเดทชื่อผู้ใช้ (ถ้ามี element)
+    // ... (unchanged logic)
     const elements = {
         'user-name': window.userData.name || window.userData.userId,
         'student-name': window.userData.name || '-',
@@ -119,7 +105,6 @@ function updateBasicUserInfo() {
         }
     });
     
-    // อัพเดท title ของ user icon (ถ้ามี)
     const userIcon = document.getElementById('user-icon');
     if (userIcon) {
         userIcon.title = `สวัสดี, ${window.userData.name || window.userData.userId}`;
@@ -127,7 +112,7 @@ function updateBasicUserInfo() {
 }
 
 // ========================================
-// Prevent Back Button After Logout
+// Prevent Back Button After Logout (Unchanged)
 // ========================================
 window.history.pushState(null, '', window.location.href);
 window.onpopstate = function() {
@@ -135,7 +120,7 @@ window.onpopstate = function() {
 };
 
 // ========================================
-// Helper: Get Current User Data
+// Helper: Get Current User Data (Unchanged)
 // ========================================
 function getCurrentUser() {
     return window.userData;
