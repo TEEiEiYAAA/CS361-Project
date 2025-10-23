@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>AchieveHub – แก้ไขกิจกรรม</title>
+    <title>AchieveHub – เพิ่มกิจกรรม</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./CSS/edit-activity.css" />
+    <link rel="stylesheet" href="./CSS/add-activity.css" />
   </head>
 
-  <body>
+  <body>dswa1
     <header class="header">
       <div class="logo">AchieveHub</div>
       <div class="nav-container">
@@ -38,31 +38,31 @@
         <form>
           <!-- ชื่อกิจกรรม -->
           <div class="full">
-            <label for="title">ชื่อกิจกรรม</label>
-            <input id="title" type="text">
+            <label for="name">ชื่อกิจกรรม</label>
+            <input id="name" type="text">
           </div>
 
           <!-- รายละเอียด -->
           <div class="full">
-            <label for="desc">รายละเอียด</label>
-            <textarea id="desc"></textarea>
+            <label for="description">รายละเอียด</label>
+            <textarea id="description"></textarea>
           </div>
 
           <!-- วันที่ / เวลา / สถานที่ / ผู้จัด -->
           <div class="pair">
-            <label for="start">เวลาเริ่มจัดกิจกรรม</label>
-            <input id="start" type="datetime-local">
+            <label for="startDateTime">เวลาเริ่มจัดกิจกรรม</label>
+            <input id="startDateTime" type="datetime-local">
 
-            <label for="end">เวลาสิ้นสุดกิจกรรม</label>
-            <input id="end" type="datetime-local">
+            <label for="endDateTime">เวลาสิ้นสุดกิจกรรม</label>
+            <input id="endDateTime" type="datetime-local">
           </div>
 
           <div class="pair">
-            <label for="place">สถานที่</label>
-            <input id="place" type="text" placeholder="เช่น ห้องประชุม 301, อาคารเรียนรวม">
+            <label for="location">สถานที่</label>
+            <input id="location" type="text" placeholder="เช่น ห้องประชุม 301, อาคารเรียนรวม">
 
-            <label for="host">ผู้จัด</label>
-            <input id="host" type="text" placeholder="ชมรม/หน่วยงานผู้รับผิดชอบ">
+            <label for="organizerId">ผู้จัด</label>
+            <input id="organizerId" type="text" placeholder="ชมรม/หน่วยงานผู้รับผิดชอบ">
           </div>
 
           <!-- กลุ่มกิจกรรม / ระดับ -->
@@ -79,15 +79,15 @@
             <label>ระดับ</label>
             <div class="level">
               <label><input type="radio" name="level"> พื้นฐาน</label>
-              <label><input type="radio" name="level"> กลาง</label>
+              <label><input type="radio" name="level"> ปานกลาง</label>
               <label><input type="radio" name="level"> สูงสุด</label>
             </div>
           </div>
 
           <!-- ชั้นปี / กิจกรรมที่ต้องเข้าร่วม -->
           <div class="pair">
-            <label for="year">เหมาะสำหรับชั้นปี</label>
-            <select id="year" required>
+            <label for="yearLevel">เหมาะสำหรับชั้นปี</label>
+            <select id="yearLevel" required>
               <option value="" selected>เลือกชั้นปีที่เหมาะสม</option>
               <option>ปี 1</option>
               <option>ปี 2</option>
@@ -145,7 +145,7 @@
           </div>
         </div>
 
-        <input type="hidden" id="plo" name="plo" value="[]">
+        <input type="hidden" id="category" name="category" value="[]">
         <input type="hidden" id="ploDescriptions" name="ploDescriptions" value="[]">
       </section>
 
@@ -162,7 +162,7 @@
       นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
   </footer>
 
-  <script src="./JS/edit-activity.js"></script>
+  <script src="./JS/add-activity.js"></script>
     
   </body>
 </html>

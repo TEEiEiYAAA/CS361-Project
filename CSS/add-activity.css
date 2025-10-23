@@ -89,7 +89,7 @@ body {
 
 .card {
   width: min(980px, 95vw);
-  background: rgba(29, 26, 26, 0.6);
+  background: rgba(255,255,255,0.6);
   backdrop-filter: blur(10px);
   border-radius: 18px;
   box-shadow: 0 12px 28px rgba(0,0,0,.12);
@@ -103,7 +103,9 @@ body {
   border: 2px rgba(0,0,0,0.15);
   border-radius: 16px;
   background: rgba(255,255,255,0.6);
-  height: 260px;
+  height: 300px;
+  overflow: hidden;
+  transition: background-size .2s ease;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -151,7 +153,7 @@ select,
 textarea {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid rgba(0,0,0,0.12);
+  border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 15px;
   background: #f6fbff;
   box-sizing: border-box;
@@ -228,12 +230,9 @@ textarea {
   color: #111827;
 }
 
-label.skill-plo-label {
-  color: #35505d !important; 
-}
-
-label.skill-desc-label {
-  color: #35505d !important; 
+#skill-rows {
+  display: grid;
+  gap: 12px;     
 }
 
 .skill-plo,
@@ -293,7 +292,7 @@ label[for="skill-desc-1"] {
   transform: scale(1.05); 
 } 
 
-.btn-add {
+/*.btn-add {
   background: linear-gradient(90deg, #FFCD58 0%, #E8A424 100%);
   width: 12%;
   color: #000000;
@@ -308,6 +307,29 @@ label[for="skill-desc-1"] {
 }
 
 .btn-add:hover {
+  background: linear-gradient(90deg, #F9C63F 0%, #D8911A 100%);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+}*/
+
+#add-skill-wrap { 
+  margin-top: 12px; 
+}
+
+.btn-add-skill {
+  background: linear-gradient(90deg, #FFCD58 0%, #E8A424 100%);
+  width: 12%;
+  color: #000000;
+  font-size: 16px;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 16px;
+  margin-top: 20px;   
+  padding-top: 8px;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0,0,0,.12);
+}
+
+.btn-add-skill:hover {
   background: linear-gradient(90deg, #F9C63F 0%, #D8911A 100%);
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
 }
@@ -325,6 +347,13 @@ label[for="skill-desc-1"] {
   display: flex;
   align-items: center;
   gap: 12px;                  
+}
+
+#skillCategory {
+  display: flex;            
+  justify-content: center;  
+  align-items: center;        
+  text-align: center;        
 }
 
 .pill-input input {
