@@ -1,103 +1,69 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ทักษะปัจจุบัน</title>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./CSS/current-skill.css">
 </head>
 <body>
-      <header class="header">
-      <div class="logo">AchieveHub</div>
-      <div class="nav-container">
-        <nav class="nav-menu">
-          <a href="student-dashboard.html" class="nav-button">หน้าแรก</a>
-          <a href="recommend-activities.html" class="nav-button">กิจกรรมที่แนะนำ</a>
-          <a href="calendar.html" class="nav-button">ปฏิทินกิจกรรม</a>
-          <a href="my-activities.html" class="nav-button">กิจกรรมของฉัน</a>
-          <a href="current-skill.html" class="nav-button active">ทักษะปัจจุบัน</a>
-          <a href="quiz-categories.html" class="nav-button">แบบทดสอบ</a>
-        </nav>
-        <div class="logout-icon" id="user-icon" onclick="logout()">
-          <img src="./Image/LogOut.png" />
-        </div>
-      </div>
-    </header>
-    
-    <!-- Requirement Notice -->
-    <div class="requirement-notice">
-      <strong>📋 เงื่อนไขการนับทักษะ:</strong> 
-      กิจกรรมจะนับเข้าทักษะเมื่อ <strong>ยืนยันการเข้าร่วม</strong> และ <strong>ทำแบบประเมินเสร็จสิ้น</strong> เท่านั้น
+  <header class="header">
+    <div class="logo">AchieveHub</div>
+    <div class="nav-container">
+      <nav class="nav-menu">
+        <a href="student-dashboard.html" class="nav-button">หน้าแรก</a>
+        <a href="recommend-activities.html" class="nav-button">กิจกรรมที่แนะนำ</a>
+        <a href="calendar.html" class="nav-button">ปฏิทินกิจกรรม</a>
+        <a href="my-activities.html" class="nav-button">กิจกรรมของฉัน</a>
+        <a href="current-skill.html" class="nav-button active">ทักษะปัจจุบัน</a>
+        <a href="quiz-categories.html" class="nav-button">แบบทดสอบ</a>
+      </nav>
+      <div class="logout-icon"><img src="./Image/LogOut.png" alt="logout"/></div>
     </div>
-    
-    <!-- Main Content -->
-    <div class="content-container">
-      <h2 class="section-title">ทักษะปัจจุบัน</h2>
-      
-      <!-- Profile Section -->
-      <div class="profile-section">
-        <div class="profile-icon">👤</div>
-        <div class="profile-info">
-          <h3 id="student-name">ชื่อ - นามสกุล</h3>
-          <p id="student-info">ชั้นปีที่กำลังศึกษา</p>
-        </div>
-      </div>
-      
-      <!-- ทักษะที่คุณได้ผ่านการทดสอบแล้ว -->
-      <div class="skills-section">
-        <h3>ทักษะที่คุณได้ผ่านการทดสอบแล้ว</h3>
-        <div id="completed-skills">
-          <div class="loading">กำลังโหลดข้อมูล...</div>
-        </div>
-      </div>
-      
-      <!-- ทักษะที่คุณยังไม่ได้ทำการทดสอบ -->
-      <div class="skills-section">
-        <h3>ทักษะที่คุณยังไม่ได้ทำการทดสอบ</h3>
-        <div id="pending-skills">
-          <div class="loading">กำลังโหลดข้อมูล...</div>
-        </div>
-      </div>
-    </div>
+  </header>
 
-    <!-- ส่วนทักษะอื่นๆ (ไม่บังคับ) -->
-    <div class="content-container">
-      <h2 class="section-title">ทักษะอื่นๆ</h2>
-      
-      <!-- ทักษะที่คุณได้ผ่านการทดสอบแล้ว -->
-      <div class="skills-section">
-        <h3>ทักษะที่คุณได้ผ่านการทดสอบแล้ว</h3>
-        <div id="optional-completed-skills">
-          <div class="loading">กำลังโหลดข้อมูล...</div>
-        </div>
-      </div>
-      
-      <!-- ทักษะที่คุณยังไม่ได้ทำการทดสอบ -->
-      <div class="skills-section">
-        <h3>ทักษะที่คุณยังไม่ได้ทำการทดสอบ</h3>
-        <div id="optional-pending-skills">
-          <div class="loading">กำลังโหลดข้อมูล...</div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- ส่วนทักษะที่ได้รับ -->
-    <div class="received-skills-section">
-      <h2 class="section-title">ทักษะที่ได้รับ</h2>
-      <div id="all-skills-list">
-        <div class="loading">กำลังโหลดข้อมูล...</div>
-      </div>
-    </div>
+  <div class="requirement-notice">
+    <strong>📋 เงื่อนไขการนับทักษะ:</strong>
+    กิจกรรมจะนับเข้าทักษะเมื่อ <strong>ยืนยันการเข้าร่วม</strong> และ <strong>ทำแบบประเมินเสร็จสิ้น</strong> เท่านั้น
   </div>
+
+  <!-- ===== Layout: 2 กล่องแยกกัน ===== -->
+  <main class="skill-layout">
+    <!-- การ์ดซ้าย: PLO -->
+    <aside class="plo-card">
+      <h3>ผลลัพธ์การเรียนรู้<br>ของหลักสูตร</h3>
+      <ul>
+        <li class="active">PLO1</li>
+        <li>PLO2</li>
+        <li>PLO3</li>
+        <li>PLO4</li>
+        <li>อื่น ๆ</li>
+      </ul>
+    </aside>
+
+    <!-- การ์ดขวา: กล่องหลัก มีแท็บอย่างเดียว -->
+    <section class="skill-card">
+      <div class="tabs-wrap">
+        <button class="tab-btn active" onclick="switchTab(event)">ทักษะที่ได้รับแล้ว</button>
+        <button class="tab-btn" onclick="switchTab(event)">ทักษะที่ยังไม่ได้รับ</button>
+      </div>
+    </section>
+  </main>
 
   <footer>
     <p>AchieveHub ©2025<br>CS361</p>
-    <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194
-      นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
+    <small>
+      นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194
+      นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475
+    </small>
   </footer>
 
-  <script src="../JS/current-skill.js"></script>
+  <script>
+    function switchTab(e){
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+    }
+  </script>
 </body>
-
 </html>
