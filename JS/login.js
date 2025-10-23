@@ -26,27 +26,30 @@ document.getElementById('login-form').addEventListener('submit', async function(
     const data = await response.json();
     
     if (data.success) {
-      // เข้ารหัสข้อมูลผู้ใช้เป็น base64 เพื่อส่งผ่าน URL
-      const userDataEncoded = btoa(encodeURIComponent(JSON.stringify({
+      
+      // *** ⭐️ ส่วนที่แก้ไข: จัดเก็บข้อมูลผู้ใช้ใน Session Storage แทน ***
+      sessionStorage.setItem('AchieveHubUser', JSON.stringify({
         token: data.token,
-        user: data.user
-      })));
+        user: data.user // มี role: 'student' หรือ 'advisor' อยู่ในนี้
+      }));
       
       // แสดงข้อความสำเร็จก่อนนำทาง
       errorMessage.style.color = '#4CAF50';
       errorMessage.style.background = 'rgba(76, 175, 80, 0.1)';
       errorMessage.textContent = "เข้าสู่ระบบสำเร็จ! กำลังนำทาง...";
       
-      // นำทางไปหน้าที่เหมาะสมตาม role พร้อมส่งข้อมูล
+      // นำทางไปหน้าที่เหมาะสมตาม role โดยไม่ต้องส่งข้อมูลผ่าน URL
       setTimeout(() => {
         if (data.user.role === 'student') {
-          window.location.href = `student-dashboard.html?data=${userDataEncoded}`;
+          window.location.href = `student-dashboard.html`; // ไม่มี ?data=...
         } else if (data.user.role === 'advisor') {
-          window.location.href = `advisor-dashboard.html?data=${userDataEncoded}`;
+          window.location.href = `advisor-dashboard.html`; // ไม่มี ?data=...
         } else {
           errorMessage.style.color = '#ff6b6b';
           errorMessage.style.background = 'rgba(255, 0, 0, 0.1)';
           errorMessage.textContent = "ไม่สามารถระบุประเภทผู้ใช้งานได้";
+          // ควรลบข้อมูลที่เพิ่งเก็บไว้หากระบุ role ไม่ได้
+          sessionStorage.removeItem('AchieveHubUser');
         }
       }, 1000); // รอ 1 วินาที
       
