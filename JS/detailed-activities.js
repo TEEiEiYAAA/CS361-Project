@@ -7,14 +7,6 @@ const CONFIG = {
   }
 };
 
-// ✅ เพิ่ม: map ชื่อเต็มของ PLO
-const PLO_NAME_MAP = {
-  PLO1: 'ความรู้พื้นฐานด้านการเขียนโปรแกรม',
-  PLO2: 'ทักษะการพัฒนาและออกแบบระบบ',
-  PLO3: 'ความรับผิดชอบและจริยธรรมวิชาชีพ',
-  PLO4: 'การทำงานร่วมกับผู้อื่นและภาวะผู้นำ',
-};
-
 let currentActivity = null;
 let currentUser = null;
 
@@ -75,21 +67,23 @@ function formatDateTime(dateTimeString) {
   }
 }
 
-function extractPLOs(activity) {
-  const raw = activity.plo || [];
-  if (Array.isArray(raw)) return raw.map(x => String(x).trim().toUpperCase());
-  if (typeof raw === 'string') {
-    try { const parsed = JSON.parse(raw); if (Array.isArray(parsed)) return parsed.map(x => String(x).trim().toUpperCase()); } catch {}
-    return raw.split(',').map(x => x.trim().toUpperCase()).filter(Boolean);
-  }
-  return [];
+function normalizeLevel(levelRaw) {
+  const s = String(levelRaw || '').trim().toLowerCase();
+  if (!s) return '';
+  if (['พื้นฐาน','basic'].includes(s)) return 'พื้นฐาน';
+  if (['กลาง','ปานกลาง','medium'].includes(s)) return 'ปานกลาง';
+  if (['ขั้นสูง','advanced'].includes(s)) return 'ขั้นสูง';
+  return s;
+}
+function getLevelDisplay(levelRaw) { return normalizeLevel(levelRaw); }
+function getLevelClass(levelRaw) {
+  const lv = normalizeLevel(levelRaw);
+  if (lv === 'พื้นฐาน') return 'level-basic';
+  if (lv === 'ปานกลาง') return 'level-medium';
+  if (lv === 'ขั้นสูง')  return 'level-advanced';
+  return '';
 }
 
-function getLevelDisplay(levelRaw) {
-  const level = (levelRaw || '').trim();
-  if (!level) return '';
-  return level === 'กลาง' ? 'ปานกลาง' : level;
-}
 
 // Display activity details
 function displayActivityDetail(activity) {
@@ -107,7 +101,8 @@ function displayActivityDetail(activity) {
     skillCategory === 'multi-skill' ? 'Multi-Skill' : 'ทักษะทั่วไป';
 
   // ✅ badge ระดับ
-  const levelDisplay = getLevelDisplay(activity.level);
+  const levelDisplay = getLevelDisplay(activity.skillLevel);
+  const levelClass   = getLevelClass(activity.skillLevel);
   const levelBadge   = levelDisplay ? `<span class="level-badge">${levelDisplay}</span>` : '';
 
   // รูป
@@ -117,21 +112,17 @@ function displayActivityDetail(activity) {
     : `<div class="img-placeholder">🖼️</div>`;
 
   // ✅ PLO แสดงชื่อเต็ม
-  const plos = extractPLOs(activity);
-  const ploFullNames = plos.map(code => PLO_NAME_MAP[code] || code);
+  const ploFullNames = Array.isArray(activity.ploFullNames) ? activity.ploFullNames : [];
+  const ploDescriptions = Array.isArray(activity.ploDescriptions) ? activity.ploDescriptions : [];
   const ploBlock = ploFullNames.length
     ? `<div class="plo-box">
          <div class="sec-title">🎯 ทักษะที่ได้รับ</div>
          <div class="sec-body">
            ${activity.activityGroup ? `<p><strong>กลุ่มกิจกรรม:</strong> ${activity.activityGroup}</p>` : ''}
-           ${ploFullNames.map((n, i) => {
-              const code = plos[i] || '';
-              // ถ้ามีคำอธิบายแยกมาใน activity.ploDescriptions จะต่อท้ายด้วย
-              const desc = Array.isArray(activity.ploDescriptions) && activity.ploDescriptions[i]
-                           ? ` — ${activity.ploDescriptions[i]}` : '';
-              return `<div class="plo-line"><strong>${code}</strong>: ${n}${desc}</div>`;
-            }).join('')}
-           ${activity.suitableYearLevel ? `<p><strong>เหมาะสำหรับชั้นปี:</strong> ${activity.suitableYearLevel}</p>` : ''}
+            ${ploFullNames.map((name, i) =>
+            `<div class="plo-line">• ${name}${ploDescriptions[i] ? ` — ${ploDescriptions[i]}` : ''}</div>`
+            ).join('')}
+           ${activity.yearLevel ? `<p><strong>เหมาะสำหรับชั้นปี:</strong> ${activity.yearLevel}</p>` : ''}
            ${activity.requiredActivities ? `<p><strong>กิจกรรมที่ต้องเข้าร่วม:</strong> ${activity.requiredActivities} กิจกรรม</p>` : ''}
          </div>
        </div>`
@@ -166,7 +157,7 @@ function displayActivityDetail(activity) {
         <div class="sec-body">
           <p><strong>เริ่ม:</strong> ${startDate}</p>
           <p><strong>สิ้นสุด:</strong> ${endDate}</p>
-          <p><strong>สถานที่:</strong> ${activity.location || 'ไม่ระบุสถานที่'}</p>
+          <p><strong>สถานที่:</strong> ${activity.locationName || activity.location || 'ไม่ระบุสถานที่'}</p>
         </div>
       </div>
 

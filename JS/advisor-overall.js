@@ -45,28 +45,57 @@
           activityTitle.textContent = activityData.name || "ไม่มีชื่อกิจกรรม";
         }
 
-        // แสดงข้อมูลทักษะ (ถ้ามี)
-        const skillSection = document.querySelector(".skill-list");
-        const skill = activityData.skill || {};
+        // === New: แสดงรายละเอียดกิจกรรม ===
+        const detailSection = document.querySelector(".activity-detail");
+        if (detailSection) {
+          let detailHtml = `
+            <h3>รายละเอียดกิจกรรม</h3>
+            <div class="detail-box">
+              <p>${activityData.description || 'ไม่มีรายละเอียดกิจกรรม'}</p>
+          `;
 
-        if (skillSection) {
-          if (skill.name) {
-            skillSection.innerHTML = `<p>🎯 <strong>${skill.name}</strong></p>`;
-            if (skill.description) {
-              skillSection.innerHTML += `<p style="margin-top: 10px; color: #666;">${skill.description}</p>`;
-            }
-            if (skill.category) {
-              skillSection.innerHTML += `<p style="margin-top: 5px; font-size: 0.9rem;">
-                <span style="background: ${skill.category === 'soft skill' ? '#FF6B6B' : '#4ECDC4'}; color: white; padding: 2px 8px; border-radius: 10px;">
-                  ${skill.category === 'soft skill' ? 'Soft Skill' : 'Hard Skill'}
+          // ===== หมวดทักษะ (Skill Category) =====
+          if (skill.category) {
+            const badgeColor =
+              skill.category === 'soft skill'
+                ? '#FF6B6B'
+                : skill.category === 'hard skill'
+                ? '#4ECDC4'
+                : '#95A5A6';
+            const badgeName =
+              skill.category === 'soft skill'
+                ? 'Soft Skill'
+                : skill.category === 'hard skill'
+                ? 'Hard Skill'
+                : 'Multi Skill';
+            detailHtml += `
+              <p style="margin-top: 10px;">
+                <span class="badge" style="background:${badgeColor};">
+                  ${badgeName}
                 </span>
-              </p>`;
-            }
-          } else {
-            skillSection.innerHTML = `<p>ไม่มีข้อมูลทักษะที่เกี่ยวข้อง</p>`;
+              </p>
+            `;
           }
-        }
 
+          // ===== ระดับความยาก (Skill Level) =====
+          if (skill.skillLevel) {
+            let levelColor = '#95A5A6';
+            if (skill.skillLevel === 'พื้นฐาน') levelColor = '#4CAF50';     // เขียว
+            else if (skill.skillLevel === 'ปานกลาง') levelColor = '#FFC107'; // เหลือง
+            else if (skill.skillLevel === 'ขั้นสูง') levelColor = '#F44336'; // แดง
+
+            detailHtml += `
+              <p style="margin-top: 10px;">
+                <span class="badge" style="background:${levelColor};">
+                  ระดับ: ${skill.skillLevel}
+                </span>
+              </p>
+            `;
+          }
+
+          detailHtml += `</div>`;
+          detailSection.innerHTML = detailHtml;
+        }
 
         // ดึงข้อมูลผู้เข้าร่วมจาก API ใหม่
         console.log("Fetching participation stats...");
@@ -130,15 +159,51 @@
           const infoHtml = `
             <div style="margin-top: 20px; padding: 15px; background: #e8f5e8; border-radius: 10px;">
               <h4 style="margin: 0 0 10px 0; color: #2e7d32;">ℹ️ ข้อมูลกิจกรรม</h4>
+              <p><strong>🎯 กลุ่มกิจกรรม:</strong> ${activityData.activityGroup || 'ไม่ระบุ'}</p>
               <p><strong>📅 วันที่เริ่ม:</strong> ${formatDateTime(activityData.startDateTime)}</p>
               <p><strong>📅 วันที่สิ้นสุด:</strong> ${formatDateTime(activityData.endDateTime)}</p>
-              <p><strong>📍 สถานที่:</strong> ${activityData.location || 'ไม่ระบุ'}</p>
-              <p><strong>🔗 QR Code:</strong> ${activityData.qrCode || 'ไม่ระบุ'}</p>
-              ${activityData.organizerId ? `<p><strong>👤 ผู้จัด:</strong> ${activityData.organizerId}</p>` : ''}
+              <p><strong>📍 สถานที่:</strong> ${activityData.locationName || activityData.location || 'ไม่ระบุ'}</p>
+              ${activityData.organizerId ? `<p><strong>👤 ผู้จัด:</strong> ${activityData.organizerId}</p>
+              <p><strong>🎓 เหมาะสมกับชั้นปี:</strong> ${activityData.yearLevel ?? 'ไม่ระบุ'}</p>
+              <p><strong>🧩 กิจกรรมที่ต้องเข้าร่วม:</strong> ${activityData.requiredActivities || 'ไม่มี'}</p>` : ''}
             </div>
           `;
           
           additionalInfo.innerHTML = infoHtml;
+        }
+
+        // แสดงข้อมูลทักษะ (PLO) ที่ได้รับ — รองรับหลายรายการ
+        const skillSection = document.querySelector(".skill-list");
+        const skill = activityData.skill || {};
+
+        if (skillSection) {
+          // เตรียมชื่อ PLO แบบ array
+          const names = Array.isArray(skill.ploFullNames)
+            ? skill.ploFullNames
+            : (skill.ploFullNames ? [skill.ploFullNames] : []);
+
+          // รองรับคำอธิบายแบบต่อรายการ (ploDescriptions) หรือคำอธิบายรวม (description)
+          const descs = Array.isArray(skill.ploDescriptions)
+            ? skill.ploDescriptions
+            : (skill.ploDescriptions ? [skill.ploDescriptions] : []);
+          const fallbackDesc = skill.description || '';
+
+          if (names.length > 0) {
+            skillSection.innerHTML = names.map((name, idx) => {
+              const desc = (descs[idx] !== undefined && descs[idx] !== null && String(descs[idx]).trim() !== '')
+                ? descs[idx]
+                : fallbackDesc;
+
+              return `
+                <div class="skill-item" style="margin-bottom:14px;">
+                  <p>🎯 <strong>${name}</strong></p>
+                  ${desc ? `<p style="margin-top: 10px; color: #666;">${desc}</p>` : ''}
+                </div>
+              `;
+            }).join('');
+          } else {
+            skillSection.innerHTML = `<p>ไม่มีข้อมูลทักษะที่เกี่ยวข้อง</p>`;
+          }
         }
 
       } catch (err) {

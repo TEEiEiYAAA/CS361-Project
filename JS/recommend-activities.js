@@ -136,44 +136,24 @@
             
             activitiesList.innerHTML = html;
         }
-
-        // ==== PLO full-name map ====
-        const PLO_NAME_MAP = {
-            PLO1: 'ความรู้พื้นฐานด้านการเขียนโปรแกรม',
-            PLO2: 'ทักษะการพัฒนาและออกแบบระบบ',
-            PLO3: 'ความรับผิดชอบและจริยธรรมวิชาชีพ',
-            PLO4: 'การทำงานร่วมกับผู้อื่นและภาวะผู้นำ',
-        };
-        
-        // ดึง PLO จาก activity (รองรับ array, JSON string, "PLO1,PLO2")
-        function extractPLOs(activity) {
-            const raw = activity.plo || activity.plos || activity.PLO || activity.PLOs || [];
-            if (Array.isArray(raw)) return raw.map(x => String(x).trim().toUpperCase());
-            if (typeof raw === 'string') {
-            const s = raw.trim();
-            try { const parsed = JSON.parse(s); if (Array.isArray(parsed)) return parsed.map(x => String(x).trim().toUpperCase()); } catch(_) {}
-            return s.split(',').map(x => x.trim().toUpperCase()).filter(Boolean);
-            }
-            return [];
-        }
-        
-        function getPloFullNames(plos) {
-            return plos.map(code => PLO_NAME_MAP[code] || code);
-        }
         
         // แสดงชื่อระดับบน badge
-        function getLevelDisplay(levelRaw) {
-            const level = (levelRaw || '').trim();
-            if (!level) return '';
-            return level === 'กลาง' ? 'ปานกลาง' : level; // ให้ขึ้นคำว่า “ปานกลาง”
-        }
-        function getLevelClass(levelRaw) {
-            const l = (levelRaw || '').trim();
-            if (l === 'พื้นฐาน') return 'level-basic';
-            if (l === 'กลาง')    return 'level-medium';
-            if (l === 'ขั้นสูง')  return 'level-advanced';
+        function normalizeLevel(levelRaw) {
+            const s = String(levelRaw || '').trim().toLowerCase();
+            if (!s) return '';
+            if (['พื้นฐาน','basic'].includes(s)) return 'พื้นฐาน';
+            if (['กลาง','ปานกลาง','medium'].includes(s)) return 'ปานกลาง';
+            if (['ขั้นสูง','advanced'].includes(s)) return 'ขั้นสูง';
+            return s;
+          }
+          function getLevelDisplay(levelRaw) { return normalizeLevel(levelRaw); }
+          function getLevelClass(levelRaw) {
+            const lv = normalizeLevel(levelRaw);
+            if (lv === 'พื้นฐาน') return 'level-basic';
+            if (lv === 'ปานกลาง') return 'level-medium';
+            if (lv === 'ขั้นสูง')  return 'level-advanced';
             return '';
-        }
+          }          
         
         
         // Create individual activity card HTML
@@ -204,8 +184,8 @@
             skillCategory === 'multi-skill' ? 'Multi-Skill' : 'ทักษะทั่วไป';
 
             // ==== Badge ระดับ ====
-            const levelDisplay = getLevelDisplay(activity.level);
-            const levelClass   = getLevelClass(activity.level);
+            const levelDisplay = getLevelDisplay(activity.skillLevel);
+            const levelClass   = getLevelClass(activity.skillLevel);
             const levelBadge   = levelDisplay ? `<div class="level-badge ${levelClass}">${levelDisplay}</div>` : '';
 
         
@@ -214,14 +194,13 @@
             const imageHtml = imageUrl ? `style="background-image: url('${imageUrl}')"` : '';
             const placeholderIcon = imageUrl ? '' : '🖼️';
         
-            // ==== ทักษะที่ได้รับ (PLO → ชื่อเต็ม) ====
-            const plos = extractPLOs(activity);
-            const ploFullNames = getPloFullNames(plos);
-            const ploHtml = ploFullNames.length
+            // ==== ทักษะที่ได้รับ (PLO → ชื่อเต็มจากตาราง) ====
+            const ploNames = Array.isArray(activity.ploFullNames) ? activity.ploFullNames : [];
+            const ploHtml = ploNames.length
             ? `<div class="plo-section">
                 <div class="plo-title">ทักษะที่ได้รับ:</div>
                 <div class="plo-values">
-                    ${ploFullNames.map(n => `<div class="plo-item">• ${n}</div>`).join('')}
+                    ${ploNames.map(n => `<div class="plo-item">• ${n}</div>`).join('')}
                 </div>
                 </div>`
             : '';
@@ -244,7 +223,7 @@
         
                 <div class="activity-meta">
                     <div class="activity-date">📅 ${dateRange}</div>
-                    <div class="activity-location">📍 ${activity.location || 'ไม่ระบุสถานที่'}</div>
+                    <div class="activity-location">📍 ${activity.locationName || activity.location || 'ไม่ระบุสถานที่'}</div>
                     ${activity.skillName ? `<div class="activity-skill">🎯 ${activity.skillName}</div>` : ''}
 
                     ${ploHtml}

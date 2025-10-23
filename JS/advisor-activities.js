@@ -165,47 +165,95 @@
             
             activitiesList.innerHTML = html;
         }
+
+        function normalizeLevel(levelRaw) {
+            const s = String(levelRaw || '').trim().toLowerCase();
+            if (!s) return '';
+            if (['พื้นฐาน','basic'].includes(s)) return 'พื้นฐาน';
+            if (['กลาง','ปานกลาง','medium'].includes(s)) return 'ปานกลาง';
+            if (['ขั้นสูง','advanced'].includes(s)) return 'ขั้นสูง';
+            return s;
+          }
+          function getLevelDisplay(levelRaw) { return normalizeLevel(levelRaw); }
+          function getLevelClass(levelRaw) {
+            const lv = normalizeLevel(levelRaw);
+            if (lv === 'พื้นฐาน') return 'level-basic';
+            if (lv === 'ปานกลาง') return 'level-medium';
+            if (lv === 'ขั้นสูง')  return 'level-advanced';
+            return '';
+          }
+          
         
         // Create individual activity card HTML
         function createActivityCard(activity) {
-            // Format date and time
-            const formattedDate = formatDateTime(activity.startDateTime);
-            
-            // Determine skill badge
+            // วันที่
+            const startTxt = formatDateTime(activity.startDateTime);
+            const endTxt   = formatDateTime(activity.endDateTime);
+            const dateRange = activity.endDateTime ? `${startTxt} – ${endTxt}` : startTxt;
+          
+            // หมวดทักษะ
             const skillCategory = activity.skillCategory || '';
             const skillBadgeClass = skillCategory.toLowerCase().replace(' ', '-');
-            const skillDisplayName = skillCategory === 'soft skill' ? 'Soft Skill' : 
-                                   skillCategory === 'hard skill' ? 'Hard Skill' : 
-                                   'ทักษะทั่วไป';
-            
-            // Create image HTML
+            const skillDisplayName =
+              skillCategory === 'soft skill'  ? 'Soft Skill'  :
+              skillCategory === 'hard skill'  ? 'Hard Skill'  :
+              skillCategory === 'multi-skill' ? 'Multi-Skill' : 'ทักษะทั่วไป';
+          
+            // ระดับ (skillLevel)
+            const levelDisplay = getLevelDisplay(activity.skillLevel);
+            const levelClass   = getLevelClass(activity.skillLevel);
+            const levelBadge   = levelDisplay ? `<div class="level-badge ${levelClass}">${levelDisplay}</div>` : '';
+          
+            // รูป
             const imageUrl = activity.imageUrl || null;
-            const imageHtml = imageUrl ? 
-                `style="background-image: url('${imageUrl}')"` : 
-                '';
+            const imageHtml = imageUrl ? `style="background-image: url('${imageUrl}')"` : '';
             const placeholderIcon = imageUrl ? '' : '🖼️';
-            
-            return `
-                <div class="activity-card" onclick="viewActivityDetail('${activity.activityId}')" style="cursor: pointer;">
-                    <div class="activity-image" ${imageHtml}>
-                        ${placeholderIcon}
-                        ${skillCategory ? `<div class="skill-badge ${skillBadgeClass}">${skillDisplayName}</div>` : ''}
-                    </div>
-                    <div class="activity-content">
-                        <h3 class="activity-title">${activity.name || 'ไม่มีชื่อกิจกรรม'}</h3>
-                        <p class="activity-description">${activity.description || 'ไม่มีคำอธิบาย'}</p>
-                        <div class="activity-meta">
-                            <div class="activity-date">📅 ${formattedDate}</div>
-                            <div class="activity-location">📍 ${activity.location || 'ไม่ระบุสถานที่'}</div>
-                            ${activity.skillName ? `<div class="activity-skill">🎯 ${activity.skillName}</div>` : ''}
-                        </div>
-                        <button class="register-btn" onclick="event.stopPropagation(); registerForActivity('${activity.activityId}', '${activity.name}')">
-                            สมัครเข้าร่วม
-                        </button>
-                    </div>
-                </div>
+          
+            // PLO (ชื่อเต็ม)
+            const ploNames = Array.isArray(activity.ploFullNames) ? activity.ploFullNames : [];
+            const ploHtml = ploNames.length
+              ? `<div class="plo-section">
+                   <div class="plo-title">ทักษะที่ได้รับ:</div>
+                   <div class="plo-values">
+                     ${ploNames.map(n => `<div class="plo-item">• ${n}</div>`).join('')}
+                   </div>
+                 </div>`
+              : '';
+          
+            // ปุ่มกด
+            const buttonsHtml = `
+              <div class="card-actions">
+                <button class="btn btn-detail"
+                  onclick="event.stopPropagation(); window.location.href='advisor-overall.html?activityId=${activity.activityId}'">
+                  ดูรายละเอียด
+                </button>
+                <button class="btn btn-edit"
+                  onclick="event.stopPropagation(); window.location.href='edit-activity.html?id=${activity.activityId}'">
+                  แก้ไข
+                </button>
+              </div>
             `;
-        }
+          
+            return `
+              <div class="activity-card" onclick="viewActivityDetail('${activity.activityId}')" style="cursor:pointer;">
+                <div class="activity-image" ${imageHtml}>
+                  ${placeholderIcon}
+                  ${levelBadge}
+                  ${skillCategory ? `<div class="skill-badge ${skillBadgeClass}">${skillDisplayName}</div>` : ''}
+                </div>
+                <div class="activity-content">
+                  <h3 class="activity-title">${activity.name || 'ไม่มีชื่อกิจกรรม'}</h3>
+                  <p class="activity-description">${activity.description || 'ไม่มีคำอธิบาย'}</p>
+                  <div class="activity-meta">
+                    <div class="activity-date">📅 ${dateRange}</div>
+                    <div class="activity-location">📍 ${activity.locationName || activity.location || 'ไม่ระบุสถานที่'}</div>
+                  </div>
+                  ${ploHtml}
+                  ${buttonsHtml}
+                </div>
+              </div>
+            `;
+          }                    
         
         // Format date and time
         function formatDateTime(dateTimeString) {
