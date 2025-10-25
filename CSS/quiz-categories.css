@@ -153,15 +153,122 @@ footer {
     color: #37798B;
     font-weight: bold;
     border-radius: 12px 12px 0 0;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+    margin-bottom: -1px;
 }
 
 .quiz-container {
     width: 95%;
     max-width: 1400px;
     margin: 0 auto 40px auto;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 0 0 16px 16px;
-    padding: 20px 30px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     min-height: 400px;
+    /* เราจะย้าย background และ padding ไปไว้ที่กล่องลูกแทน */
+}
+
+/* --- ส่วนของรายการแบบทดสอบ (ที่สร้างโดย JS) --- */
+
+/* หัวข้อของตาราง (กลุ่มกิจกรรม, ระดับ, ฯลฯ) */
+.quiz-header-row {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1.5fr 1fr; 
+    gap: 15px;
+    font-size: 1.1rem; 
+    font-weight: bold; 
+    color: #37798B; 
+
+    /* ★★★ นี่คือส่วนที่คุณต้องการ ★★★ */
+    background: #F8F9FA; /* ★ สีพื้นหลังเทาอ่อน (แบบในดีไซน์) ★ */
+    padding: 20px 30px; /* ★ ใส่ padding ที่นี่ ★ */
+
+    /* ★ ทำให้มุมบนโค้ง (ประกบกับแท็บ) ★ */
+    /* เราจะใช้ JS สลับคลาสนี้ทีหลัง */
+    border-radius: 0 16px 0 0; /* (ค่าเริ่มต้น: แท็บซ้าย active) */
+
+    /* ★ เพิ่มเงาให้ดูมีมิติ ★ */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#done-header {
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+}
+
+/* ★★★ อย่าลืม CSS สำหรับแท็บ "ทำไปแล้ว" ด้วย ★★★ */
+/* ทำให้หัวข้อของแท็บ "Done" มี Grid 4 ช่องเท่ากัน */
+#done-header {
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+}
+
+/* แถวข้อมูล */
+.quiz-data-row {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1fr; /* 3 คอลัมน์ */
+    gap: 15px;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #F0F0F0;
+    transition: background-color 0.2s;
+}
+
+.quiz-data-row:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* ปรับแถวสำหรับแท็บ "Done" ให้มี 4 คอลัมน์ */
+.quiz-data-row.done {
+    grid-template-columns: 2fr 1fr 1fr 1fr; 
+}
+
+/* ปุ่ม "กดเพื่อทำแบบทดสอบ" */
+.quiz-start-btn {
+    background-color: #FFECEC;
+    color: #D9534F;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    text-align: center;
+}
+
+.quiz-start-btn:hover {
+    background-color: #FFD9D9;
+}
+
+/* ป้ายคะแนน "ผ่าน" */
+.score-badge {
+    background-color: #E6F7F0;
+    color: #28A745;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* ข้อความตอนไม่มีข้อมูล หรือ กำลังโหลด */
+.loading,
+.empty-message,
+.error-message {
+    text-align: center;
+    padding: 40px;
+    color: #6C757D;
+    font-size: 1.1rem;
+}
+.empty-message small {
+    font-size: 0.9rem;
+    color: #888;
+}
+.error-message {
+    color: #D9534F;
+}
+
+#quiz-list-data {
+    background: #FFFFFF; /* ★ สีขาว ★ */
+    padding: 20px 30px;
+    border-radius: 0 0 16px 16px; /* ★ มุมล่างโค้ง ★ */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    min-height: 300px;
 }
