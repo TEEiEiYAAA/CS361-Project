@@ -10,20 +10,19 @@
         // Global variables
         let allActivities = [];
         let currentFilter = 'all';
-        let currentUser = null;
         
-        // Initialize application
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeApp();
-        });
-        
-        // Initialize the application
-        function initializeApp() {
-            // Check login status
-            currentUser = JSON.parse(localStorage.getItem('userData') || '{}');
-            
-            if (!currentUser.studentId && !currentUser.userId) {
-                window.location.href = "login.html";
+        // ⭐️ MODIFIED: ฟังก์ชันเริ่มต้น (ถูกเรียกโดย auth-check.js)
+        function initializeRecommendActivitiesPage() {
+            console.log('Initialize Recommend Activities Page...');
+
+            // ⭐️ Session Check: ตรวจสอบ Role (ใช้ window.userData ที่ตั้งค่าโดย auth-check.js)
+            if (!window.userData || window.userData.role !== 'student') {
+                console.error('User role is not student, redirecting...');
+                if (typeof navigateTo === 'function') {
+                    navigateTo("login.html"); 
+                } else {
+                    window.location.href = "login.html";
+                }
                 return;
             }
             
@@ -31,8 +30,13 @@
             setupTabButtons();
             
             // Load activities
-            loadActivities();
+            const studentId = window.userData.userId || window.userData.studentId;
+            loadActivities(studentId);
         }
+
+        // ⭐️ NEW/MODIFIED: กำหนดให้ auth-check.js เรียกฟังก์ชันนี้เมื่อ Authentication ผ่าน
+        window.initializePage = initializeRecommendActivitiesPage;
+
         
         // Setup tab button event listeners
         function setupTabButtons() {
@@ -75,7 +79,7 @@
                 const response = await fetch(apiUrl, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Authorization': `Bearer ${window.userToken}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -255,7 +259,7 @@
         
         // Register for activity
         async function registerForActivity(activityId, activityName) {
-            const studentId = currentUser.studentId || currentUser.userId;
+            const studentId = window.userData.userId || window.userData.userId;
             
             if (!confirm(`ต้องการสมัครเข้าร่วมกิจกรรม "${activityName}" หรือไม่?`)) {
                 return;
@@ -268,7 +272,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${window.userToken}`
                     },
                     body: JSON.stringify({
                         activityId: activityId,
@@ -310,30 +314,4 @@
                     <button class="retry-btn" onclick="loadActivities()">ลองใหม่</button>
                 </div>
             `;
-        }
-
-        // เพิ่มฟังก์ชัน navigateTo ในส่วน <script>
-        function navigateTo(page) {
-        // ตรวจสอบว่ามี token และ userData อยู่หรือไม่
-        const token = localStorage.getItem('token');
-        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-        
-        if (!token || !userData.userId) {
-            // ถ้าไม่มี token หรือ userData ให้กลับไปหน้า login
-            window.location.href = 'login.html';
-            return;
-        }
-
-        // ถ้ามี token และ userData ให้นำทางไปยังหน้าที่ต้องการ
-        window.location.href = page;
-        }
-        
-        // ฟังก์ชันล็อกเอาท์
-        function logout() {
-            const confirmLogout = confirm('ต้องการออกจากระบบหรือไม่?');
-            if (confirmLogout) {
-                localStorage.removeItem('userData');
-                localStorage.removeItem('token');
-                window.location.href = "login.html";
-            }
         }

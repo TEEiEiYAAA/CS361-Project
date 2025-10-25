@@ -1,14 +1,16 @@
+console.log("🚀 student-dashboard.js: Script started loading..."); // LOG 1: ไฟล์เริ่มโหลด
+
 // Configuration
 const API_BASE_URL = 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod';
-const REQUIRED_ACTIVITIES_COUNT = 3;
 
-// ⭐️ MODIFIED: ฟังก์ชันหลักที่ถูกเรียกโดย auth-check.js
+// ⭐️ ฟังก์ชันหลักที่ถูกเรียกโดย auth-check.js
 function initializeStudentDashboard() {
+    console.log("🏁 student-dashboard.js: initializeStudentDashboard() called"); // LOG 3: ฟังก์ชันเริ่มต้นถูกเรียก
+
     // ⭐️ ตรวจสอบ Role
     if (!window.userData || window.userData.role !== 'student') {
         console.error('Authentication failed - not a student:', window.userData.role);
         alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
-        // ใช้ navigateTo ที่อยู่ใน auth-check.js
         if (typeof navigateTo === 'function') {
             navigateTo("login.html");
         } else {
@@ -16,131 +18,155 @@ function initializeStudentDashboard() {
         }
         return;
     }
-
-    // ⭐️ DELETED: Logic การแสดงผลข้อมูลส่วนตัวถูกลบออก (ย้ายไป auth-check.js)
     
     // ดึงข้อมูลทักษะจาก API
     const studentInfo = window.userData;
-    const studentId = studentInfo.userId || studentInfo.userId;
+    const studentId = studentInfo.userId || studentInfo.userId; 
     loadAllSkillData(studentId);
 }
 
-// ⭐️ MODIFIED: กำหนดให้ auth-check.js เรียกฟังก์ชันนี้เมื่อ Authentication ผ่าน
-window.initializePage = initializeStudentDashboard;
+// ⭐️ กำหนดให้ auth-check.js เรียกฟังก์ชันนี้เมื่อ Authentication ผ่าน
+console.log("🔧 student-dashboard.js: Defining window.initializePage..."); // LOG 2: กำลังจะกำหนด initializePage
+//window.initializePage = initializeStudentDashboard;
+console.log("✅ student-dashboard.js: window.initializePage is set.");
 
 
-// ฟังก์ชันดึงข้อมูลทักษะทั้งหมด (unchanged)
+// ฟังก์ชันหลักที่โหลดข้อมูล (เวอร์ชันใหม่ที่รอรับ Summary)
 async function loadAllSkillData(studentId) {
+    console.log("🔄 student-dashboard.js: loadAllSkillData() called for student:", studentId); // LOG 4: เริ่มโหลดข้อมูล
+    const progressText = document.getElementById('progress-text');
+    const quizContainer = document.getElementById('quiz-container');
+
+    // แสดงสถานะโหลด
+    quizContainer.innerHTML = 
+        `<div class="loading" style="text-align: center; padding: 20px; color: #666;">กำลังโหลดข้อมูล...</div>`;
+
     try {
-        // 1. ดึงข้อมูลทักษะที่นักศึกษามี
-        const skillResponse = await fetchAllSkillsFromAPI(studentId);
+        // 1. ดึง yearLevel ที่ auth-check.js คำนวณไว้
+        const studentYear = window.userData.calculatedYearLevel;
+        console.log("🔢 student-dashboard.js: Calculated year level:", studentYear); // LOG 5: แสดงชั้นปี
+
+        if (!studentYear) {
+            throw new Error("ไม่สามารถคำนวณชั้นปีของนักศึกษาได้ (จาก auth-check.js)");
+        }
+
+        // 2. เรียก API (getStudentSkillsSummary.py)
+        const skillsApiUrl = `${API_BASE_URL}/students/${studentId}/skills?yearLevel=${studentYear}`;
+        console.log("📡 student-dashboard.js: Calling API:", skillsApiUrl); // LOG 6: กำลังเรียก API
         
-        // 2. ดึงข้อมูลกิจกรรมที่เข้าร่วม (ใช้ mock data เดิม)
-        const activityResponse = await fetchStudentActivities(studentId);
+        const skillsResponse = await fetch(skillsApiUrl, {
+             headers: {
+                'Authorization': `Bearer ${window.userToken}`
+            }
+        });
         
-        // 3. แสดงผลทักษะ
-        displaySkillProgress(skillResponse.data, activityResponse.data);
+        console.log("📈 student-dashboard.js: API response status:", skillsResponse.status); // LOG 7: สถานะ API
+
+        if (!skillsResponse.ok) {
+             throw new Error(`API call failed with status: ${skillsResponse.status}`);
+        }
         
-        // 4. แสดงผลแบบทดสอบ
-        displayQuizzes(skillResponse.data.pendingSkills);
+        const result = await skillsResponse.json(); 
+        console.log("📊 student-dashboard.js: API response data:", result); // LOG 8: ข้อมูลที่ได้รับ
+
+        if (result.success && result.data) {
+            // 3. ส่ง "ผลสรุป" (Summary) ไปแสดงผล
+            displaySkillProgress(result.data);
+        } else {
+            throw new Error(result.error || "รูปแบบข้อมูลที่ได้รับจาก API ไม่ถูกต้อง");
+        }
 
     } catch (error) {
-        console.error('Error loading all skill data:', error);
-        document.getElementById('progress-text').textContent = "Error";
-        document.getElementById('quiz-container').innerHTML = `<div class="error-message">ไม่สามารถโหลดข้อมูลทักษะได้: ${error.message}</div>`;
+        console.error('❌ student-dashboard.js: Error loading skill data:', error); // LOG ERROR
+        progressText.textContent = 'Error';
+        quizContainer.innerHTML = `<div class="error-message" style="text-align: center; color: #ff6b6b; padding: 20px;">ไม่สามารถโหลดข้อมูลทักษะได้: ${error.message}</div>`;
     }
 }
 
-// ฟังก์ชันเรียก API ดึงข้อมูลทักษะ (unchanged, relies on global window.userToken)
-async function fetchAllSkillsFromAPI(studentId) {
-    const response = await fetch(`${API_BASE_URL}/student/skills`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${window.userToken}` // ใช้ Global Token
-        },
-        body: JSON.stringify({ studentId: studentId })
-    });
+// ฟังก์ชันแสดงความคืบหน้า (รับ "ผลสรุป" มาแสดงผล)
+function displaySkillProgress(summary) {
+    console.log("✍️ student-dashboard.js: displaySkillProgress() called with summary:", summary); // LOG 9: เริ่มแสดงผล
     
-    if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
-    }
-    return response.json();
-}
+    const totalRequiredSkills = summary.totalRequiredSkills || 0;
+    const completedRequiredSkills = summary.completedRequiredSkills || 0;
+    const completedOptionalSkills = summary.completedOptionalSkills || 0;
+    const pendingSkills = summary.pendingSkills || [];
+    
+    const pendingRequiredSkillsCount = totalRequiredSkills - completedRequiredSkills;
 
-// ฟังก์ชันเรียก API ดึงข้อมูลกิจกรรม (unchanged)
-async function fetchStudentActivities(studentId) {
-    // โค้ดสำหรับเรียกข้อมูลกิจกรรม
-    // ... (สมมติว่า API นี้คืนค่า { data: { completedActivities: 5 } } )
-    return { data: { completedActivities: 5 } };
-}
-
-// ฟังก์ชันแสดงผลความคืบหน้าทักษะ (unchanged)
-function displaySkillProgress(skillData, activityData) {
-    const totalRequiredSkills = skillData.totalRequiredSkills || 0;
-    const completedRequiredSkills = skillData.completedRequiredSkills || 0;
-    const completedOptionalSkills = skillData.completedOptionalSkills || 0;
+    // อัปเดต Progress Circle
+    const percentage = totalRequiredSkills > 0 ? (completedRequiredSkills / totalRequiredSkills) * 100 : 0;
+    const progressIndicator = document.getElementById('progress-indicator');
     
-    const progressPercent = totalRequiredSkills > 0 ? (completedRequiredSkills / totalRequiredSkills) : 0;
-    const offset = 282.74 - (282.74 * progressPercent);
-    
-    document.getElementById('progress-indicator').style.strokeDashoffset = offset;
     document.getElementById('progress-text').textContent = `${completedRequiredSkills}/${totalRequiredSkills}`;
     
+    if (progressIndicator) {
+        const circumference = 282.74; 
+        const offset = circumference * (100 - percentage) / 100;
+        progressIndicator.style.strokeDashoffset = offset;
+        progressIndicator.style.strokeDasharray = circumference;
+    }
+
+    // อัปเดตรายละเอียดทักษะในกล่อง
     document.getElementById('completed-required-skills').textContent = completedRequiredSkills;
-    document.getElementById('pending-required-skills').textContent = totalRequiredSkills - completedRequiredSkills;
+    document.getElementById('pending-required-skills').textContent = pendingRequiredSkillsCount;
     document.getElementById('completed-optional-skills').textContent = completedOptionalSkills;
-    
-    const activityCount = activityData.completedActivities || 0;
-    document.getElementById('activity-progress').textContent = `${activityCount}/${REQUIRED_ACTIVITIES_COUNT}`;
+
+    // เรียกใช้ฟังก์ชันแสดงรายการ "แบบทดสอบ" (ทักษะที่ขาดไป)
+    displayPendingQuizzes(pendingSkills);
 }
 
-// ฟังก์ชันแสดงผลแบบทดสอบ (unchanged)
-function displayQuizzes(pendingSkills) {
+
+// ฟังก์ชันแสดงรายการทักษะที่ต้องทำ (ลบส่วนแบบทดสอบ)
+function displayPendingQuizzes(pendingSkills) {
+    console.log("📋 student-dashboard.js: displayPendingQuizzes() called with skills:", pendingSkills); // LOG 10: เริ่มแสดง Pending Skills
     const quizContainer = document.getElementById('quiz-container');
-    quizContainer.innerHTML = '';
-    
+    quizContainer.innerHTML = ''; 
+    let html = '';
+
     if (!pendingSkills || pendingSkills.length === 0) {
-        quizContainer.innerHTML = `<div class="info-message">คุณได้ทักษะบังคับครบถ้วนแล้ว!</div>`;
-        return;
+        html = `<div class="info-message">คุณได้ทักษะบังคับครบถ้วนแล้วสำหรับชั้นปีนี้!</div>`;
+    } else {
+        pendingSkills.forEach(skill => {
+            html += `
+                <div class="quiz-card">
+                    <h3>${skill.name}</h3>
+                    <p>ทักษะที่ยังขาด: ${skill.category}</p>
+                    <p class="quiz-note">ต้องเข้าร่วมกิจกรรมอย่างน้อย ${skill.requiredActivities || 3} ครั้งในหมวดนี้</p>
+                    <button onclick="navigateToRecommendActivities()" class="primary-btn">ค้นหากิจกรรมที่แนะนำ</button>
+                </div>
+            `;
+        });
     }
-
-    pendingSkills.forEach(skill => {
-        const quizCard = document.createElement('div');
-        quizCard.className = 'quiz-card';
-        quizCard.innerHTML = `
-            <h3>${skill.name}</h3>
-            <p>ทักษะที่ยังขาด: ${skill.category}</p>
-            <button onclick="startQuiz('${skill.id}')">เริ่มทำแบบทดสอบ</button>
-        `;
-        quizContainer.appendChild(quizCard);
-    });
+    
+    quizContainer.innerHTML = html;
 }
 
-// เริ่มทำแบบทดสอบ
-function startQuiz(skillId) {
-    const skillNames = {
-        'skill001': 'ด้านการทำงานเป็นทีม',
-        // ... (Define more skill names)
-    };
-    
-    const skillName = skillNames[skillId] || 'ทักษะ';
-    
-    const confirmStart = confirm(
-        `🎯 ต้องการเริ่มทำแบบทดสอบ "${skillName}" หรือไม่?\n\n` +
-        `📋 จำนวนข้อ: 10 ข้อ\n` +
-        `⏰ เวลา: 15 นาที\n` +
-        `📊 เกณฑ์ผ่าน: 70% (7 ข้อขึ้นไป)\n` +
-        `🏆 หากผ่าน: จะได้รับทักษะนี้\n\n` +
-        `⚠️ หมายเหตุ: เมื่อเริ่มแล้วจะนับเวลาทันที`
-    );
-    
-    if (confirmStart) {
-        // ⭐️ MODIFIED: ใช้ navigateTo (ที่อยู่ใน auth-check.js) และไม่ส่ง data=...
-        if (typeof navigateTo === 'function') {
-            navigateTo(`quiz.html?skillId=${skillId}`); 
-        } else {
-            window.location.href = `quiz.html?skillId=${skillId}`;
-        }
+// ฟังก์ชันนำทางไปยังหน้ากิจกรรมที่แนะนำ (เรียกใช้ navigateTo ที่อยู่ใน auth-check.js)
+function navigateToRecommendActivities() {
+    if (typeof navigateTo === 'function') {
+        navigateTo("recommend-activities.html");
+    } else {
+        window.location.href = "recommend-activities.html";
     }
 }
+
+// ⭐️ NEW: เพิ่ม Event Listener ที่ท้ายไฟล์
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("🚀 student-dashboard.js: DOM fully loaded.");
+    
+    // ตรวจสอบว่า auth-check.js ทำงานเสร็จแล้ว (window.userData ถูกตั้งค่าแล้ว)
+    if (window.userData) {
+        console.log("✅ student-dashboard.js: User data found, calling initialization.");
+        initializeStudentDashboard(); // เรียกฟังก์ชันเริ่มต้น
+    } else {
+        // กรณีผิดพลาด: auth-check.js อาจยังไม่เสร็จ หรือมีปัญหา
+        console.error("❌ student-dashboard.js: User data not found after DOM load. Auth check might have failed.");
+        // อาจจะต้อง Redirect กลับไปหน้า Login หรือแสดงข้อความ Error
+        alert("เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้ กรุณาลองเข้าสู่ระบบใหม่");
+        if(typeof navigateTo === 'function') navigateTo('login.html');
+        else window.location.href = 'login.html';
+    }
+});
+
+console.log("✅ student-dashboard.js: Script finished loading."); // LOG END: ไฟล์โหลดเสร็จ

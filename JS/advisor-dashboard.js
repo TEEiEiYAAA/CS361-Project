@@ -1,14 +1,13 @@
 // Configuration
 const API_BASE_URL = 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod';
 
-// ⭐️ MODIFIED: ห่อหุ้ม Logic หลักไว้ใน initializeAdvisorDashboard
-// ฟังก์ชันนี้จะถูกเรียกโดย auth-check.js เมื่อ Authentication ผ่านแล้ว
+// ⭐️ MODIFIED: ฟังก์ชันหลักที่ถูกเรียกโดย auth-check.js
 function initializeAdvisorDashboard() {
-    // ⭐️ MODIFIED: ตรวจสอบ Role เฉพาะหน้า
+    // ⭐️ ตรวจสอบ Role
     if (!window.userData || window.userData.role !== 'advisor') {
         console.error('Authentication failed - not an advisor:', window.userData.role);
         alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
-        // ใช้ navigateTo ที่ไม่มี data=... (อยู่ใน auth-check.js)
+        // ใช้ navigateTo ที่อยู่ใน auth-check.js
         if (typeof navigateTo === 'function') {
             navigateTo("login.html");
         } else {
@@ -16,9 +15,8 @@ function initializeAdvisorDashboard() {
         }
         return;
     }
-
+    
     // แสดงชื่อผู้ใช้ (user-name ถูกอัพเดทโดย updateBasicUserInfo ใน auth-check.js แล้ว)
-    // แต่ถ้าต้องการใช้ข้อมูลอื่น ๆ ของอาจารย์ ให้ทำต่อตรงนี้
     document.getElementById('user-name').textContent = window.userData.name || window.userData.userId;
     
     // เรียกข้อมูลนักศึกษาจาก API
@@ -27,6 +25,7 @@ function initializeAdvisorDashboard() {
 
 // ⭐️ MODIFIED: กำหนดให้ auth-check.js เรียกฟังก์ชันนี้เมื่อ Authentication ผ่าน
 window.initializePage = initializeAdvisorDashboard;
+
 
 // ฟังก์ชันเรียกข้อมูลนักศึกษาจาก API
 async function fetchStudents(advisorId) {
@@ -108,13 +107,9 @@ function filterByYearDropdown() {
 // ฟังก์ชันดูรายละเอียดนักศึกษา
 function viewStudentDetails(studentId) {
     // ⭐️ MODIFIED: ใช้ navigateTo (ที่อยู่ใน auth-check.js) และไม่ส่ง data=...
-    // my-students.html จะต้องเรียก auth-check.js เพื่อยืนยัน session เอง
     if (typeof navigateTo === 'function') {
-        navigateTo(`my-students.html?studentId=${studentId}`);
+        navigateTo(`my-students.html?studentId=${studentId}`); // Removed &data=...
     } else {
-        // Fallback
         window.location.href = `my-students.html?studentId=${studentId}`;
     }
 }
-
-// ⭐️ MODIFIED: ลบฟังก์ชัน navigateTo และ logout (เพราะอยู่ใน auth-check.js แล้ว)
