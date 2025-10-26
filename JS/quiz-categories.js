@@ -25,26 +25,23 @@ function setupTabs(studentId) {
     const tabButtons = document.querySelectorAll('.tab-btn');
     const availableHeader = document.getElementById('available-header');
     const doneHeader = document.getElementById('done-header');
-
+    
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
             tabButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
-
+            
             const filter = button.dataset.filter;
 
+            // ★★★ นี่คือโค้ดที่สลับหัวข้อ ★★★
             if (filter === 'available') {
-                availableHeader.style.display = 'grid';
+                availableHeader.style.display = 'grid'; // ใช้ 'grid'
                 doneHeader.style.display = 'none';
-                // ★★★ ทำให้มุมบนขวาของกล่องเทา "โค้ง" ★★★
-                availableHeader.style.borderRadius = '0 16px 0 0';
             } else {
                 availableHeader.style.display = 'none';
-                doneHeader.style.display = 'grid';
-                // ★★★ ทำให้มุมบนซ้ายของกล่องเทา "โค้ง" ★★★
-                doneHeader.style.borderRadius = '16px 0 0 0';
+                doneHeader.style.display = 'grid'; // ใช้ 'grid'
             }
-
+            
             loadQuizzes(filter, studentId);
         });
     });
@@ -147,7 +144,7 @@ function displayDoneQuizzes(quizzes) {
             <div class="quiz-data-row done">
                 <span>${skill.skillName || 'ไม่มีชื่อทักษะ'}</span>
                 <span>${skill.PLO || 'PL01'}</span>
-                <td><span class="score-badge">ผ่าน ${skill.FinalScore || 80} คะแนน</span></td>
+                <td><span class="score-badge">ผ่าน ${skill.FinalScore || 70} คะแนน</span></td>
                 <span>${formatDate(skill.completedDate)}</span>
             </div>
         `;
@@ -157,30 +154,29 @@ function displayDoneQuizzes(quizzes) {
 
 // ฟังก์ชันแสดงผลแบบทดสอบที่ "ทำไปแล้ว"
 function displayDoneQuizzes(quizzes) {
-    const container = document.getElementById('quiz-list');
+    const container = document.getElementById('quiz-list-data');
     if (quizzes.length === 0) {
         container.innerHTML = '<div class="empty-message">ยังไม่มีแบบทดสอบที่ทำผ่านแล้ว</div>';
         return;
     }
 
-    // สร้าง Header ของตาราง
-    let html = `
-        <div class="quiz-header-row">
-            <span>กลุ่มกิจกรรม</span>
-            <span>ผลลัพธ์การเรียนรู้ (PLOs)</span>
-            <span>คะแนน</span>
-            <span>วันที่ผ่าน</span>
-        </div>
-    `;
+    let html = ''; // เริ่มต้นด้วยค่าว่าง
 
-    // สร้างแถวข้อมูล
+    // สร้างแถวข้อมูลที่ตรงกับ 3 หัวข้อ + 1 สถานะ
     quizzes.forEach(skill => {
         html += `
-            <div class="quiz-data-row done">
+            <div class="quiz-data-row">
                 <span>${skill.skillName || 'ไม่มีชื่อทักษะ'}</span>
+                
+                <span>${skill.skillDescription || 'ทักษะระดับกลาง'}</span>
+                
                 <span>${skill.PLO || 'PL01'}</span>
-                <td><span class="score-badge">ผ่าน ${skill.FinalScore || 80} คะแนน</span></td>
-                <span>${formatDate(skill.completedDate)}</span>
+                
+                <div class="quiz-action">
+                    <span class="score-badge">
+                        ผ่าน ${skill.FinalScore || 70} คะแนน
+                    </span>
+                </div>
             </div>
         `;
     });
