@@ -4,9 +4,9 @@ function computeCategory(plos) {
   if (!set.size) return '';
   const hasHard = [...set].some(p => p === 'PLO1' || p === 'PLO2');
   const hasSoft = [...set].some(p => p === 'PLO3' || p === 'PLO4');
-  if (hasHard && hasSoft) return 'Multi-Skill';
-  if (hasHard) return 'Hard Skill';
-  if (hasSoft) return 'Soft Skill';
+  if (hasHard && hasSoft) return 'multi-skill';
+  if (hasHard) return 'hard skill';
+  if (hasSoft) return 'soft skill';
   return '';
 }
 
@@ -14,9 +14,9 @@ function computeCategory(plos) {
 const skillRowsEl        = document.getElementById('skill-rows');
 const addSkillBtn        = document.getElementById('add-skill-btn');
 const addSkillWrap       = document.getElementById('add-skill-wrap'); 
-const skillCategoryInput = document.getElementById('skillCategory');
-const ploHidden          = document.getElementById('category');
-const ploDescHidden      = document.getElementById('ploDescriptions');
+const skillCategoryInput = document.getElementById('skillCategory'); // ถ้าจะส่งหมวดสำเร็จรูป
+const ploHidden          = document.getElementById('plo');              // เก็บ JSON ["PLO1","PLO3"]
+const ploDescHidden      = document.getElementById('ploDescriptions');  // เก็บ JSON ["desc1","desc2"]
 
 const MAX_ROWS = 4; 
 
@@ -24,9 +24,9 @@ const MAX_ROWS = 4;
 function recalcCategory() {
   const plos  = [...document.querySelectorAll('.skill-plo')].map(s => s.value).filter(Boolean);
   const descs = [...document.querySelectorAll('.skill-desc')].map(i => i.value || '');
-  if (ploHidden)            ploHidden.value            = JSON.stringify(plos);
-  if (ploDescHidden)        ploDescHidden.value        = JSON.stringify(descs);
-  if (skillCategoryInput)   skillCategoryInput.value   = computeCategory(plos);
+  if (ploHidden)           ploHidden.value = JSON.stringify(plos);
+  if (ploDescHidden)       ploDescHidden.value = JSON.stringify(descs);
+  if (skillCategoryInput)  skillCategoryInput.value = computeCategory(plos);
 }
 
 // ทำแถวใหม่ (id ไม่ซ้ำ)
@@ -40,10 +40,10 @@ function createSkillRowDynamic() {
         <label class="skill-plo-label" for="skill-plo-${index}">ทักษะที่ได้รับ</label>
         <select id="skill-plo-${index}" class="skill-plo" required>
           <option value="" disabled selected hidden>เลือก PLO</option>
-          <option value="PLO1">PLO1</option>
-          <option value="PLO2">PLO2</option>
-          <option value="PLO3">PLO3</option>
-          <option value="PLO4">PLO4</option>
+          <option value="PLO1">PLO1 – ความรู้พื้นฐานด้านการเขียนโปรแกรม</option>
+          <option value="PLO2">PLO2 – ทักษะการพัฒนาและออกแบบระบบ</option>
+          <option value="PLO3">PLO3 – ความรับผิดชอบและจริยธรรมวิชาชีพ</option>
+          <option value="PLO4">PLO4 – การทำงานร่วมกับผู้อื่นและภาวะผู้นำ</option>
         </select>
       </div>
       <div>
@@ -185,250 +185,412 @@ if (form && !window.__ACHV_bindSubmit__) {
 skillRowsEl.addEventListener('input',  e => clearValidity(e.target));
 skillRowsEl.addEventListener('change', e => clearValidity(e.target));
 
+// =========================
+//  Helpers & Utilities
+// =========================
 
-(function setupValidationAndSaveFlow() {
-  const form       = document.getElementById('edit-activity-form') || document.querySelector('form');
-  const saveBtn    = document.querySelector('.btn-primary'); // ปุ่มบันทึกที่อยู่นอก <form>
-  const fileInput  = document.querySelector('.upload-area input[type="file"]');
-  const titleEl    = document.getElementById('name');
-  const descEl     = document.getElementById('description');
-  const startEl    = document.getElementById('startDateTime');
-  const endEl      = document.getElementById('endDateTime');
-  const placeEl    = document.getElementById('location');
-  const hostEl     = document.getElementById('organizerId');
-  const groupEl    = document.getElementById('group');
-  const yearEl     = document.getElementById('yearLevel');
-  const requiredEl = document.getElementById('required');
-  const skillPloEl = document.getElementById('skill-plo-1');
-  const skilldesEl = document.getElementById('skill-desc-1');
+// แสดงข้อความ popup สำเร็จ
+window.showSuccessPopup = function (message = 'บันทึกสำเร็จ') {
+  const overlay = document.createElement('div');
+  Object.assign(overlay.style, {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(0,0,0,0.35)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 9999
+  });
 
-// ฟังก์ชันช่วยเน้นช่องที่ผิด
+  const box = document.createElement('div');
+  Object.assign(box.style, {
+    background: '#fff',
+    padding: '20px 24px',
+    borderRadius: '14px',
+    boxShadow: '0 12px 28px rgba(0,0,0,.12)',
+    minWidth: '280px',
+    textAlign: 'center'
+  });
+
+  box.innerHTML = `
+    <div style="font-weight:700;font-size:18px;margin-bottom:8px">${message}</div>
+    <div style="margin-bottom:16px;color:#4b5563">ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว</div>
+  `;
+
+  const okBtn = document.createElement('button');
+  okBtn.textContent = 'ตกลง';
+  Object.assign(okBtn.style, {
+    padding: '8px 20px',
+    borderRadius: '999px',
+    border: '0',
+    background: 'linear-gradient(90deg, #50E486 0%, #27C4B7 100%)',
+    color: '#fff',
+    fontWeight: 800,
+    cursor: 'pointer'
+  });
+  okBtn.addEventListener('click', () => overlay.remove());
+  box.appendChild(okBtn);
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+};
+
+// ไฮไลท์ช่องผิด
 function markInvalid(el) {
   if (!el) return;
   el.classList.add('invalid');
   el.style.borderColor = '#e83c3c';
   el.style.boxShadow = '0 0 0 2px rgba(232,60,60,0.15)';
 }
+
+// เคลียร์ช่องผิด
 function clearInvalid(el) {
   if (!el) return;
   el.classList.remove('invalid');
   el.style.borderColor = '';
   el.style.boxShadow = '';
 }
-// เคลียร์เมื่อผู้ใช้พิมพ์/เปลี่ยนค่า
-([
-  fileInput, titleEl, descEl, startEl, endEl, placeEl, hostEl, groupEl, yearEl, requiredEl, skillPloEl, skilldesEl
-].filter(Boolean)).forEach(el => {
-  el.addEventListener('input', () => clearInvalid(el));
-  el.addEventListener('change', () => clearInvalid(el));
-});
-// เคลียร์ให้ช่องทักษะด้วย
-document.getElementById('skill-rows')?.addEventListener('input', e => clearInvalid(e.target));
-document.getElementById('skill-rows')?.addEventListener('change', e => clearInvalid(e.target));
 
-// ตรวจสอบทักษะ (ถ้ามี validateSkills() เดิมอยู่แล้วจะเรียกใช้)
-function validateSkillsWrapper(errors) {
-  // ถ้ามีฟังก์ชันเดิมในไฟล์นี้อยู่แล้ว ให้ใช้ต่อ
+// ตรวจกล่องทักษะทั้งหมด
+function validateSkillsWrapper(errors = []) {
   if (typeof validateSkills === 'function') {
     const ok = validateSkills();
     if (!ok) errors.push('');
     return ok;
   }
 
-  // fallback แบบเบา ๆ : ทุกแถวต้องเลือก PLO และกรอกคำอธิบาย
   let valid = true;
   document.querySelectorAll('.skill-row').forEach(row => {
-    const sel  = row.querySelector('.skill-plo-1');
-    const desc = row.querySelector('.skill-desc-1');
-    if (sel && !sel.value)    { valid = false; markInvalid(sel); }
-    if (desc && !desc.value?.trim()) { valid = false; markInvalid(desc); }
+    const sel = row.querySelector('.skill-plo');
+    const desc = row.querySelector('.skill-desc');
+    if (sel && !sel.value) { valid = false; markInvalid(sel); }
+    if (desc && !desc.value?.trim?.()) { valid = false; markInvalid(desc); }
   });
-  if (!valid) markInvalid(fileInput);
   return valid;
 }
 
-// ตรวจสอบทุกช่อง
-function validateAll() {
-  const errors = [];
+// =========================
+//  Upload Preview
+// =========================
+(function enhanceUploadArea() {
+  const uploadArea = document.querySelector('.upload-area');
+  const fileInput = document.getElementById('image'); 
+  const hintEl = uploadArea?.querySelector('.hint');
+  if (!uploadArea || !fileInput || !hintEl) return;
 
-  // 2.1 ไฟล์รูป
-  if (!fileInput || !(fileInput.files && fileInput.files[0])) {
-    markInvalid(fileInput);
-    errors.push('ต้องอัปโหลดรูปภาพกิจกรรม'); 
-  } else if (!fileInput.files[0].type.startsWith('image/')) {
-    markInvalid(fileInput);
+  Object.assign(uploadArea.style, { position: 'relative', overflow: 'hidden' });
+  Object.assign(hintEl.style, {
+    position: 'absolute',
+    left: '50%',
+    top: '50%',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 3,
+    cursor: 'pointer',
+    pointerEvents: 'auto'
+  });
+
+  hintEl.addEventListener('click', e => {
+    e.preventDefault();
+    fileInput.click();
+  });
+
+  Object.assign(fileInput.style, {
+    position: 'absolute',
+    inset: '0',
+    opacity: '0',
+    cursor: 'pointer',
+    zIndex: 4
+  });
+
+  function isAllowedImage(file) {
+    const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+    const ext = file.name.split(".").pop().toLowerCase();
+    const allowedExt = ["png", "jpg", "jpeg", "webp"];
+  
+    return allowedTypes.includes(file.type) && allowedExt.includes(ext);
+  }
+  
+  function renderPreview(file) {
+    const old = uploadArea.querySelector('.upload-preview');
+    if (old) old.remove();
+  
+    if (!file) {
+      uploadArea.style.backgroundImage = '';
+      return;
+    }
+  
+    if (!isAllowedImage(file)) {
+      alert('รองรับเฉพาะไฟล์รูป .png .jpg .jpeg .webp เท่านั้น');
+      fileInput.value = '';
+      uploadArea.style.backgroundImage = '';
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      alert('กรุณาเลือกเฉพาะไฟล์รูปภาพ');
+      fileInput.value = '';
+      uploadArea.style.backgroundImage = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      uploadArea.style.backgroundImage = `url(${reader.result})`;
+      uploadArea.style.backgroundSize = 'cover';
+      uploadArea.style.backgroundPosition = 'center';
+      uploadArea.style.backgroundRepeat = 'no-repeat';
+    };
+    reader.readAsDataURL(file);
   }
 
-  // 2.2 ฟิลด์ข้อความหลัก
-  if (!titleEl?.value.trim()) { markInvalid(titleEl); }
-  if (!descEl?.value.trim())  { markInvalid(descEl); }
-  if (!placeEl?.value.trim()) { markInvalid(placeEl); }
-  if (!hostEl?.value.trim())  { markInvalid(hostEl); }
-  if (!requiredEl?.value.trim()) { markInvalid(requiredEl); }
-  if (!skillPloEl?.value.trim()) { markInvalid(skillPloEl); }
-  if (!skilldesEl?.value.trim()) { markInvalid(skilldesEl); }
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files?.[0];
+    renderPreview(file);
+  });
+})();
 
+// =========================
+//  API Presign + Save
+// =========================
+const API_BASE = "https://isukcfvzoi.execute-api.us-east-1.amazonaws.com/test";
+const GET_UPLOAD_URL = `${API_BASE}/activities/upload-url`;
+const LEVEL_MAP = { 'พื้นฐาน': 'พื้นฐาน', 'ปานกลาง': 'กลาง', 'สูงสุด': 'ขั้นสูง' };
+// ขอ presigned URL จาก Lambda
+async function getUploadUrl(file) {
+  const fileName = file.name || 'upload.bin';
+  const fileType = file.type || 'application/octet-stream';
 
-  // 2.3 วันเวลา (ต้องไม่ว่าง และ end >= start)
-  const startVal = startEl?.value;
-  const endVal   = endEl?.value;
-  if (!startVal) { markInvalid(startEl); }
-  if (!endVal)   { markInvalid(endEl); }
-  if (startVal && endVal) {
-    const s = new Date(startVal).getTime();
-    const e = new Date(endVal).getTime();
-    if (!isFinite(s) || !isFinite(e) || e < s) {
-      markInvalid(startEl);
-      markInvalid(endEl);
+  const res = await fetch(GET_UPLOAD_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fileName, fileType }),
+  });
+
+  let raw;
+  try {
+    raw = await res.json();          // raw = อะไรสักอย่างจาก API Gateway
+  } catch (e) {
+    throw new Error('presign response is not JSON');
+  }
+
+  // ---- แกะ Lambda proxy envelope ----
+  let statusCode = res.status;
+  let payload = raw;
+
+  // ถ้าเป็นรูปแบบ { statusCode, headers, body }
+  if (raw && typeof raw === 'object' && 'statusCode' in raw && 'body' in raw) {
+    statusCode = raw.statusCode || res.status;
+
+    if (typeof raw.body === 'string') {
+      try {
+        payload = JSON.parse(raw.body);
+      } catch {
+        payload = { rawBody: raw.body };
+      }
+    } else {
+      payload = raw.body || {};
     }
   }
 
-  // 2.4 กลุ่มกิจกรรม/ชั้นปี
-  if (!groupEl?.value) { markInvalid(groupEl); }
-  if (!yearEl?.value)  { markInvalid(yearEl); }
+  console.log('[DEBUG] presign data:', payload);
 
-  // 2.5 ระดับ (radio name="level")
-  const levelChecked = !!document.querySelector('input[name="level"]:checked');
-  if (!levelChecked) {
-    // ไฮไลต์กรอบกล่อง container ของ radio (ใช้ label หลักที่อยู่แถวเดียวกับ "ระดับ")
-    const levelBox = (startEl && endEl) ? startEl.closest('.pair')?.nextElementSibling?.querySelector('.level')
-                                        : document.querySelector('.level');
-    if (levelBox) markInvalid(levelBox);
+  // เช็ค error จาก Lambda
+  if (statusCode >= 400 || payload.error) {
+    throw new Error(payload.error || `presign failed: ${statusCode}`);
   }
 
-  // 2.6 ทักษะ (PLO + คำอธิบาย)
-  validateSkillsWrapper(errors);
+  if (!payload.uploadUrl) {
+    throw new Error('uploadUrl is missing from presign response');
+  }
 
+  return payload; // { uploadUrl, objectUrl, key, contentType }
+}
+
+async function putToS3(uploadUrl, file, contentType) {
+  if (!uploadUrl) {
+    throw new Error('uploadUrl is missing from presign response');
+  }
+  const res = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: { 'Content-Type': contentType || file.type || 'application/octet-stream' },
+    body: file
+  });
+  if (!res.ok) throw new Error(`S3 PUT failed: ${res.status}`);
+  return true;
+}
+
+async function postActivity(payload) {
+  const res = await fetch(`${API_BASE}/activities`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  const text = await res.text();
+  let data;
+  try { data = JSON.parse(text); } catch { data = { raw: text }; }
+  if (!res.ok) throw new Error(data.error || `Create failed (${res.status})`);
+  return data;
+}
+
+// =========================
+//  Validate Inputs
+// =========================
+function validateAll() {
+  const errors = [];
+  // ดึง element ทุกตัวที่ต้องตรวจ
+  const fileInput   = document.getElementById('image');
+  const titleEl     = document.getElementById('name');
+  const descEl      = document.getElementById('description');
+  const startEl     = document.getElementById('startDateTime');
+  const endEl       = document.getElementById('endDateTime');
+  const placeEl     = document.getElementById('locationId');
+  const hostEl      = document.getElementById('organizerId');
+  const groupEl     = document.getElementById('group');
+  const yearEl      = document.getElementById('yearLevel');
+  const requiredEl  = document.getElementById('required');
+  const skillPloEl  = document.getElementById('skill-plo-1');
+  const skilldesEl  = document.getElementById('skill-desc-1');
+  const levelBox    = document.querySelector('.level');
+  const levelInput  = document.querySelector('input[name="level"]:checked');
+
+  // ใช้ไว้โฟกัสช่องแรกที่ผิด
+  let firstInvalid = null;
+  const hit = (el, key) => {
+    if (el && !firstInvalid) firstInvalid = el;
+    if (el) markInvalid(el);
+    if (key) errors.push(key);
+  };
+
+  // 1) ไฟล์ภาพ
+  if (!fileInput?.files?.length) {
+    hit(fileInput, 'image');
+  }
+
+  // 2) ฟิลด์ข้อความหลัก
+  if (!titleEl?.value.trim())    hit(titleEl, 'name');
+  if (!descEl?.value.trim())     hit(descEl, 'desc');
+  if (!placeEl?.value)           hit(placeEl, 'place');
+  if (!hostEl?.value.trim())     hit(hostEl, 'host');
+  if (!groupEl?.value)           hit(groupEl, 'group');
+  if (!yearEl?.value)            hit(yearEl, 'year');
+  if (!requiredEl?.value.trim()) hit(requiredEl, 'required');
+
+  // 3) เวลา
+  const startVal = startEl?.value;
+  const endVal   = endEl?.value;
+  const s = startVal ? new Date(startVal).getTime() : NaN;
+  const e = endVal   ? new Date(endVal).getTime()   : NaN;
+
+  if (!startVal) hit(startEl, 'start');
+  if (!endVal)   hit(endEl, 'end');
+  if (startVal && endVal && (!isFinite(s) || !isFinite(e) || e < s)) {
+    hit(startEl, 'time-order'); hit(endEl);
+  }
+
+  // 4) ระดับ (radio)
+  if (!levelInput) hit(levelBox, 'level');
+
+  // 5) ทักษะอย่างน้อย 1 แถว + ค่าในแถวแรก
+  if (!skillPloEl?.value)   hit(skillPloEl, 'plo');
+  if (!skilldesEl?.value?.trim()) hit(skilldesEl, 'plodesc');
+  validateSkillsWrapper(errors); // ตรวจทุกแถว
+
+  // โฟกัส/เลื่อนจอไปยังช่องแรกที่ผิด
+  if (firstInvalid?.focus) {
+    firstInvalid.focus();
+    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
   return errors;
 }
 
-// ==========================
-// 3) ปุ่มบันทึก + Popup สำเร็จ
-// ==========================
-function showSuccessPopup(message = 'บันทึกสำเร็จ') {
-  // โมดัลเล็ก ๆ แบบไม่พึ่ง CSS เพิ่ม
-  const overlay = document.createElement('div');
-  Object.assign(overlay.style, {
-    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
-  });
+// =========================
+//  Save Activity
+// =========================
+async function saveActivity() {
+  const name = document.getElementById('name').value.trim();
+  const description = document.getElementById('description').value.trim();
+  const startDateTime = document.getElementById('startDateTime').value;
+  const endDateTime = document.getElementById('endDateTime').value;
+  const locationId = document.getElementById('locationId').value;
+  const activityGroup = document.getElementById('group').value || null;
+  const yearLevel = Number(document.getElementById('yearLevel').value) || null;
+  //const isRequired = document.getElementById('isRequired')?.checked || false;
+  const requiredActivities = document.getElementById('required').value.trim();
+  //const passingScore = Number(document.getElementById('passingScore')?.value || 0);
+  const organizerId = document.getElementById('organizerId').value.trim();
 
-  const box = document.createElement('div');
-  Object.assign(box.style, {
-    background: '#fff', padding: '20px 24px', borderRadius: '14px',
-    boxShadow: '0 12px 28px rgba(0,0,0,.12)', minWidth: '280px', textAlign: 'center'
-  });
-  box.innerHTML = `<div style="font-weight:700;font-size:18px;margin-bottom:8px">${message}</div>
-                    <div style="margin-bottom:16px;color:#4b5563">ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว</div>`;
+  const levelInput = document.querySelector('input[name="level"]:checked');
+  const levelLabel = levelInput?.value || 'พื้นฐาน';
+  const skillLevel = LEVEL_MAP[levelLabel] || 'พื้นฐาน';
 
-  const okBtn = document.createElement('button');
-  okBtn.textContent = 'ตกลง';
-  Object.assign(okBtn.style, {
-    padding: '8px 20px', borderRadius: '999px', border: '0',
-    background: 'linear-gradient(90deg, #50E486 0%, #27C4B7 100%)',
-    color: '#fff', fontWeight: 800, cursor: 'pointer'
-  });
-  okBtn.addEventListener('click', () => overlay.remove());
+  const plos = [...document.querySelectorAll('.skill-plo')].map(s => s.value).filter(Boolean);
+  const ploDescriptions = [...document.querySelectorAll('.skill-desc')].map(i => i.value || '');
+  const skillCategory = computeCategory(plos);
+  const toISO = s => s ? (s.endsWith('Z') ? s : `${s}:00Z`) : s;
 
-  box.appendChild(okBtn);
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
+  const fileInput = document.getElementById('image');
+  let imageUrl = '';
+  
+  if (fileInput?.files?.[0]) {
+    const file = fileInput.files[0];
+    console.log('[DEBUG] file selected:', file.name, file.type, file.size);
+  
+    const { uploadUrl, objectUrl, contentType } = await getUploadUrl(file);
+    console.log('[DEBUG] presign:', { uploadUrl, objectUrl, contentType });
+  
+    await putToS3(uploadUrl, file, contentType);
+    imageUrl = objectUrl;
+  } else {
+    throw new Error('กรุณาเลือกไฟล์รูป');
+  }    
+
+  const payload = {
+    name,
+    description,
+    startDateTime: toISO(startDateTime),
+    endDateTime: toISO(endDateTime),
+    locationId,
+    locationName: document.querySelector('#locationId option:checked')?.textContent || '',
+    skillCategory,
+    plo: plos,
+    ploDescriptions,
+    level: skillLevel,
+    skillLevel,
+    activityGroup,
+    yearLevel,
+    //isRequired,
+    requiredActivities,
+    //passingScore,
+    imageUrl,
+    organizerId
+  };
+
+  const result = await postActivity(payload);
+  showSuccessPopup('บันทึกสำเร็จ');
+  console.log('Create result:', result);
 }
 
-  if (saveBtn && !window.__ACHV_bindSaveClick__) {
-    saveBtn.addEventListener('click', (e) => {
-      e.preventDefault(); 
+// =========================
+//  Bind Save Button
+// =========================
+const saveBtn = document.querySelector('.btn-primary');
+if (saveBtn && !window.__ACHV_POST_BOUND__) {
+  saveBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    console.log('[DEBUG] กดปุ่มบันทึกแล้ว');
 
-      // เคลียร์ invalid เดิม ๆ
-      document.querySelectorAll('.invalid').forEach(el => clearInvalid(el));
-
+    try {
       const errors = validateAll();
       if (errors.length) {
-        alert('กรุณากรอกข้อมูลให้ครบถ้วน\n');
-
-        const firstInvalid = document.querySelector('.invalid, .upload-area input[type="file"].invalid');
-        if (firstInvalid && firstInvalid.scrollIntoView) {
-          firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        alert('กรุณากรอกให้ครบถ้วน');
         return;
       }
-
-      // ผ่านทุกอย่าง → โชว์ป๊อปอัปสำเร็จ
-      showSuccessPopup('บันทึกสำเร็จ');
-      // ถ้าต้อง submit ฟอร์มจริง ให้ uncomment บรรทัดนี้:
-      // form?.submit();
-    });
-    window.__ACHV_bindSaveClick__ = true;
-  }
-})();
-
-(function enhanceUploadArea() {
-const uploadArea = document.querySelector('.upload-area');
-const fileInput  = uploadArea?.querySelector('input[type="file"]');
-const hintEl     = uploadArea?.querySelector('.hint');
-
-if (!uploadArea || !fileInput || !hintEl) return;
-
-// จัดวางชั้น (z-index) ให้คลิกได้เสมอ
-Object.assign(uploadArea.style, { position: 'relative', overflow: 'hidden' });
-Object.assign(hintEl.style, {
-  position: 'absolute',
-  left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
-  zIndex: 3,  
-  cursor: 'pointer',
-  pointerEvents: 'auto'
-});
-// คลิกที่ hint ให้เปิด file picker
-hintEl.addEventListener('click', (e) => {
-  e.preventDefault();
-  fileInput.click();
-});
-
-// ทำให้คลิกที่ "พื้นที่ไหนก็ได้" เปิดไฟล์ได้ (โดยไม่ต้องแก้ HTML)
-Object.assign(fileInput.style, {
-  position: 'absolute', inset: '0', opacity: '0',
-  cursor: 'pointer', zIndex: 4 // สูงสุดเพื่อให้คลิกได้
-});
-
-// แสดงรูป preview แต่ "ไม่ซ่อน" ปุ่ม hint
-function renderPreview(file) {
-// เคลียร์ <img> เดิมถ้ามี
-const old = uploadArea.querySelector('.upload-preview');
-if (old) old.remove();
-
-// ถ้าไม่มีไฟล์ → ล้างพื้นหลัง
-if (!file) {
-  uploadArea.style.backgroundImage = '';
-  uploadArea.style.backgroundSize = '';
-  uploadArea.style.backgroundPosition = '';
-  uploadArea.style.backgroundRepeat = '';
-  return;
+      await saveActivity();
+    } catch (err) {
+      console.error('[ERROR] ในการบันทึก', err);
+      alert('บันทึกไม่สำเร็จ: ' + err.message);
+    }
+  });
+  window.__ACHV_POST_BOUND__ = true;
 }
 
-// ต้องเป็นรูปภาพเท่านั้น
-if (!file.type || !file.type.startsWith('image/')) {
-  alert('กรุณาเลือกเฉพาะไฟล์รูปภาพ');
-  fileInput.value = '';
-  uploadArea.style.backgroundImage = '';
-  uploadArea.style.backgroundSize = '';
-  uploadArea.style.backgroundPosition = '';
-  uploadArea.style.backgroundRepeat = '';
-  return;
-}
-
-const reader = new FileReader();
-reader.onload = () => {
-  uploadArea.style.backgroundImage = `url(${reader.result})`;
-  uploadArea.style.backgroundSize = `cover`;        
-  uploadArea.style.backgroundPosition = 'center';   
-  uploadArea.style.backgroundRepeat = 'no-repeat';  
-};
-reader.readAsDataURL(file);
-}
-
-
-fileInput.addEventListener('change', () => {
-  const file = fileInput.files && fileInput.files[0];
-  renderPreview(file);
-});
-})();

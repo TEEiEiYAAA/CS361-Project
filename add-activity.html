@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="./CSS/add-activity.css" />
   </head>
 
-  <body>dswa1
+  <body>
     <header class="header">
       <div class="logo">AchieveHub</div>
       <div class="nav-container">
@@ -31,10 +31,10 @@
       <div class="card">
 
         <!-- Upload Card -->
-          <div class="upload-area">
-            <span class="hint">เพิ่มรูปภาพกิจกรรม</span>
-            <input type="file" name="cover" accept="image/*" />
-          </div>
+        <div class="upload-area">
+          <span class="hint">เพิ่มรูปภาพกิจกรรม</span>
+          <input id="image" type="file" name="cover" accept="image/*" />
+        </div>
         <form>
           <!-- ชื่อกิจกรรม -->
           <div class="full">
@@ -58,8 +58,16 @@
           </div>
 
           <div class="pair">
-            <label for="location">สถานที่</label>
-            <input id="location" type="text" placeholder="เช่น ห้องประชุม 301, อาคารเรียนรวม">
+            <label for="locationId">สถานที่</label>
+            <select id="locationId" required>
+              <option value="" selected hidden>เลือกสถานที่</option>
+              <!-- ใช้รหัสตรงกับ DynamoDB.Table "Locations" -->
+              <option value="SC1">อาคารเรียนรวมสังคมศาสตร์ 1 (SC1)</option>
+              <option value="LC2">อาคารบรรยายรวม 2 (LC2)</option>
+              <option value="SC3">อาคารเรียนรวมสังคมศาสตร์ 3 (SC3)</option>
+              <option value="LC4">อาคารบรรยายรวม 4 (LC4)</option>
+              <option value="LC5"> อาคารบรรยายรวม 5 (LC5)</option>
+            </select>
 
             <label for="organizerId">ผู้จัด</label>
             <input id="organizerId" type="text" placeholder="ชมรม/หน่วยงานผู้รับผิดชอบ">
@@ -78,9 +86,9 @@
 
             <label>ระดับ</label>
             <div class="level">
-              <label><input type="radio" name="level"> พื้นฐาน</label>
-              <label><input type="radio" name="level"> ปานกลาง</label>
-              <label><input type="radio" name="level"> สูงสุด</label>
+              <label><input type="radio" name="level" value="พื้นฐาน"> พื้นฐาน</label>
+              <label><input type="radio" name="level" value="ปานกลาง"> ปานกลาง</label>
+              <label><input type="radio" name="level" value="สูงสุด"> สูงสุด</label>
             </div>
           </div>
 
@@ -89,11 +97,11 @@
             <label for="yearLevel">เหมาะสำหรับชั้นปี</label>
             <select id="yearLevel" required>
               <option value="" selected>เลือกชั้นปีที่เหมาะสม</option>
-              <option>ปี 1</option>
-              <option>ปี 2</option>
-              <option>ปี 3</option>
-              <option>ปี 4</option>
-              <option>ทุกชั้นปี</option>
+              <option value="1">ปี 1</option>
+              <option value="2">ปี 2</option>
+              <option value="3">ปี 3</option>
+              <option value="4">ปี 4</option>
+              <option value="0">ทุกชั้นปี</option>
             </select>
 
             <label for="required">กิจกรรมที่ต้องเข้าร่วม</label>
