@@ -352,7 +352,7 @@ function validateSkillsWrapper(errors = []) {
 // =========================
 //  API Presign + Save
 // =========================
-const API_BASE = "https://isukcfvzoi.execute-api.us-east-1.amazonaws.com/test";
+const API_BASE = "https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod";
 const GET_UPLOAD_URL = `${API_BASE}/activities/upload-url`;
 const LEVEL_MAP = { 'พื้นฐาน': 'พื้นฐาน', 'ปานกลาง': 'กลาง', 'สูงสุด': 'ขั้นสูง' };
 // ขอ presigned URL จาก Lambda
