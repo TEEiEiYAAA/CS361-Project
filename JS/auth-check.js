@@ -117,13 +117,13 @@ function updateBasicUserInfo() {
             console.error("❌ auth-check.js: Error occurred within updateBasicUserInfo:", updateError);
         }
         
-        /*// โค้ดส่วนนี้ควรจะทำงานต่อได้แม้ updateBasicUserInfo จะมี Error
+        // โค้ดส่วนนี้ควรจะทำงานต่อได้แม้ updateBasicUserInfo จะมี Error
         if (typeof initializePage === 'function') {
             console.log("🚀 auth-check.js: Calling initializePage()..."); // DEBUG LOG
             initializePage(); // เรียกฟังก์ชันเริ่มต้น (เช่น initializeStudentDashboard)
         } else {
              console.warn("🤔 auth-check.js: initializePage is not defined or not a function yet."); // DEBUG LOG
-        }*/
+        }
         
     } catch (error) {
         console.error('❌ auth-check.js: Error loading session data:', error);
@@ -150,6 +150,7 @@ function logout() {
     const confirmLogout = confirm('ต้องการออกจากระบบหรือไม่?');
     if (confirmLogout) {
         sessionStorage.removeItem('AchieveHubUser');
+        localStorage.clear(); // เพิ่มเข้ามาเพื่อล้าง localStorage ด้วย
         window.userData = null;
         window.userToken = null;
         window.location.href = "login.html";

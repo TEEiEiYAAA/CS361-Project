@@ -20,14 +20,15 @@ function initializeStudentDashboard() {
     }
     
     // ดึงข้อมูลทักษะจาก API
-    const studentInfo = window.userData;
-    const studentId = studentInfo.userId || studentInfo.userId; 
+    //const studentInfo = window.userData;
+    //const studentId = studentInfo.userId || studentInfo.userId; 
+    const studentId = window.userData.userId;
     loadAllSkillData(studentId);
 }
 
 // ⭐️ กำหนดให้ auth-check.js เรียกฟังก์ชันนี้เมื่อ Authentication ผ่าน
 console.log("🔧 student-dashboard.js: Defining window.initializePage..."); // LOG 2: กำลังจะกำหนด initializePage
-//window.initializePage = initializeStudentDashboard;
+window.initializePage = initializeStudentDashboard;
 console.log("✅ student-dashboard.js: window.initializePage is set.");
 
 
@@ -151,7 +152,7 @@ function navigateToRecommendActivities() {
     }
 }
 
-// ⭐️ NEW: เพิ่ม Event Listener ที่ท้ายไฟล์
+/* // ⭐️ NEW: เพิ่ม Event Listener ที่ท้ายไฟล์
 document.addEventListener('DOMContentLoaded', () => {
     console.log("🚀 student-dashboard.js: DOM fully loaded.");
     
@@ -169,4 +170,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-console.log("✅ student-dashboard.js: Script finished loading."); // LOG END: ไฟล์โหลดเสร็จ
+console.log("✅ student-dashboard.js: Script finished loading."); // LOG END: ไฟล์โหลดเสร็จ */
