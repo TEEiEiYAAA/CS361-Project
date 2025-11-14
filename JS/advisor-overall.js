@@ -45,6 +45,14 @@
           activityTitle.textContent = activityData.name || "ไม่มีชื่อกิจกรรม";
         }
 
+        // === ใส่ปุ่มแก้ไขตรงนี้เลย ===
+const editBtn = document.querySelector(".edit-btn");
+if (editBtn) {
+    editBtn.addEventListener("click", () => {
+        window.location.href = `edit-activity.html?activityId=${activityId}`;
+    });
+}
+
         // === New: แสดงรายละเอียดกิจกรรม ===
         const detailSection = document.querySelector(".activity-detail");
         if (detailSection) {
@@ -350,3 +358,5 @@
     }
   });
   // === จบส่วน POP-UP ===
+
+
