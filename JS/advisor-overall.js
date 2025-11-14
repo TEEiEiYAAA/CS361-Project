@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // ดึงข้อมูลกิจกรรมจาก Activities API (getActivityDetail)
     console.log("Fetching activity details...");
     const activityResponse = await fetch(
-      `https://isukcfvzoi.execute-api.us-east-1.amazonaws.com/test/activities/${activityId}`,
+      `https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod/activities/${activityId}`,
       { headers: commonHeaders }
     );
 
@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // ========== ดึงข้อมูลผู้เข้าร่วม ==========
     console.log("Fetching participation stats...");
     const participantsResponse = await fetch(
-      `https://isukcfvzoi.execute-api.us-east-1.amazonaws.com/test/activities/${activityId}/participants`,
+      `https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod/activities/${activityId}/participants`,
       { headers: commonHeaders }
     );
 
@@ -170,7 +170,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const infoHtml = `
         <div style="margin-top: 20px; padding: 15px; background: #e8f5e8; border-radius: 10px;">
           <h4 style="margin: 0 0 10px 0; color: #2e7d32;">ℹ️ ข้อมูลกิจกรรม</h4>
-          <p><strong>🎯 กลุ่มกิจกรรม:</strong> ${activityData.activityGroup || 'ไม่ระบุ'}</p>
+          <p><strong>🎯 กลุ่มกิจกรรม:</strong> ${activityData.skillId || 'ไม่ระบุ'}</p>
           <p><strong>📅 วันที่เริ่ม:</strong> ${formatDateTime(activityData.startDateTime)}</p>
           <p><strong>📅 วันที่สิ้นสุด:</strong> ${formatDateTime(activityData.endDateTime)}</p>
           <p><strong>📍 สถานที่:</strong> ${activityData.locationName || activityData.location || 'ไม่ระบุ'}</p>

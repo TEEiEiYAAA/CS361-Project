@@ -1,6 +1,6 @@
         // Configuration - แก้ URL ให้ตรงกับ API Gateway จริงของคุณ
         const CONFIG = {
-            API_BASE_URL: 'https://isukcfvzoi.execute-api.us-east-1.amazonaws.com/test',
+            API_BASE_URL: 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod',
             ENDPOINTS: {
                 GET_ACTIVITIES: '/activities',
                 REGISTER_ACTIVITY: '/activities/register'

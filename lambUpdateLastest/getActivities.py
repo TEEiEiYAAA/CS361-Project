@@ -73,9 +73,9 @@ def lambda_handler(event, context):
                 if plo_filter.upper() not in plos_list:
                     continue
 
-            # ✅ กรองตาม activityGroup
+            # ✅ กรองตาม activityGroup (ใช้ skillId แทน)
             if activity_group and activity_group.lower() != 'all':
-                group_value = activity.get('activityGroup') or ''
+                group_value = (activity.get('skillId') or '')  # ใช้จากตาราง Activities โดยตรง
                 if str(group_value).lower() != activity_group.lower():
                     continue
 

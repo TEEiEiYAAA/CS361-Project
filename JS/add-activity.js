@@ -190,7 +190,7 @@ skillRowsEl.addEventListener('change', e => clearValidity(e.target));
 // =========================
 
 // แสดงข้อความ popup สำเร็จ
-window.showSuccessPopup = function (message = 'บันทึกสำเร็จ') {
+window.showSuccessPopup = function (message = 'บันทึกสำเร็จ', onClose) {
   const overlay = document.createElement('div');
   Object.assign(overlay.style, {
     position: 'fixed',
@@ -228,12 +228,16 @@ window.showSuccessPopup = function (message = 'บันทึกสำเร็
     fontWeight: 800,
     cursor: 'pointer'
   });
-  okBtn.addEventListener('click', () => overlay.remove());
+  okBtn.addEventListener('click', () => {
+    overlay.remove();
+    if (typeof onClose === 'function') onClose();
+  });
   box.appendChild(okBtn);
 
   overlay.appendChild(box);
   document.body.appendChild(overlay);
 };
+
 
 // ไฮไลท์ช่องผิด
 function markInvalid(el) {
@@ -354,7 +358,7 @@ function validateSkillsWrapper(errors = []) {
 // =========================
 const API_BASE = "https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod";
 const GET_UPLOAD_URL = `${API_BASE}/activities/upload-url`;
-const LEVEL_MAP = { 'พื้นฐาน': 'พื้นฐาน', 'ปานกลาง': 'กลาง', 'สูงสุด': 'ขั้นสูง' };
+const LEVEL_MAP = { 'พื้นฐาน': 'พื้นฐาน', 'ปานกลาง': 'ปานกลาง', 'ขั้นสูง': 'ขั้นสูง' };
 // ขอ presigned URL จาก Lambda
 async function getUploadUrl(file) {
   const fileName = file.name || 'upload.bin';
@@ -514,9 +518,7 @@ async function saveActivity() {
   const locationId = document.getElementById('locationId').value;
   const activityGroup = document.getElementById('group').value || null;
   const yearLevel = Number(document.getElementById('yearLevel').value) || null;
-  //const isRequired = document.getElementById('isRequired')?.checked || false;
   const requiredActivities = document.getElementById('required').value.trim();
-  //const passingScore = Number(document.getElementById('passingScore')?.value || 0);
   const organizerId = document.getElementById('organizerId').value.trim();
 
   const levelInput = document.querySelector('input[name="level"]:checked');
@@ -526,23 +528,24 @@ async function saveActivity() {
   const plos = [...document.querySelectorAll('.skill-plo')].map(s => s.value).filter(Boolean);
   const ploDescriptions = [...document.querySelectorAll('.skill-desc')].map(i => i.value || '');
   const skillCategory = computeCategory(plos);
+  //const skillIds = computeSkillIds(plos);
   const toISO = s => s ? (s.endsWith('Z') ? s : `${s}:00Z`) : s;
 
   const fileInput = document.getElementById('image');
   let imageUrl = '';
-  
+
   if (fileInput?.files?.[0]) {
     const file = fileInput.files[0];
     console.log('[DEBUG] file selected:', file.name, file.type, file.size);
-  
+
     const { uploadUrl, objectUrl, contentType } = await getUploadUrl(file);
     console.log('[DEBUG] presign:', { uploadUrl, objectUrl, contentType });
-  
+
     await putToS3(uploadUrl, file, contentType);
     imageUrl = objectUrl;
   } else {
     throw new Error('กรุณาเลือกไฟล์รูป');
-  }    
+  }
 
   const payload = {
     name,
@@ -556,19 +559,77 @@ async function saveActivity() {
     ploDescriptions,
     level: skillLevel,
     skillLevel,
-    activityGroup,
+    //activityGroup,
     yearLevel,
-    //isRequired,
     requiredActivities,
-    //passingScore,
     imageUrl,
-    organizerId
+    organizerId,
+    skillId: activityGroup
   };
 
   const result = await postActivity(payload);
-  showSuccessPopup('บันทึกสำเร็จ');
   console.log('Create result:', result);
+  const newId = result?.activity?.activityId || null;
+
+  const activityId =
+    result?.activity?.activityId ||
+    result?.activityId ||
+    null;
+
+  // แสดง popup แล้วค่อยเด้งไปหน้า advisor-overall
+  window.showSuccessPopup = function (message = 'บันทึกสำเร็จ', activityId = null) {
+    const overlay = document.createElement('div');
+    Object.assign(overlay.style, {
+      position: 'fixed',
+      inset: 0,
+      background: 'rgba(0,0,0,0.35)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 9999
+    });
+
+    const box = document.createElement('div');
+    Object.assign(box.style, {
+      background: '#fff',
+      padding: '20px 24px',
+      borderRadius: '14px',
+      boxShadow: '0 12px 28px rgba(0,0,0,.12)',
+      minWidth: '280px',
+      textAlign: 'center'
+    });
+
+    box.innerHTML = `
+      <div style="font-weight:700;font-size:18px;margin-bottom:8px">${message}</div>
+      <div style="margin-bottom:16px;color:#4b5563">ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว</div>
+    `;
+
+    const okBtn = document.createElement('button');
+    okBtn.textContent = 'ตกลง';
+    Object.assign(okBtn.style, {
+      padding: '8px 20px',
+      borderRadius: '999px',
+      border: '0',
+      background: 'linear-gradient(90deg, #50E486 0%, #27C4B7 100%)',
+      color: '#fff',
+      fontWeight: 800,
+      cursor: 'pointer'
+    });
+
+    okBtn.addEventListener('click', () => {
+      overlay.remove();
+
+      if (activityId) {
+        window.location.href = `advisor-overall.html?activityId=${activityId}`;
+      }
+    });
+
+    box.appendChild(okBtn);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+  };
 }
+
 
 // =========================
 //  Bind Save Button
