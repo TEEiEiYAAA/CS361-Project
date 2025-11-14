@@ -149,24 +149,33 @@ body {
     position: relative;
 }
 
-.skill-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 5px 12px;
-    border-radius: 15px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    color: white;
+.badge-row {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 6px;
 }
 
-.skill-badge.soft-skill {
-    background-color: #FF6B6B;
+.badge-skill,
+.badge-level {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
 }
 
-.skill-badge.hard-skill {
-    background-color: #4ECDC4;
-}
+/* สี skill */
+.soft-skill { background: #FF6B6B; }
+.hard-skill { background: #4ECDC4; }
+.multi-skill { background: #95A5A6; }
+
+/* สี level */
+.level-basic { background: #4CAF50; }
+.level-medium { background: #FFC107; }
+.level-advanced { background: #F44336; }
+
 
 .activity-content {
     padding: 1.5rem;
@@ -349,3 +358,20 @@ footer small {
   .btn-edit { background: #e5e7eb; color: #111827; }
   .btn-edit:hover { filter: brightness(0.95); }
   
+.plo-section {
+  margin-top: 8px;
+}
+
+.plo-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.plo-item {
+  font-size: 0.82rem;
+  color: #555;
+  line-height: 1.35rem;
+  margin-left: 4px;
+}
