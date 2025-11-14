@@ -212,7 +212,7 @@
             const s = String(levelRaw || '').trim().toLowerCase();
             if (!s) return '';
             if (['พื้นฐาน','basic'].includes(s)) return 'พื้นฐาน';
-            if (['กลาง','ปานกลาง','medium'].includes(s)) return 'ปานกลาง';
+            if (['ปานกลาง','medium'].includes(s)) return 'ปานกลาง';
             if (['ขั้นสูง','advanced'].includes(s)) return 'ขั้นสูง';
             return s;
           }
@@ -230,21 +230,16 @@
         function createActivityCard(activity) {
         // --------------------------
         // 1) Map level → badge class
-        // --------------------------
+        // ดึงจาก Activities: ใช้ level ก่อน ถ้าไม่มีค่อย fallback เป็น skillLevel
         const levelRaw = activity.level || activity.skillLevel || "";
-        const levelText = levelRaw === "พื้นฐาน" ? "พื้นฐาน"
-                        : levelRaw === "กลาง"     ? "ปานกลาง"
-                        : levelRaw === "ขั้นสูง"  ? "ขั้นสูง"
-                        : levelRaw;
-
-        const levelBadgeClass = levelRaw === "พื้นฐาน" ? "level-basic"
-                                : levelRaw === "กลาง"     ? "level-medium"
-                                : levelRaw === "ขั้นสูง"  ? "level-advanced"
-                                : "";
+        const levelText = getLevelDisplay(levelRaw);
+        const levelBadgeClass = getLevelClass(levelRaw);
 
         const levelBadge = levelText
-            ? `<span class="badge-level ${levelBadgeClass}">${levelText}</span>`
-            : "";
+        ? `<span class="badge-level ${levelBadgeClass}">${levelText}</span>`
+        : "";
+
+
 
         // --------------------------
         // 2) skillCategory Badge
