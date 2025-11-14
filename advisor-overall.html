@@ -37,37 +37,50 @@
                 <img src="./Image/Backward.png" class="back-icon" alt="ย้อนกลับ">
             </div>
 
+        <div class="student-card">
 
-                <div class="student-card">
-                    <div class="card-header">
-                        <h2 class="activity-title">กำลังโหลดข้อมูล...</h2>
-                        <div class="action-buttons">
-                            <button class="delete-btn">ลบ</button>
-                            <button class="edit-btn">แก้ไข</button>
-                        </div>
-                    </div>
+            <!-- ชื่อกิจกรรม -->
+            <div class="activity-header">
+                <span class="activity-title activity-title-badge" id="activity-title">กำลังโหลด...</span>
 
-                    <div class="participant-section">
-                        <h3>สถิติการเข้าร่วม</h3>
-                        <div class="participant-count">
-                            <div class="loading">กำลังโหลดข้อมูลผู้เข้าร่วม...</div>
-                        </div>
-                    </div>
-
-                    <div class="skill-section">
-                        <h3>ทักษะที่ได้รับ</h3>
-                        <div class="skill-list">
-                            <div class="loading">กำลังโหลดข้อมูลทักษะ...</div>
-                        </div>
-                    </div>
-
-                    <div class="additional-info">
-                    </div>
+                <div class="action-buttons">
+                    <button class="delete-btn">ลบ</button>
+                    <button class="edit-btn">แก้ไข</button>
                 </div>
-
             </div>
-        </main>
-    </div>
+
+            <!-- รูปกิจกรรม -->
+            <div class="activity-image-container">
+                <img id="activity-image" class="activity-image" src="" alt="Activity Image">
+            </div>
+
+            <!-- รายละเอียดกิจกรรม -->
+            <div class="activity-detail detail-box detail-card" id="activity-detail-box">
+                <!-- filled by JS -->
+            </div>
+
+            <!-- สถิติการเข้าร่วม -->
+            <div class="participant-section">
+                <h3>สถิติการเข้าร่วม</h3>
+                <div class="participant-count" id="participant-list">
+                    <div class="loading">กำลังโหลดข้อมูลผู้เข้าร่วม...</div>
+                </div>
+            </div>
+
+            <!-- ข้อมูลกิจกรรม -->
+            <div class="additional-info" id="additional-info">
+                <!-- filled by JS -->
+            </div>
+
+            <!-- ทักษะที่ได้รับ -->
+            <div class="skill-section">
+                <h3>ทักษะที่ได้รับ</h3>
+                <div class="skill-list" id="skill-list">
+                    <div class="loading">กำลังโหลด...</div>
+                </div>
+            </div>
+
+        </div>
 
     <div id="delete-modal" class="modal-overlay">
         <div class="modal-content">

@@ -3,87 +3,114 @@ import boto3
 import decimal
 from botocore.exceptions import ClientError
 
-# สร้าง DynamoDB client
 dynamodb = boto3.resource('dynamodb')
 
-# Helper class to convert a DynamoDB item to JSON
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, decimal.Decimal):
-            if o % 1 > 0:
-                return float(o)
-            else:
-                return int(o)
+            return float(o) if o % 1 > 0 else int(o)
         return super(DecimalEncoder, self).default(o)
 
 def lambda_handler(event, context):
-    # CORS headers
     headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type,Authorization',
         'Access-Control-Allow-Methods': 'GET,OPTIONS'
     }
-    
-    # Handle preflight OPTIONS request
+
+    # รองรับ preflight
     if event.get('httpMethod') == 'OPTIONS':
-        return {
-            'statusCode': 200,
-            'headers': headers,
-            'body': ''
-        }
-    
+        return {'statusCode': 200, 'headers': headers, 'body': ''}
+
     try:
-        # ดึง activityId จาก path parameters
+        # ---------- 1) อ่าน activityId ----------
         activity_id = event.get('pathParameters', {}).get('activityId')
-        
         if not activity_id:
             return {
                 'statusCode': 400,
                 'headers': headers,
                 'body': json.dumps({'error': 'ต้องระบุรหัสกิจกรรม'})
             }
-        
-        print(f'Getting activity detail for: {activity_id}')
-        
-        # เชื่อมต่อ DynamoDB tables
+
+        print(f'Fetching activity: {activity_id}')
         activities_table = dynamodb.Table('Activities')
-        skills_table = dynamodb.Table('Skills')
-        
-        # ดึงข้อมูลกิจกรรม
-        activity_response = activities_table.get_item(
-            Key={'activityId': activity_id}
-        )
-        
-        if 'Item' not in activity_response:
+        plos_table = dynamodb.Table('PLOs')
+
+        # ---------- 2) ดึงกิจกรรมจาก Activities ----------
+        activity_res = activities_table.get_item(Key={'activityId': activity_id})
+        if 'Item' not in activity_res:
             return {
                 'statusCode': 404,
                 'headers': headers,
                 'body': json.dumps({'error': 'ไม่พบกิจกรรมที่ระบุ'})
             }
-        
-        activity = activity_response['Item']
-        
-        # ดึงข้อมูลทักษะที่เกี่ยวข้อง
-        skill_id = activity.get('skillId')
-        skill_info = {}
-        
-        if skill_id:
+
+        activity = activity_res['Item']
+
+        # ---------- 3) จัดการ PLO จากกิจกรรม ----------
+        raw_plos = activity.get('plo') or []
+        if isinstance(raw_plos, str):
+            # เผื่อเก็บเป็น string เช่น "PLO1,PLO2"
             try:
-                skill_response = skills_table.get_item(
-                    Key={'skillId': skill_id}
-                )
-                if 'Item' in skill_response:
-                    skill_info = skill_response['Item']
-            except Exception as e:
-                print(f'Error fetching skill info: {str(e)}')
-        
-        # รวมข้อมูลกิจกรรมกับทักษะ
+                parsed = json.loads(raw_plos)
+                if isinstance(parsed, list):
+                    raw_plos = parsed
+                else:
+                    raw_plos = [parsed]
+            except Exception:
+                raw_plos = [p.strip() for p in raw_plos.split(',') if p.strip()]
+
+        plos = raw_plos
+
+        # ดึงข้อมูลจากตาราง PLOs ทั้งหมด แล้ว map เป็น dict
+        plos_items = plos_table.scan().get('Items', [])
+        plo_map = {item['plo']: item for item in plos_items}
+
+        plo_full_names = []
+        # ถ้า activity มี ploDescriptions อยู่แล้วใช้ของเดิมก่อน
+        plo_descriptions = activity.get('ploDescriptions') or []
+
+        for idx, plo_code in enumerate(plos):
+            info = plo_map.get(plo_code, {})
+            full_name = info.get('ploFullName', plo_code)
+            plo_full_names.append(full_name)
+
+            # ถ้าไม่มี description ตรง index นี้ ลองดึงจากตาราง PLOs (ถ้ามี field นี้)
+            if idx >= len(plo_descriptions):
+                desc_from_table = info.get('description') or ''
+                plo_descriptions.append(desc_from_table)
+
+        # ---------- 4) หาประเภททักษะ (skillCategory) ----------
+        skill_category = activity.get('skillCategory')
+
+        if not skill_category:
+            categories = {
+                plo_map.get(p, {}).get('skillCategory')
+                for p in plos if plo_map.get(p)
+            }
+            categories = {c for c in categories if c}
+            if len(categories) == 1:
+                skill_category = categories.pop()
+            elif len(categories) > 1:
+                skill_category = 'multi skill'
+            else:
+                skill_category = ''
+
+        level = activity.get('level')  # พื้นฐาน/ปานกลาง/ขั้นสูง
+
+        # ---------- 5) location info ----------
+        location_info = {
+            'locationId': activity.get('locationId'),
+            'locationName': activity.get('locationName') or activity.get('location')
+        }
+
+        # ---------- 6) สร้าง object สำหรับส่งกลับ ----------
         detailed_activity = {
-            # ข้อมูลกิจกรรม
+            # 🟩 Activity Info
             'activityId': activity.get('activityId'),
             'name': activity.get('name'),
             'description': activity.get('description'),
-            'location': activity.get('location'),
+            **location_info,
             'startDateTime': activity.get('startDateTime'),
             'endDateTime': activity.get('endDateTime'),
             'organizerId': activity.get('organizerId'),
@@ -91,46 +118,51 @@ def lambda_handler(event, context):
             'imageUrl': activity.get('imageUrl'),
             'createdAt': activity.get('createdAt'),
             'updatedAt': activity.get('updatedAt'),
-            
-            # ข้อมูลทักษะที่เกี่ยวข้อง
+
+            # 🟦 UI Fields
+            'skillCategory': skill_category,
+            'activityGroup': activity.get('activityGroup', ''),
+            'level': level,
+            'suitableYearLevel': activity.get('suitableYearLevel', 0),
+            'requiredActivities': activity.get('requiredActivities', 0),
+            'prerequisiteActivities': activity.get('prerequisiteActivities', []),
+
+            # 🟨 PLO Section (ทั้ง code + ชื่อเต็ม + description)
+            'plo': plos,
+            'ploFullNames': plo_full_names,
+            'ploDescriptions': plo_descriptions,
+
+            # 🟧 Skill object ที่ advisor-overall.js ใช้
             'skill': {
-                'skillId': skill_info.get('skillId', skill_id),
-                'name': skill_info.get('name', 'ไม่ระบุทักษะ'),
-                'description': skill_info.get('description', ''),
-                'category': skill_info.get('category', ''),
-                'subcategory': skill_info.get('subcategory', ''),
-                'yearLevel': skill_info.get('yearLevel', 0),
-                'isRequired': skill_info.get('isRequired', False),
-                'passingScore': skill_info.get('passingScore', 0),
-                'requiredActivities': skill_info.get('requiredActivities', 0)
+                'category': skill_category or '',
+                'skillLevel': level or '',
+                'ploFullNames': plo_full_names,
+                'ploDescriptions': plo_descriptions,
             }
         }
-        
-        print(f'Successfully retrieved activity: {activity.get("name")}')
-        
+
+        # ล้างค่า None
+        clean_data = {k: v for k, v in detailed_activity.items() if v is not None}
+
+        print(f"✅ Loaded activity detail: {activity.get('name')}")
         return {
             'statusCode': 200,
             'headers': headers,
-            'body': json.dumps(detailed_activity, cls=DecimalEncoder)
+            'body': json.dumps(clean_data, cls=DecimalEncoder, ensure_ascii=False)
         }
-        
+
     except ClientError as e:
         print('DynamoDB Error:', str(e))
         return {
             'statusCode': 500,
             'headers': headers,
-            'body': json.dumps({
-                'error': 'เกิดข้อผิดพลาดในการเข้าถึงฐานข้อมูล',
-                'details': str(e)
-            })
+            'body': json.dumps({'error': 'เกิดข้อผิดพลาดในการเข้าถึงฐานข้อมูล', 'details': str(e)})
         }
+
     except Exception as e:
-        print('Unexpected error:', str(e))
+        print('Unexpected Error:', str(e))
         return {
             'statusCode': 500,
             'headers': headers,
-            'body': json.dumps({
-                'error': 'เกิดข้อผิดพลาดที่ไม่คาดคิด',
-                'details': str(e)
-            })
+            'body': json.dumps({'error': 'เกิดข้อผิดพลาดที่ไม่คาดคิด', 'details': str(e)})
         }
