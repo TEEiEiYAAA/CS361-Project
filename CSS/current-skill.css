@@ -153,3 +153,111 @@ footer{
   .tabs-wrap{ left:14px; right:14px; top:-16px; }
   .tab-btn{ height:36px; }
 }
+
+/* =========================================
+   ส่วนที่เพิ่มใหม่สำหรับ Accordion
+   ========================================= */
+
+/* ปรับพื้นที่แสดงผล Accordion */
+.accordion-list {
+  padding: 20px 25px; /* ให้มีระยะห่างจากขอบกล่อง */
+  min-height: 300px;
+}
+
+/* ข้อความ Loading / Empty */
+.loading-text, .loading-placeholder, .empty-message {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 20px;
+}
+
+/* การ์ดแต่ละอัน (Accordion Item) */
+.accordion-card {
+  background: #fff;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.5);
+}
+
+/* ส่วนหัว (กดเพื่อเปิด/ปิด) */
+.accordion-header {
+  padding: 15px 20px;
+  background: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.3s;
+}
+
+.accordion-header:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.accordion-header .group-name {
+  font-weight: 700;
+  color: #0a5e6c; /* สีเดียวกับหัวข้อ PLO */
+  font-size: 1.1rem;
+}
+
+/* ไอคอนลูกศร */
+.arrow-icon {
+  color: #2f7484;
+  transition: transform 0.3s ease;
+}
+
+/* เมื่อเปิดอยู่ ให้หมุนลูกศร */
+.accordion-card.open .arrow-icon {
+  transform: rotate(180deg);
+}
+
+/* ส่วนเนื้อหาข้างใน */
+.accordion-body {
+  display: none; /* ซ่อนไว้ก่อน */
+  padding: 5px 20px 15px 20px;
+  background: #fff;
+  border-top: 1px solid #eee;
+}
+
+.accordion-card.open .accordion-body {
+  display: block; /* แสดงเมื่อมี class open */
+  animation: slideDown 0.3s ease-out;
+}
+
+/* รายการย่อย (Easy/Medium/Hard) */
+.level-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px dashed #eee;
+  font-size: 0.95rem;
+}
+
+.level-item:last-child {
+  border-bottom: none;
+}
+
+.level-name {
+  color: #333;
+}
+
+/* สถานะ (ผ่าน/ไม่ผ่าน) */
+.level-status.passed {
+  color: #27ae60; /* สีเขียว */
+  font-weight: 600;
+}
+
+.level-status.not-passed {
+  color: #95a5a6; /* สีเทา */
+  font-size: 0.9rem;
+}
+
+/* Animation เล็กน้อย */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}

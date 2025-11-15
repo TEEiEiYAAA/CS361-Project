@@ -6,6 +6,7 @@
   <title>ทักษะปัจจุบัน</title>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./CSS/current-skill.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
   <header class="header">
@@ -19,7 +20,7 @@
         <a href="current-skill.html" class="nav-button active">ทักษะปัจจุบัน</a>
         <a href="quiz-categories.html" class="nav-button">แบบทดสอบ</a>
       </nav>
-      <div class="logout-icon"><img src="./Image/LogOut.png" alt="logout"/></div>
+      <div class="logout-icon" onclick="logout()"><img src="./Image/LogOut.png" alt="logout"/></div>
     </div>
   </header>
 
@@ -28,25 +29,25 @@
     กิจกรรมจะนับเข้าทักษะเมื่อ <strong>ยืนยันการเข้าร่วม</strong> และ <strong>ทำแบบประเมินเสร็จสิ้น</strong> เท่านั้น
   </div>
 
-  <!-- ===== Layout: 2 กล่องแยกกัน ===== -->
+  <!-- ===== Layout: 2 กล่อง ===== -->
   <main class="skill-layout">
     <!-- การ์ดซ้าย: PLO -->
     <aside class="plo-card">
       <h3>ผลลัพธ์การเรียนรู้<br>ของหลักสูตร</h3>
-      <ul>
-        <li class="active">PLO1</li>
-        <li>PLO2</li>
-        <li>PLO3</li>
-        <li>PLO4</li>
-        <li>อื่น ๆ</li>
+      <ul id="plo-menu-list">
+        <li class="loading-text">กำลังโหลด...</li>
       </ul>
     </aside>
 
     <!-- การ์ดขวา: กล่องหลัก มีแท็บอย่างเดียว -->
     <section class="skill-card">
       <div class="tabs-wrap">
-        <button class="tab-btn active" onclick="switchTab(event)">ทักษะที่ได้รับแล้ว</button>
-        <button class="tab-btn" onclick="switchTab(event)">ทักษะที่ยังไม่ได้รับ</button>
+        <button class="tab-btn active" onclick="switchSubTab('received')">ทักษะที่ได้รับแล้ว</button>
+        <button class="tab-btn" onclick="switchSubTab('pending')">ทักษะที่ยังไม่ได้รับ</button>
+      </div>
+
+      <div id="accordion-container" class="accordion-list">
+        <div class="loading-placeholder">กำลังดึงข้อมูล...</div>
       </div>
     </section>
   </main>
@@ -59,13 +60,7 @@
     </small>
   </footer>
 
-  <script>
-    function switchTab(e){
-      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-      e.currentTarget.classList.add('active');
-    }
-  </script>
-  <script src="../JS/my-activities.js"></script>
+  <script src="../JS/current-skill.js"></script>
   <script src="../JS/auth-check.js"></script>
 
 </body>
