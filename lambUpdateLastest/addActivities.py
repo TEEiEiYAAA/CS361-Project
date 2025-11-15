@@ -10,7 +10,7 @@ dynamodb = boto3.resource('dynamodb')
 ACTIVITIES_TABLE = os.getenv('ACTIVITIES_TABLE', 'Activities')
 SKILLS_TABLE = os.getenv('SKILLS_TABLE', 'Skills')
 
-ALLOWED_LEVELS = {'พื้นฐาน', 'กลาง', 'ขั้นสูง'}
+ALLOWED_LEVELS = {'พื้นฐาน', 'ปานกลาง', 'ขั้นสูง'}
 
 
 def _now_iso():
@@ -123,8 +123,7 @@ def lambda_handler(event, context):
             year_level = _parse_int(body.get('suitableYearLevel'), default=None)
 
         # activityGroup ไม่ใช้แล้ว แต่เผื่อรับจาก frontend เก่าเอาไว้เป็น fallback
-        activityGroup = (body.get('activityGroup') or '').strip() or None
-
+        skillId = (body.get('skillId') or '').strip() or None
 
         # ===== สร้าง item =====
         activityId = 'A' + uuid.uuid4().hex[:7].upper()
@@ -136,7 +135,7 @@ def lambda_handler(event, context):
             'startDateTime': startDateTime,
             'endDateTime': endDateTime,
             'skillCategory': skillCategory,
-            'skillId': activityGroup,                   # << ใช้ skill_id ตรงนี้
+            'skillId': skillId,                   # << ใช้ skill_id ตรงนี้
             'plo': plos,
             'ploDescriptions': ploDescriptions,
             'level': level,

@@ -457,7 +457,6 @@ function validateAll() {
   const levelBox    = document.querySelector('.level');
   const levelInput  = document.querySelector('input[name="level"]:checked');
 
-  // ใช้ไว้โฟกัสช่องแรกที่ผิด
   let firstInvalid = null;
   const hit = (el, key) => {
     if (el && !firstInvalid) firstInvalid = el;
@@ -475,7 +474,13 @@ function validateAll() {
   if (!descEl?.value.trim())     hit(descEl, 'desc');
   if (!placeEl?.value)           hit(placeEl, 'place');
   if (!hostEl?.value.trim())     hit(hostEl, 'host');
-  if (!groupEl?.value)           hit(groupEl, 'group');
+
+  // 🔥 กลุ่มกิจกรรม — กันเคสที่ยังเป็น placeholder อยู่
+  const groupVal = groupEl?.value?.trim() || '';
+  if (!groupVal || groupVal === '' || groupVal === 'กรุณาเลือกกลุ่มของกิจกรรม') {
+    hit(groupEl, 'group');
+  }
+
   if (!yearEl?.value)            hit(yearEl, 'year');
   if (!requiredEl?.value.trim()) hit(requiredEl, 'required');
 
@@ -495,11 +500,10 @@ function validateAll() {
   if (!levelInput) hit(levelBox, 'level');
 
   // 5) ทักษะอย่างน้อย 1 แถว + ค่าในแถวแรก
-  if (!skillPloEl?.value)   hit(skillPloEl, 'plo');
-  if (!skilldesEl?.value?.trim()) hit(skilldesEl, 'plodesc');
+  if (!skillPloEl?.value)             hit(skillPloEl, 'plo');
+  if (!skilldesEl?.value?.trim())     hit(skilldesEl, 'plodesc');
   validateSkillsWrapper(errors); // ตรวจทุกแถว
 
-  // โฟกัส/เลื่อนจอไปยังช่องแรกที่ผิด
   if (firstInvalid?.focus) {
     firstInvalid.focus();
     firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -516,7 +520,12 @@ async function saveActivity() {
   const startDateTime = document.getElementById('startDateTime').value;
   const endDateTime = document.getElementById('endDateTime').value;
   const locationId = document.getElementById('locationId').value;
-  const activityGroup = document.getElementById('group').value || null;
+
+  // ===== กลุ่มกิจกรรม / skillId =====
+  const groupEl = document.getElementById('group');            // 👈 เพิ่มบรรทัดนี้
+  const skillId = document.querySelector('#group option:checked')?.textContent.trim() || null;
+                                           // 👈 ตอนนี้ไม่เป็น undefined แล้ว
+
   const yearLevel = Number(document.getElementById('yearLevel').value) || null;
   const requiredActivities = document.getElementById('required').value.trim();
   const organizerId = document.getElementById('organizerId').value.trim();
@@ -525,12 +534,16 @@ async function saveActivity() {
   const levelLabel = levelInput?.value || 'พื้นฐาน';
   const skillLevel = LEVEL_MAP[levelLabel] || 'พื้นฐาน';
 
-  const plos = [...document.querySelectorAll('.skill-plo')].map(s => s.value).filter(Boolean);
-  const ploDescriptions = [...document.querySelectorAll('.skill-desc')].map(i => i.value || '');
+  const plos = [...document.querySelectorAll('.skill-plo')]
+    .map(s => s.value)
+    .filter(Boolean);
+  const ploDescriptions = [...document.querySelectorAll('.skill-desc')]
+    .map(i => i.value || '');
   const skillCategory = computeCategory(plos);
-  //const skillIds = computeSkillIds(plos);
+
   const toISO = s => s ? (s.endsWith('Z') ? s : `${s}:00Z`) : s;
 
+  // ===== อัปโหลดรูปไป S3 =====
   const fileInput = document.getElementById('image');
   let imageUrl = '';
 
@@ -547,6 +560,7 @@ async function saveActivity() {
     throw new Error('กรุณาเลือกไฟล์รูป');
   }
 
+  // ===== payload ที่ส่งเข้า Lambda =====
   const payload = {
     name,
     description,
@@ -559,77 +573,25 @@ async function saveActivity() {
     ploDescriptions,
     level: skillLevel,
     skillLevel,
-    //activityGroup,
     yearLevel,
     requiredActivities,
     imageUrl,
     organizerId,
-    skillId: activityGroup
+    skillId, 
   };
+
+  console.log('[DEBUG] payload ก่อนส่งเข้า /activities:', payload);
 
   const result = await postActivity(payload);
   console.log('Create result:', result);
-  const newId = result?.activity?.activityId || null;
 
   const activityId =
     result?.activity?.activityId ||
     result?.activityId ||
     null;
 
-  // แสดง popup แล้วค่อยเด้งไปหน้า advisor-overall
-  window.showSuccessPopup = function (message = 'บันทึกสำเร็จ', activityId = null) {
-    const overlay = document.createElement('div');
-    Object.assign(overlay.style, {
-      position: 'fixed',
-      inset: 0,
-      background: 'rgba(0,0,0,0.35)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 9999
-    });
-
-    const box = document.createElement('div');
-    Object.assign(box.style, {
-      background: '#fff',
-      padding: '20px 24px',
-      borderRadius: '14px',
-      boxShadow: '0 12px 28px rgba(0,0,0,.12)',
-      minWidth: '280px',
-      textAlign: 'center'
-    });
-
-    box.innerHTML = `
-      <div style="font-weight:700;font-size:18px;margin-bottom:8px">${message}</div>
-      <div style="margin-bottom:16px;color:#4b5563">ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว</div>
-    `;
-
-    const okBtn = document.createElement('button');
-    okBtn.textContent = 'ตกลง';
-    Object.assign(okBtn.style, {
-      padding: '8px 20px',
-      borderRadius: '999px',
-      border: '0',
-      background: 'linear-gradient(90deg, #50E486 0%, #27C4B7 100%)',
-      color: '#fff',
-      fontWeight: 800,
-      cursor: 'pointer'
-    });
-
-    okBtn.addEventListener('click', () => {
-      overlay.remove();
-
-      if (activityId) {
-        window.location.href = `advisor-overall.html?activityId=${activityId}`;
-      }
-    });
-
-    box.appendChild(okBtn);
-    overlay.appendChild(box);
-    document.body.appendChild(overlay);
-  };
+  window.showSuccessPopup('บันทึกสำเร็จ', activityId);
 }
-
 
 // =========================
 //  Bind Save Button
