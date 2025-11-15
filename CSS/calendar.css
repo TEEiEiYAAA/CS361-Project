@@ -88,15 +88,12 @@ main {
 
 /* ปฏิทิน */
 #calendar {
-    width: 94vw; /* ใช้ vw เพื่อให้ยืดหยุ่นตามขนาดหน้าจอ */
-    height: auto;
-    max-height: 850px; /* เพิ่มจาก 700px เป็น 850px (ความสูงสูงสุด) */
-    max-height: 700px; /* กำหนดความสูงสูงสุด */
-    background-color: rgba(255, 255, 255, 0.842); /* เพิ่มพื้นหลังสีขาว */
+    width: 94vw; 
+    background-color: rgba(255, 255, 255, 0.842); 
     border: 0;
     border-radius: 12px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    padding: 15px; /* เพิ่มระยะห่างข้างใน */
+    padding: 15px; 
 }
 
 /* เปลี่ยน Font โดยรวมให้เป็น Sarabun ทั้งหมด */
