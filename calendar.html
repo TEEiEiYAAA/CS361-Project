@@ -36,65 +36,81 @@
     <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194
       นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
   </footer>
-<script>
+  <script>
     document.addEventListener('DOMContentLoaded', function () {
       const calendarEl = document.getElementById('calendar');
-
-      // 1. นี่คือ API URL ที่ถูกต้อง (อ้างอิงจาก advisor-activities.js)
       const API_URL = 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod/activities';
-      
+
+      // ★★★ 1. (ใหม่) อัปเดต "ชุดสีพาสเทล" เป็น 8 สี ★★★
+      // และบังคับตัวอักษรสีดำทั้งหมด
+      const colorPalette = [
+        { bg: '#AEC6CF', text: '#000000' }, // ฟ้าพาสเทล
+        { bg: '#BDECB6', text: '#000000' }, // เขียวพาสเทล
+        { bg: '#FFD1A1', text: '#000000' }, // ส้มพาสเทล
+        { bg: '#FFB6C1', text: '#000000' }, // ชมพูพาสเทล (แดงอ่อน)
+        { bg: '#C3B1E1', text: '#000000' },  // ม่วงพาสเทล
+        { bg: '#ACE7E2', text: '#000000' }  // เขียวน้ำทะเล
+      ];
+
       const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth', 
-        locale: 'th', 
-	height: 'auto',
+        initialView: 'dayGridMonth',
+        locale: 'th',
+        height: 'auto',
         headerToolbar: {
           left: 'prev,next today',
           center: 'title',
           right: 'dayGridMonth,timeGridWeek,listWeek'
         },
 
-        // 2. ★★★ นี่คือจุดที่แก้ไข ★★★
-        // เราเปลี่ยน "events" จาก string ธรรมดาให้เป็นฟังก์ชัน
-        // เพื่อดึงข้อมูลและแปลงข้อมูลก่อน
-        events: async function(fetchInfo, successCallback, failureCallback) {
+        events: async function (fetchInfo, successCallback, failureCallback) {
           try {
-            // 3. ดึงข้อมูลจาก API /activities
             const response = await fetch(API_URL);
-            
-            // 4. จัดการข้อมูลที่ Lambda ส่งกลับมา
-            // (Lambda ของคุณอาจจะส่งกลับมาแบบมี body ครอบ)
             let raw = await response.json();
             let activities = raw;
-
-            // ตรวจสอบว่าข้อมูลอยู่ใน 'body' หรือไม่ (เหมือนใน advisor-activities.js)
             if (raw && typeof raw === 'object' && !Array.isArray(raw) && 'body' in raw) {
               activities = typeof raw.body === 'string' ? JSON.parse(raw.body) : raw.body;
             }
-
             if (!Array.isArray(activities)) {
-               throw new Error("Data received is not an array");
+              throw new Error("Data received is not an array");
             }
 
-            // 5. ★★★ นี่คือหัวใจสำคัญ: การแปลงข้อมูล ★★★
-            // เราจะ map ข้อมูลที่ได้จาก DynamoDB ให้เป็นชื่อที่ FullCalendar เข้าใจ
-            const transformedEvents = activities.map(function(activity) {
+            // แปลงข้อมูล (Mapping)
+            const transformedEvents = activities.map(function (activity) {
+
+              // ★★★ 2. สร้าง "Hash" จาก activityId (หรือ name) ★★★
+              let hash = 0;
+              const idString = activity.activityId || activity.name || '';
+              if (idString.length === 0) {
+                hash = 0;
+              } else {
+                for (let i = 0; i < idString.length; i++) {
+                  const char = idString.charCodeAt(i);
+                  hash = ((hash << 5) - hash) + char;
+                  hash = hash & hash; // Convert to 32bit integer
+                }
+              }
+              hash = Math.abs(hash);
+
+              // 3. นำ hash มา % (mod) กับจำนวนสี (ตอนนี้คือ 8)
+              const colorSet = colorPalette[hash % colorPalette.length];
+
+              // ★★★ 4. กำหนดสีพื้นหลัง (color) และสีตัวอักษร (textColor) ★★★
               return {
-                id: activity.activityId,       //
-                title: activity.name,          // (แปลง name -> title)
-                start: activity.startDateTime, // (แปลง startDateTime -> start)
-                end: activity.endDateTime,     // (แปลง endDateTime -> end)
-                
-                // เก็บข้อมูลอื่นๆ ที่เหลือไว้ใน extendedProps
+                id: activity.activityId,
+                title: activity.name,
+                start: activity.startDateTime,
+                end: activity.endDateTime,
+                color: colorSet.bg,       // <-- สีพื้นหลังพาสเทล
+                textColor: colorSet.text, // <-- สีตัวอักษรดำ
                 extendedProps: {
-                  description: activity.description, //
-                  location: activity.locationName || activity.locationId, //
-                  skillCategory: activity.skillCategory, //
-                  level: activity.level || activity.skillLevel //
+                  description: activity.description,
+                  location: activity.locationName || activity.locationId,
+                  skillCategory: activity.skillCategory,
+                  level: activity.level || activity.skillLevel
                 }
               };
             });
 
-            // 6. ส่งข้อมูลที่แปลงแล้วให้ FullCalendar
             successCallback(transformedEvents);
 
           } catch (error) {
@@ -103,14 +119,10 @@
           }
         },
 
-        // 7. แก้ไข eventClick ให้ดึงข้อมูลจาก extendedProps ที่เราเพิ่งเก็บ
         eventClick: function (info) {
           alert('กิจกรรม: ' + info.event.title + '\n' +
-                'รายละเอียด: ' + (info.event.extendedProps.description || 'ไม่มี') + '\n' +
-                'สถานที่: ' + (info.event.extendedProps.location || 'ไม่มี'));
-
-          // หากต้องการให้คลิกแล้วไปหน้าอื่น ให้ใช้บรรทัดนี้แทน
-          // window.location.href = 'detailed-activities.html?id=' + info.event.id;
+            'รายละเอียด: ' + (info.event.extendedProps.description || 'ไม่มี') + '\n' +
+            'สถานที่: ' + (info.event.extendedProps.location || 'ไม่มี'));
         }
       });
 

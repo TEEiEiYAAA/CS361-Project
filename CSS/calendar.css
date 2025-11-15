@@ -144,12 +144,12 @@ main {
     border: none !important; /* ลบขอบเดิม */
     padding: 2px 4px;
     font-size: 0.85em;
-    background-color: #107c79; /* สีพื้นหลังตั้งต้น (สีน้ำเงินเหมือน Google) */
+    background-color: #d8d8d8; /* สีพื้นหลังตั้งต้น (สีน้ำเงินเหมือน Google) */
+
 }
 
 .fc-event-main {
-    color: white !important; /* สีตัวอักษรในกิจกรรม */
-}
+    color: inherit; /* <-- แก้ไขเป็น inherit (รับสีมาจาก JavaScript) */}
 
 
 /* 5. สไตล์ของหัวตาราง (อา, จ, อ, ...) */
@@ -174,6 +174,42 @@ main {
     background-color: #7dbacb77 !important; /* เปลี่ยนสีพื้นหลังเป็นสีที่ต้องการ */
 }
 
+/* --- ★★★ โค้ดสำหรับสลับสีใน List View ★★★ --- */
+/* (วางต่อท้ายสุดใน calendar.css) */
+
+/* 1. กำหนดสีสำหรับแถวที่เป็น "เลขคี่" (กิจกรรมที่ 1, 3, 5...) */
+.fc-list-event:nth-child(odd) {
+    background-color: #87beb7 !important; /* สีเข้ม */
+}
+/* 1a. ทำให้ตัวอักษรและจุดเป็นสีขาว */
+.fc-list-event:nth-child(odd) .fc-list-event-time,
+.fc-list-event:nth-child(odd) .fc-list-event-title,
+.fc-list-event:nth-child(odd) .fc-list-event-title a {
+    color: #000000 !important;
+}
+.fc-list-event:nth-child(odd) .fc-list-event-dot {
+    border-color: #FFFFFF !important;
+}
+
+
+/* 2. กำหนดสีสำหรับแถวที่เป็น "เลขคู่" (กิจกรรมที่ 2, 4, 6...) */
+.fc-list-event:nth-child(even) {
+    background-color: #B5D6D6 !important; /* สีอ่อน */
+}
+/* 2a. ทำให้ตัวอักษรและจุดเป็นสีดำ */
+.fc-list-event:nth-child(even) .fc-list-event-time,
+.fc-list-event:nth-child(even) .fc-list-event-title,
+.fc-list-event:nth-child(even) .fc-list-event-title a {
+    color: #000000 !important;
+}
+.fc-list-event:nth-child(even) .fc-list-event-dot {
+    border-color: #000000 !important;
+}
+
+/* 3. ลบสีพื้นหลังเมื่อ hover (เพราะเรากำหนดสีเองแล้ว) */
+.fc .fc-list-event:hover td {
+    background-color: transparent !important;
+}
 
 /* footer */
 footer {
