@@ -1,59 +1,112 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="th">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AchieveHub</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./CSS/advisor-dashboard.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>เว็บปฏิทิน</title>
+  <link rel="stylesheet" href="./CSS/calendar.css" />
+  <script src='./JS/fullcalendar.js'></script>
 </head>
+
 <body>
-    <header class="header">
-        <div class="logo">AchieveHub</div>
-        <div class="nav-container">
-            <nav class="nav-menu">
-                <a href="advisor-dashboard.html" class="nav-button active">หน้าแรก</a>
-                <a href="advisor-activities.html" class="nav-button">ตรวจสอบกิจกรรม</a>
-                <a href="advisor-calender.html" class="nav-button">ปฏิทินกิจกรรม</a>
-                <a href="add-activity.html" class="nav-button">เพิ่มกิจกรรม</a>
-            </nav>
-            <div class="logout-icon" id="user-icon" onclick="logout()">
-                <img src="./Image/LogOut.png" />
-            </div>
-        </div>
-    </header>
-    <div class="container">
-
-        <div class="list-header">
-            <h2>นักศึกษาในที่ปรึกษา</h2>
-          
-            <!-- ► Dropdown อยู่มุมขวาบน -->
-            <div class="filter-container">
-              <label for="year-filter" class="visually-hidden">กรองตามชั้นปี</label>
-              <select id="year-filter" onchange="filterByYearDropdown()">
-                <option value="" selected disabled>ระดับชั้นปี</option>
-                <option value="all">ทั้งหมด</option>
-                <option value="1">ปี 1</option>
-                <option value="2">ปี 2</option>
-                <option value="3">ปี 3</option>
-                <option value="4">ปี 4</option>
-              </select>
-            </div>
-          </div>
-          
-          <p>อาจารย์ที่ปรึกษา: <span id="user-name"></span></p>
-        <div id="students-list" class="loading">กำลังโหลดข้อมูล...</div>
+  <header class="header">
+    <div class="logo">AchieveHub</div>
+    <div class="nav-container">
+      <nav class="nav-menu">
+        <a href="advisor-dashboard.html" class="nav-button">หน้าแรก</a>
+        <a href="advisor-activities.html" class="nav-button">ตรวจสอบกิจกรรม</a>
+        <a href="advisor-calender.html" class="nav-button active">ปฏิทินกิจกรรม</a>
+        <a href="add-activity.html" class="nav-button">เพิ่มกิจกรรม</a>
+      </nav>
+      <div class="logout-icon" id="user-icon" onclick="logout()">
+        <img src="./Image/LogOut.png" />
+      </div>
     </div>
+  </header>
 
-    </div>
-    <footer>
-        <p>AchieveHub ©2025<br>CS361</p>
-        <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194
-            นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
-    </footer>
+  <main>
+    <div id="calendar"></div>
+  </main>
 
-    <script src="../JS/auth-check.js"></script>
-    <script src="../JS/advisor-dashboard.js"></script>
+  <footer>
+    <p>AchieveHub ©2025<br>CS361</p>
+    <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194
+      นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const calendarEl = document.getElementById('calendar');
+
+      // 1. นี่คือ API URL ที่ถูกต้อง (อ้างอิงจาก advisor-activities.js)
+      const API_URL = 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod/activities';
+
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'th',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,listWeek'
+        },
+
+        // 2. ใช้ "events" เป็นฟังก์ชันเพื่อดึงและแปลงข้อมูล
+        events: async function (fetchInfo, successCallback, failureCallback) {
+          try {
+            // 3. ดึงข้อมูลจาก API /activities
+            const response = await fetch(API_URL);
+
+            // 4. จัดการข้อมูลที่ Lambda ส่งกลับมา
+            let raw = await response.json();
+            let activities = raw;
+            if (raw && typeof raw === 'object' && !Array.isArray(raw) && 'body' in raw) {
+              activities = typeof raw.body === 'string' ? JSON.parse(raw.body) : raw.body;
+            }
+            if (!Array.isArray(activities)) {
+              throw new Error("Data received is not an array");
+            }
+
+            // 5. แปลงข้อมูล (Mapping)
+            const transformedEvents = activities.map(function (activity) {
+              return {
+                id: activity.activityId,
+                title: activity.name,
+                start: activity.startDateTime,
+                end: activity.endDateTime,
+                extendedProps: {
+                  description: activity.description,
+                  location: activity.locationName || activity.locationId,
+                  skillCategory: activity.skillCategory,
+                  level: activity.level || activity.skillLevel
+                }
+              };
+            });
+
+            // 6. ส่งข้อมูลที่แปลงแล้วให้ FullCalendar
+            successCallback(transformedEvents);
+
+          } catch (error) {
+            console.error('Error fetching or transforming activities:', error);
+            failureCallback(error);
+          }
+        },
+
+        // 7. แก้ไข eventClick ให้ดึงข้อมูลจาก extendedProps
+        eventClick: function (info) {
+          alert('กิจกรรม: ' + info.event.title + '\n' +
+            'รายละเอียด: ' + (info.event.extendedProps.description || 'ไม่มี') + '\n' +
+            'สถานที่: ' + (info.event.extendedProps.location || 'ไม่มี'));
+
+          // สำหรับหน้าอาจารย์ อาจจะอยากให้คลิกแล้วไปหน้า advisor-overall
+          // window.location.href = 'advisor-overall.html?activityId=' + info.event.id;
+        }
+      });
+
+      calendar.render();
+    });
+  </script>
+
 </body>
-</html>
 
+</html>

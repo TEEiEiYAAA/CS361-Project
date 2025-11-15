@@ -1,40 +1,121 @@
 <!doctype html>
 <html lang="th">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>เว็บปฏิทิน</title>
+  <title>ปฏิทิน</title>
   <link rel="stylesheet" href="./CSS/calendar.css" />
+  <script src='./JS/fullcalendar.js'></script>
 </head>
+
 <body>
-      <header class="header">
-      <div class="logo">AchieveHub</div>
-      <div class="nav-container">
-        <nav class="nav-menu">
-          <a href="student-dashboard.html" class="nav-button">หน้าแรก</a>
-          <a href="recommend-activities.html" class="nav-button">กิจกรรมที่แนะนำ</a>
-          <a href="calendar.html" class="nav-button active">ปฏิทินกิจกรรม</a>
-          <a href="my-activities.html" class="nav-button">กิจกรรมของฉัน</a>
-          <a href="current-skill.html" class="nav-button">ทักษะปัจจุบัน</a>
-          <a href="quiz-categories.html" class="nav-button">แบบทดสอบ</a>
-        </nav>
-        <div class="logout-icon" id="user-icon" onclick="logout()">
-          <img src="./Image/LogOut.png" />
-        </div>
+  <header class="header">
+    <div class="logo">AchieveHub</div>
+    <div class="nav-container">
+      <nav class="nav-menu">
+        <a href="student-dashboard.html" class="nav-button">หน้าแรก</a>
+        <a href="recommend-activities.html" class="nav-button">กิจกรรมที่แนะนำ</a>
+        <a href="calendar.html" class="nav-button active">ปฏิทินกิจกรรม</a>
+        <a href="my-activities.html" class="nav-button">กิจกรรมของฉัน</a>
+        <a href="current-skill.html" class="nav-button">ทักษะปัจจุบัน</a>
+        <a href="quiz-categories.html" class="nav-button">แบบทดสอบ</a>
+      </nav>
+      <div class="logout-icon" id="user-icon" onclick="logout()">
+        <img src="./Image/LogOut.png" />
       </div>
-    </header>
+    </div>
+  </header>
 
   <main>
-    <!-- เปลี่ยน src ให้เป็น Calendar ของคุณ -->
-    <iframe 
-      src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=Asia%2FBangkok&showPrint=0&title&src=dGVlcmF0LnNyaXNAZG9tZS50dS5hYy50aA&src=ZW4udGgjaG9saWRheUBncm91cC52LmNhbGVuZGFyLmdvb2dsZS5jb20&color=%23039be5&color=%230b8043"
-      frameborder="0"
-      scrolling="no">
-    </iframe>
+    <div id="calendar"></div>
   </main>
+
   <footer>
     <p>AchieveHub ©2025<br>CS361</p>
-    <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194 นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
-    </footer>
+    <small>นางสาวธวัลหทัย เทียมทอง 6609650111 นางสาวกนกพร พรรณปัญญา 6609650152 นายกุลเศรษฐ์ เนตรเพชร 6609650194
+      นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
+  </footer>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const calendarEl = document.getElementById('calendar');
+
+      // 1. นี่คือ API URL ที่ถูกต้อง (อ้างอิงจาก advisor-activities.js)
+      const API_URL = 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod/activities';
+      
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth', 
+        locale: 'th', 
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,listWeek'
+        },
+
+        // 2. ★★★ นี่คือจุดที่แก้ไข ★★★
+        // เราเปลี่ยน "events" จาก string ธรรมดาให้เป็นฟังก์ชัน
+        // เพื่อดึงข้อมูลและแปลงข้อมูลก่อน
+        events: async function(fetchInfo, successCallback, failureCallback) {
+          try {
+            // 3. ดึงข้อมูลจาก API /activities
+            const response = await fetch(API_URL);
+            
+            // 4. จัดการข้อมูลที่ Lambda ส่งกลับมา
+            // (Lambda ของคุณอาจจะส่งกลับมาแบบมี body ครอบ)
+            let raw = await response.json();
+            let activities = raw;
+
+            // ตรวจสอบว่าข้อมูลอยู่ใน 'body' หรือไม่ (เหมือนใน advisor-activities.js)
+            if (raw && typeof raw === 'object' && !Array.isArray(raw) && 'body' in raw) {
+              activities = typeof raw.body === 'string' ? JSON.parse(raw.body) : raw.body;
+            }
+
+            if (!Array.isArray(activities)) {
+               throw new Error("Data received is not an array");
+            }
+
+            // 5. ★★★ นี่คือหัวใจสำคัญ: การแปลงข้อมูล ★★★
+            // เราจะ map ข้อมูลที่ได้จาก DynamoDB ให้เป็นชื่อที่ FullCalendar เข้าใจ
+            const transformedEvents = activities.map(function(activity) {
+              return {
+                id: activity.activityId,       //
+                title: activity.name,          // (แปลง name -> title)
+                start: activity.startDateTime, // (แปลง startDateTime -> start)
+                end: activity.endDateTime,     // (แปลง endDateTime -> end)
+                
+                // เก็บข้อมูลอื่นๆ ที่เหลือไว้ใน extendedProps
+                extendedProps: {
+                  description: activity.description, //
+                  location: activity.locationName || activity.locationId, //
+                  skillCategory: activity.skillCategory, //
+                  level: activity.level || activity.skillLevel //
+                }
+              };
+            });
+
+            // 6. ส่งข้อมูลที่แปลงแล้วให้ FullCalendar
+            successCallback(transformedEvents);
+
+          } catch (error) {
+            console.error('Error fetching or transforming activities:', error);
+            failureCallback(error);
+          }
+        },
+
+        // 7. แก้ไข eventClick ให้ดึงข้อมูลจาก extendedProps ที่เราเพิ่งเก็บ
+        eventClick: function (info) {
+          alert('กิจกรรม: ' + info.event.title + '\n' +
+                'รายละเอียด: ' + (info.event.extendedProps.description || 'ไม่มี') + '\n' +
+                'สถานที่: ' + (info.event.extendedProps.location || 'ไม่มี'));
+
+          // หากต้องการให้คลิกแล้วไปหน้าอื่น ให้ใช้บรรทัดนี้แทน
+          // window.location.href = 'detailed-activities.html?id=' + info.event.id;
+        }
+      });
+
+      calendar.render();
+    });
+  </script>
 </body>
+
 </html>
