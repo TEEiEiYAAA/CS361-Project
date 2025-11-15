@@ -35,6 +35,7 @@ def lambda_handler(event, context):
         print(f'Fetching activity: {activity_id}')
         activities_table = dynamodb.Table('Activities')
         plos_table = dynamodb.Table('PLOs')
+        locations_table = dynamodb.Table('Locations')
 
         # ---------- 2) ดึงกิจกรรมจาก Activities ----------
         activity_res = activities_table.get_item(Key={'activityId': activity_id})
@@ -99,12 +100,26 @@ def lambda_handler(event, context):
         level = activity.get('level')  # พื้นฐาน/ปานกลาง/ขั้นสูง
 
         # ---------- 5) location info ----------
+        location_id = activity.get('locationId')
+        location_name = activity.get('locationName') or activity.get('location')
+
+        if location_id:
+            try:
+                loc_res = locations_table.get_item(Key={'locationId': location_id})
+                loc_item = loc_res.get('Item')
+                if loc_item:
+                    location_name = loc_item.get('locationName', location_name)
+            except ClientError as e:
+                print('Error fetching location from Locations table:', str(e))
+
         location_info = {
-            'locationId': activity.get('locationId'),
-            'locationName': activity.get('locationName') or activity.get('location')
+            'locationId': location_id,
+            'locationName': location_name
         }
 
-        # ---------- 6) สร้าง object สำหรับส่งกลับ ----------
+        # --- ดึง skillId (รองรับของเก่า activityGroup) ---
+        skill_id = activity.get('skillId') or activity.get('activityGroup', '')
+
         detailed_activity = {
             # 🟩 Activity Info
             'activityId': activity.get('activityId'),
@@ -121,18 +136,18 @@ def lambda_handler(event, context):
 
             # 🟦 UI Fields
             'skillCategory': skill_category,
-            'activityGroup': activity.get('activityGroup', ''),
+            'skillId': skill_id,
             'level': level,
-            'suitableYearLevel': activity.get('suitableYearLevel', 0),
+            'yearLevel': activity.get('yearLevel', 0),
             'requiredActivities': activity.get('requiredActivities', 0),
             'prerequisiteActivities': activity.get('prerequisiteActivities', []),
 
-            # 🟨 PLO Section (ทั้ง code + ชื่อเต็ม + description)
+            # 🟨 PLO Section (code + ชื่อเต็ม + description)
             'plo': plos,
             'ploFullNames': plo_full_names,
             'ploDescriptions': plo_descriptions,
 
-            # 🟧 Skill object ที่ advisor-overall.js ใช้
+            # 🟧 skill object สำหรับหน้า advisor-overall.js
             'skill': {
                 'category': skill_category or '',
                 'skillLevel': level or '',

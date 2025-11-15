@@ -1,4 +1,4 @@
-       // Configuration - แก้ URL ให้ตรงกับ API Gateway จริงของคุณ
+        // Configuration - แก้ URL ให้ตรงกับ API Gateway จริงของคุณ
         const CONFIG = {
             API_BASE_URL: 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod',
             ENDPOINTS: {
@@ -12,7 +12,7 @@
         let currentFilter = 'all';
         
         // ⭐️ MODIFIED: ฟังก์ชันเริ่มต้น (ถูกเรียกโดย auth-check.js)
-        function initializeRecommendActivitiesPage() {
+        /*function initializePage() {
             console.log('Initialize Recommend Activities Page...');
 
             // ⭐️ Session Check: ตรวจสอบ Role (ใช้ window.userData ที่ตั้งค่าโดย auth-check.js)
@@ -25,93 +25,137 @@
                 }
                 return;
             }
+
+            console.log('[RECOMMEND] userData =', window.userData);
+            console.log('[RECOMMEND] userToken exists =', !!window.userToken);
             
             // Setup tab buttons
             setupTabButtons();
             
             // Load activities
-            const studentId = window.userData.userId || window.userData.studentId;
+            //const studentId = window.userData.userId || window.userData.studentId;
             loadActivities(studentId);
         }
-
         // ⭐️ NEW/MODIFIED: กำหนดให้ auth-check.js เรียกฟังก์ชันนี้เมื่อ Authentication ผ่าน
-        window.initializePage = initializeRecommendActivitiesPage;
+        window.initializePage = initializePage;*/
 
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log("Recommend Page Loaded — initializing...");
+            
+            setupTabButtons();
+            loadActivities(null); // โหลดทั้งหมด
+        });   
         
         // Setup tab button event listeners
         function setupTabButtons() {
             const tabButtons = document.querySelectorAll('.tab-btn');
-            
+        
+            console.log("[RECOMMEND] setupTabButtons found buttons =", tabButtons.length);
+        
             tabButtons.forEach(button => {
+                console.log("[RECOMMEND] attaching event on button:", button.dataset.filter);
+        
                 button.addEventListener('click', function() {
-                    // Remove active class from all buttons
+                    console.log("[RECOMMEND] TAB CLICKED =", this.dataset.filter);   // 🟩 ต้องออก
                     tabButtons.forEach(btn => btn.classList.remove('active'));
-                    
-                    // Add active class to clicked button
                     this.classList.add('active');
-                    
-                    // Update current filter
+        
                     currentFilter = this.dataset.filter;
-                    
-                    // Filter and display activities
                     filterActivities();
                 });
             });
-        }
+        }        
         
         // Load activities from API
         async function loadActivities(skillType = null) {
             const activitiesList = document.getElementById('activities-list');
-            
+
+            if (!activitiesList) {
+                console.error('[RECOMMEND] #activities-list element not found');
+                alert('[RECOMMEND] ไม่พบ element #activities-list ในหน้า HTML');
+                return;
+            }
+
+            console.log('---------------------------------------');
+            console.log('[RECOMMEND] loadActivities() CALLED');
+            console.log('[RECOMMEND] skillType received =', skillType);
+            console.log('---------------------------------------');
+
             try {
-                // Show loading state
-                activitiesList.innerHTML = '<div class="loading">กำลังโหลดกิจกรรม...</div>';
-                
-                // Build API URL
+                activitiesList.innerHTML = `<div class="loading">กำลังโหลดกิจกรรม...</div>`;
+
                 let apiUrl = CONFIG.API_BASE_URL + CONFIG.ENDPOINTS.GET_ACTIVITIES;
-                
-                // Add skill type filter if specified
-                if (skillType && skillType !== 'all') {
-                    apiUrl += `?skillType=${encodeURIComponent(skillType)}`;
+                const params = new URLSearchParams();
+
+                // ⭐ FIX: ส่ง skillCategory ทุกครั้งถ้ามีค่า ไม่ต้องเช็ค !== 'all'
+                if (skillType) {
+                    console.log('[RECOMMEND] Appending skillCategory =', skillType);
+                    params.append('skillCategory', skillType);
                 }
-                
-                // Make API request
+
+                if (params.toString()) {
+                    apiUrl += `?${params.toString()}`;
+                }
+
+                // ⭐ LOG ตรวจ URL ที่ส่งไปจริง
+                console.log('[RECOMMEND] Final Fetch URL =>', apiUrl);
+
                 const response = await fetch(apiUrl, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${window.userToken}`,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': window.userToken ? `Bearer ${window.userToken}` : ''
                     }
                 });
-                
+
+                console.log('[RECOMMEND] Response status =', response.status);
+
                 if (!response.ok) {
+                    const errText = await response.text();
+                    console.error('[RECOMMEND] Server returned error text:', errText);
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-                
-                const activities = await response.json();
-                
-                console.log('Activities loaded:', activities.length);
-                
-                // Store activities globally
+
+                const raw = await response.json();
+
+                // ⭐ ตรวจรูปแบบ response (proxy vs array)
+                let activities = raw.body
+                    ? JSON.parse(raw.body)
+                    : raw;
+
+                console.log('[RECOMMEND] Activities loaded =>', activities);
+
                 allActivities = activities;
-                
-                // Display activities
                 displayActivities(activities);
-                
+
             } catch (error) {
-                console.error('Error loading activities:', error);
+                console.error('[RECOMMEND] Error loading activities:', error);
                 showError(error.message);
             }
-        }
-        
+        }             
+                
         function filterActivities() {
-            // โหลดใหม่เสมอ ไม่ว่า filter ใด
-            if (currentFilter === 'all') {
-                loadActivities(); // โหลดทั้งหมด
-            } else {
-                loadActivities(currentFilter); // โหลดตามหมวดหมู่
+            console.log("[RECOMMEND] filterActivities() CLICKED, currentFilter =", currentFilter);
+        
+            let skillCategory = null;
+        
+            switch (currentFilter) {
+                case 'hard':
+                    skillCategory = 'hard skill';
+                    break;
+                case 'soft':
+                    skillCategory = 'soft skill';
+                    break;
+                case 'multi':
+                    skillCategory = 'multi-skill';
+                    break;
             }
-        }
+        
+            console.log("[RECOMMEND] mapped skillCategory =", skillCategory);
+        
+            // 🔥 สำคัญที่สุด — บังคับส่ง filter เสมอ
+            loadActivities(skillCategory);
+        }               
         
         // Display activities in the grid
         function displayActivities(activities) {
@@ -146,7 +190,7 @@
             const s = String(levelRaw || '').trim().toLowerCase();
             if (!s) return '';
             if (['พื้นฐาน','basic'].includes(s)) return 'พื้นฐาน';
-            if (['กลาง','ปานกลาง','medium'].includes(s)) return 'ปานกลาง';
+            if (['ปานกลาง','medium'].includes(s)) return 'ปานกลาง';
             if (['ขั้นสูง','advanced'].includes(s)) return 'ขั้นสูง';
             return s;
           }
@@ -162,83 +206,110 @@
         
         // Create individual activity card HTML
         function createActivityCard(activity) {
-            // ==== เวลา/ปุ่มสมัคร ====
-            const now   = new Date();
-            const start = activity.startDateTime ? new Date(activity.startDateTime) : null;
-            const end   = activity.endDateTime ? new Date(activity.endDateTime)   : null;
-        
-            let btnText = 'สมัครเข้าร่วม';
-            let btnDisabled = false;
-            if (start && now >= start) {
-            btnDisabled = true;
-            btnText = (end && now <= end) ? 'กำลังจัดกิจกรรม' : 'ปิดรับสมัครแล้ว';
-            }
-        
-            // ==== วันที่ ====
-            const formattedStart = formatDateTime(activity.startDateTime);
-            const formattedEnd   = formatDateTime(activity.endDateTime);
-            const dateRange = activity.endDateTime ? `${formattedStart} – ${formattedEnd}` : formattedStart;
-        
-            // ==== Badge หมวดทักษะ ====
+            // ── badge skillCategory ──
             const skillCategory = activity.skillCategory || '';
             const skillBadgeClass = skillCategory.toLowerCase().replace(' ', '-');
-            const skillDisplayName =
-            skillCategory === 'soft skill' ? 'Soft Skill' :
-            skillCategory === 'hard skill' ? 'Hard Skill' :
-            skillCategory === 'multi-skill' ? 'Multi-Skill' : 'ทักษะทั่วไป';
-
-            // ==== Badge ระดับ ====
-            const levelDisplay = getLevelDisplay(activity.skillLevel);
-            const levelClass   = getLevelClass(activity.skillLevel);
-            const levelBadge   = levelDisplay ? `<div class="level-badge ${levelClass}">${levelDisplay}</div>` : '';
-
-        
-            // ==== รูป ====
-            const imageUrl = activity.imageUrl || null;
-            const imageHtml = imageUrl ? `style="background-image: url('${imageUrl}')"` : '';
-            const placeholderIcon = imageUrl ? '' : '🖼️';
-        
-            // ==== ทักษะที่ได้รับ (PLO → ชื่อเต็มจากตาราง) ====
-            const ploNames = Array.isArray(activity.ploFullNames) ? activity.ploFullNames : [];
-            const ploHtml = ploNames.length
-            ? `<div class="plo-section">
-                <div class="plo-title">ทักษะที่ได้รับ:</div>
-                <div class="plo-values">
-                    ${ploNames.map(n => `<div class="plo-item">• ${n}</div>`).join('')}
-                </div>
-                </div>`
-            : '';
-        
-            // ==== ปุ่มสมัคร ====
-            const buttonHtml = btnDisabled
-            ? `<button class="register-btn disabled" disabled>${btnText}</button>`
-            : `<button class="register-btn" onclick="event.stopPropagation(); registerForActivity('${activity.activityId}', '${activity.name}')">${btnText}</button>`;
-        
-            return `
-            <div class="activity-card" onclick="viewActivityDetail('${activity.activityId}')" style="cursor: pointer;">
-                <div class="activity-image" ${imageHtml}>
-                ${placeholderIcon}
+            const skillBadge = skillCategory
+              ? `<span class="badge-skill ${skillBadgeClass}">${skillCategory}</span>`
+              : '';
+          
+            // ── badge level ──
+            const levelRaw = activity.level || activity.skillLevel || '';
+            const levelText = getLevelDisplay(levelRaw);
+            const levelClass = getLevelClass(levelRaw);
+            const levelBadge = levelText
+              ? `<span class="badge-level ${levelClass}">${levelText}</span>`
+              : '';
+          
+            const badgeRow = `
+              <div class="badge-row">
+                ${skillBadge}
                 ${levelBadge}
-                ${skillCategory ? `<div class="skill-badge ${skillBadgeClass}">${skillDisplayName}</div>` : ''}
-                </div>
-                <div class="activity-content">
-                <h3 class="activity-title">${activity.name || 'ไม่มีชื่อกิจกรรม'}</h3>
-                <p class="activity-description">${activity.description || 'ไม่มีคำอธิบาย'}</p>
-        
-                <div class="activity-meta">
-                    <div class="activity-date">📅 ${dateRange}</div>
-                    <div class="activity-location">📍 ${activity.locationName || activity.location || 'ไม่ระบุสถานที่'}</div>
-                    ${activity.skillName ? `<div class="activity-skill">🎯 ${activity.skillName}</div>` : ''}
-
-                    ${ploHtml}
-                </div>
-        
-                ${buttonHtml}
-                </div>
-            </div>
+              </div>
             `;
-        }
-                
+          
+            // ── วันที่/สถานที่/PLO ──
+            const startTxt = formatDateTime(activity.startDateTime);
+            
+            const LOCATIONS_MAP = {
+                "SC1": "อาคารเรียนรวมสังคมศาสตร์ 1",
+                "SC3": "อาคารเรียนรวมสังคมศาสตร์ 3",
+                "LC2": "อาคารเรียนรวม 2",
+                "LC4": "อาคารเรียนรวม 4",
+                "LC5": "อาคารเรียนรวม 5"
+            };
+
+            const locationName =
+              LOCATIONS_MAP[activity.locationId] ||
+              activity.locationName ||
+              activity.locationId ||
+              '-';
+            
+            const PLO_FULL = {
+                "PLO1": "ความรู้พื้นฐานด้านการเขียนโปรแกรม",
+                "PLO2": "ทักษะการพัฒนาและออกแบบระบบ",
+                "PLO3": "ความรับผิดชอบและจริยธรรมวิชาชีพ",
+                "PLO4": "การทำงานร่วมกับผู้อื่นและภาวะผู้นำ"
+            };
+    
+            const ploList = Array.isArray(activity.plo) ? activity.plo : [];
+            const ploHtml = ploList
+              .map(p => `<div class="plo-item">• ${p}: ${PLO_FULL[p] || ''}</div>`)
+              .join('');
+            const ploSection = ploList.length
+              ? `<div class="plo-section">
+                   <div class="plo-title">ทักษะที่ได้รับ:</div>
+                   ${ploHtml}
+                 </div>`
+              : '';
+          
+            const imageUrl = activity.imageUrl || '';
+            const imageStyle = imageUrl ? `style="background-image:url('${imageUrl}')"` : '';
+          
+            // ── ปุ่มสมัคร ──
+            let btnText = 'สมัครเข้าร่วม';
+            let btnDisabled = false;
+            const now = new Date();
+            const start = activity.startDateTime ? new Date(activity.startDateTime) : null;
+            const end = activity.endDateTime ? new Date(activity.endDateTime) : null;
+          
+            if (start && now >= start) {
+              btnDisabled = true;
+              btnText = end && now <= end ? 'กำลังจัดกิจกรรม' : 'ปิดรับสมัครแล้ว';
+            }
+          
+            const buttonHtml = btnDisabled
+              ? `<button class="register-btn disabled" disabled>${btnText}</button>`
+              : `<button class="register-btn"
+                   onclick="event.stopPropagation(); registerForActivity('${activity.activityId}','${activity.name || ''}')">
+                   สมัครเข้าร่วม
+                 </button>`;
+          
+            return `
+              <div class="activity-card">
+                <div class="activity-image" ${imageStyle}>
+                  ${badgeRow}
+                </div>
+          
+                <div class="activity-content">
+                  <h3 class="activity-title">${activity.name || 'ไม่มีชื่อกิจกรรม'}</h3>
+                  <p class="activity-description">${activity.description || ''}</p>
+          
+                  <div class="activity-meta">
+                    <div class="activity-date">📅 ${startTxt}</div>
+                    <div class="activity-location">📍 ${locationName}</div>
+                  </div>
+          
+                  ${ploSection}
+          
+                  <div class="activity-actions">
+                    ${buttonHtml}
+                  </div>
+                </div>
+              </div>
+            `;
+        }   
+
         // Format date and time
         function formatDateTime(dateTimeString) {
             if (!dateTimeString) return 'ไม่ระบุเวลา';
@@ -256,6 +327,22 @@
                 return 'รูปแบบวันที่ไม่ถูกต้อง';
             }
         }
+        
+        function showError(message) {
+            console.error('[RECOMMEND] showError:', message);
+            alert('[RECOMMEND] เกิดข้อผิดพลาดในการโหลดกิจกรรม: ' + message);
+        
+            const activitiesList = document.getElementById('activities-list');
+            if (!activitiesList) return;
+        
+            activitiesList.innerHTML = `
+                <div class="error-box">
+                    <p>เกิดข้อผิดพลาดในการโหลดกิจกรรม<br>${message}</p>
+                    <button class="retry-btn" onclick="loadActivities()">ลองใหม่</button>
+                </div>
+            `;
+        }
+        
         
         // Register for activity
         async function registerForActivity(activityId, activityName) {

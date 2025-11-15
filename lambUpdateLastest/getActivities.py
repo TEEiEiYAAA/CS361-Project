@@ -6,11 +6,27 @@ from datetime import datetime
 
 dynamodb = boto3.resource('dynamodb')
 
+
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, decimal.Decimal):
             return float(o) if o % 1 > 0 else int(o)
         return super(DecimalEncoder, self).default(o)
+
+
+def normalize_category(cat):
+    """ ทำให้ category ทุกแบบ normalize เป็นค่าเดียวกัน """
+    if not cat:
+        return ''
+    c = cat.strip().lower().replace('_', '-').replace(' ', '-')
+    if c in ['hardskill', 'hard-skill', 'hard']: 
+        return 'hard skill'
+    if c in ['softskill', 'soft-skill', 'soft']: 
+        return 'soft skill'
+    if c in ['multi', 'multi-skill', 'multiskill', 'multi-skill']: 
+        return 'multi-skill'
+    return cat.strip().lower()
+
 
 def lambda_handler(event, context):
     headers = {
@@ -19,116 +35,69 @@ def lambda_handler(event, context):
         'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
     }
 
-    # CORS preflight
     if event.get('httpMethod') == 'OPTIONS':
         return {'statusCode': 200, 'headers': headers, 'body': ''}
 
     try:
         query_params = event.get('queryStringParameters') or {}
-        skill_type = query_params.get('skillType')          # soft/hard/multi-skill
-        plo_filter = query_params.get('plo')                # PLO1–PLO4
-        activity_group = query_params.get('activityGroup')  # Database / Programming / etc.
-        
-        print(f'Filters => skillType={skill_type}, plo={plo_filter}, activityGroup={activity_group}')
-        
+
+        skill_category_filter = normalize_category(query_params.get('skillCategory'))
+        plo_filter = query_params.get('plo')
+        activity_group = query_params.get('activityGroup')
+
+        print("\n====== [DEBUG] Incoming Filters ======")
+        print(f"skillCategory (normalized) => {skill_category_filter}")
+        print(f"plo => {plo_filter}")
+        print(f"activityGroup => {activity_group}")
+        print("=====================================\n")
+
         activities_table = dynamodb.Table('Activities')
-        plos_table = dynamodb.Table('PLOs')   # ✅ เปลี่ยนจาก Skills เป็น PLOs
-        
+        plos_table = dynamodb.Table('PLOs')
+
         activities = activities_table.scan().get('Items', [])
         plos = plos_table.scan().get('Items', [])
-        
-        # ✅ map จาก PLOs: key = plo (PLO1, PLO2, ...)
-        skill_category_map = {p['plo']: p.get('skillCategory', '') for p in plos}
-        # ใช้ ploFullName แทน subcategory/description เดิม
-        skill_name_map = {p['plo']: p.get('ploFullName', '') for p in plos}
-        
+
+        plo_category_map = {p['plo']: p.get('skillCategory', '') for p in plos}
+
         filtered_activities = []
 
         for activity in activities:
-            # --- Normalize skillId ให้เป็น list เสมอ ---
-            raw_skill_id = activity.get('skillId')
 
-            if isinstance(raw_skill_id, list):
-                skill_ids = [str(x) for x in raw_skill_id if x]
-            elif raw_skill_id:
-                skill_ids = [str(raw_skill_id)]
-            else:
-                skill_ids = []
+            # Normalize skillCategory ของกิจกรรมด้วย
+            raw_cat = activity.get('skillCategory', '')
+            normalized_cat = normalize_category(raw_cat)
 
-            primary_skill_id = skill_ids[0] if skill_ids else None  # เช่น "PLO3"
+            # log รายกิจกรรม
+            print(f"[ACTIVITY] {activity.get('activityId')} | skillCategory(raw)= {raw_cat} => normalized={normalized_cat} | plo={activity.get('plo')}")
 
-            skill_category = skill_category_map.get(primary_skill_id, '')
-            skill_name = skill_name_map.get(primary_skill_id, '')
-
-            # ✅ กรองตาม PLO (ใช้ activity.plo ซึ่งเป็น list ของ PLO*)
+            # ------------ Filter PLO (advisor-activities) ------------
             if plo_filter and plo_filter.lower() != 'all':
-                raw_plos = activity.get('plo') or []
-                if isinstance(raw_plos, str):
-                    try:
-                        parsed = json.loads(raw_plos)
-                        raw_plos = parsed if isinstance(parsed, list) else raw_plos.split(',')
-                    except Exception:
-                        raw_plos = raw_plos.split(',')
-                plos_list = [str(p).strip().upper() for p in raw_plos if p]
-                if plo_filter.upper() not in plos_list:
+                plos_list = activity.get('plo') or []
+                if plo_filter.upper() not in [p.upper() for p in plos_list]:
+                    print(f"  [SKIP] ไม่ match PLO {plo_filter}")
                     continue
 
-            # ✅ กรองตาม activityGroup (ใช้ skillId แทน)
-            if activity_group and activity_group.lower() != 'all':
-                group_value = (activity.get('skillId') or '')  # ใช้จากตาราง Activities โดยตรง
-                if str(group_value).lower() != activity_group.lower():
+            # ------------ Filter skillCategory (recommend-activities) ------------
+            if skill_category_filter and skill_category_filter != 'all':
+                if normalized_cat != skill_category_filter:
+                    print(f"  [SKIP] ไม่ match skillCategory {skill_category_filter} (ของกิจกรรม = {normalized_cat})")
                     continue
 
-            # ✅ กรองตาม skillType (ใช้ skillCategory จาก activity หรือจาก PLOs)
-            if skill_type and skill_type.lower() != 'all':
-                activity_cat = (activity.get('skillCategory') or '').lower()
-                mapped_cat = (skill_category or '').lower()
-                if activity_cat != skill_type.lower() and mapped_cat != skill_type.lower():
-                    continue
+            # ถ้าไม่ skip ก็ผ่าน
+            filtered_activities.append(activity)
 
-            # ✅ เติมข้อมูล skill/PLO ลงในกิจกรรม
-            if primary_skill_id:
-                activity['skillId'] = skill_ids                      # เก็บเป็น list ตามของจริง
-                activity['skillCategory'] = skill_category or activity.get('skillCategory', '')
-                activity['skillName'] = skill_name                   # ใช้ ploFullName
-            else:
-                activity['skillCategory'] = activity.get('skillCategory', '')
-                activity['skillName'] = ''
+        print(f"\n====== [DEBUG] Final Count: {len(filtered_activities)} ======\n")
 
-            # เอาเฉพาะกิจกรรมในอนาคต (หรือถ้า parse ไม่ได้ก็ปล่อยผ่าน)
-            if is_upcoming_activity(activity.get('startDateTime')):
-                filtered_activities.append(activity)
-        
-        # เรียงตาม startDateTime
-        filtered_activities.sort(key=lambda x: x.get('startDateTime', ''))
-        print(f'Returning {len(filtered_activities)} filtered activities')
-        
         return {
             'statusCode': 200,
             'headers': headers,
             'body': json.dumps(filtered_activities, cls=DecimalEncoder)
         }
 
-    except ClientError as e:
-        print('DynamoDB Error:', str(e))
-        return {
-            'statusCode': 500,
-            'headers': headers,
-            'body': json.dumps({'error': 'DynamoDB error', 'details': str(e)})
-        }
     except Exception as e:
-        print('Unexpected error:', str(e))
+        print("[ERROR]", str(e))
         return {
             'statusCode': 500,
             'headers': headers,
-            'body': json.dumps({'error': 'Unhandled error', 'details': str(e)})
+            'body': json.dumps({'error': str(e)})
         }
-
-def is_upcoming_activity(start_date_time):
-    if not start_date_time:
-        return True
-    try:
-        dt = datetime.fromisoformat(start_date_time.replace('Z', '+00:00'))
-        return dt >= datetime.now(dt.tzinfo)
-    except Exception:
-        return True
