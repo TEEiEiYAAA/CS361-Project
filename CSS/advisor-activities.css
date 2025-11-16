@@ -375,3 +375,37 @@ footer small {
   line-height: 1.35rem;
   margin-left: 4px;
 }
+
+/* การ์ดกิจกรรมที่สิ้นสุดแล้ว (past) */
+.activity-card--past {
+    background-color: #75787b;
+    opacity: 0.9;
+  }
+  
+  .activity-card--past .activity-title {
+    color: #c7c7c7;
+  }
+  
+  .activity-card--past .activity-description,
+  .activity-card--past .activity-date,
+  .activity-card--past .activity-location,
+  .activity-card--past .plo-item {
+    color: #c7c7c7;
+  }
+  
+  /* ทำ badge ให้หม่นลงหน่อย */
+  .activity-card--past .badge-skill,
+  .activity-card--past .badge-level {
+    filter: grayscale(0.6);
+    opacity: 0.8;
+  }
+  
+  /* ปุ่มแก้ไขที่ถูก disable */
+  .btn-edit--disabled,
+  .btn-edit[disabled] {
+    background-color: #535353 !important;
+    color: #6b7280 !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+  }
+  

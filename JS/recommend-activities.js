@@ -69,37 +69,35 @@
         // Load activities from API
         async function loadActivities(skillType = null) {
             const activitiesList = document.getElementById('activities-list');
-
+        
             if (!activitiesList) {
                 console.error('[RECOMMEND] #activities-list element not found');
                 alert('[RECOMMEND] ไม่พบ element #activities-list ในหน้า HTML');
                 return;
             }
-
+        
             console.log('---------------------------------------');
             console.log('[RECOMMEND] loadActivities() CALLED');
             console.log('[RECOMMEND] skillType received =', skillType);
             console.log('---------------------------------------');
-
+        
             try {
                 activitiesList.innerHTML = `<div class="loading">กำลังโหลดกิจกรรม...</div>`;
-
+        
                 let apiUrl = CONFIG.API_BASE_URL + CONFIG.ENDPOINTS.GET_ACTIVITIES;
                 const params = new URLSearchParams();
-
-                // ⭐ FIX: ส่ง skillCategory ทุกครั้งถ้ามีค่า ไม่ต้องเช็ค !== 'all'
+        
                 if (skillType) {
                     console.log('[RECOMMEND] Appending skillCategory =', skillType);
                     params.append('skillCategory', skillType);
                 }
-
+        
                 if (params.toString()) {
                     apiUrl += `?${params.toString()}`;
                 }
-
-                // ⭐ LOG ตรวจ URL ที่ส่งไปจริง
+        
                 console.log('[RECOMMEND] Final Fetch URL =>', apiUrl);
-
+        
                 const response = await fetch(apiUrl, {
                     method: 'GET',
                     headers: {
@@ -107,32 +105,60 @@
                         'Authorization': window.userToken ? `Bearer ${window.userToken}` : ''
                     }
                 });
-
+        
                 console.log('[RECOMMEND] Response status =', response.status);
-
+        
                 if (!response.ok) {
                     const errText = await response.text();
                     console.error('[RECOMMEND] Server returned error text:', errText);
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-
+        
                 const raw = await response.json();
-
-                // ⭐ ตรวจรูปแบบ response (proxy vs array)
+        
                 let activities = raw.body
                     ? JSON.parse(raw.body)
                     : raw;
-
+        
                 console.log('[RECOMMEND] Activities loaded =>', activities);
-
-                allActivities = activities;
-                displayActivities(activities);
-
+        
+                // 🔥 แยก “ยังไม่จบ” กับ “หมดอายุแล้ว”
+                const now = new Date();
+                const upcoming = [];
+                const past = [];
+        
+                activities.forEach(act => {
+                    const end = act.endDateTime ? new Date(act.endDateTime) : null;
+        
+                    if (end && !isNaN(end.getTime()) && end < now) {
+                        past.push(act);
+                    } else {
+                        upcoming.push(act);
+                    }
+                });
+        
+                const sortByStart = (a, b) => {
+                    const da = new Date(a.startDateTime || 0);
+                    const db = new Date(b.startDateTime || 0);
+                    return da - db;
+                };
+        
+                upcoming.sort(sortByStart);
+                past.sort(sortByStart);
+        
+                const ordered = [...upcoming, ...past];
+        
+                console.log('[RECOMMEND] Upcoming =', upcoming.length, 'Past =', past.length);
+                console.log('[RECOMMEND] Final Ordered =>', ordered);
+        
+                allActivities = ordered;
+                displayActivities(ordered);
+        
             } catch (error) {
                 console.error('[RECOMMEND] Error loading activities:', error);
                 showError(error.message);
             }
-        }             
+        }                   
                 
         function filterActivities() {
             console.log("[RECOMMEND] filterActivities() CLICKED, currentFilter =", currentFilter);
