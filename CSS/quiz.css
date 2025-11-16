@@ -24,7 +24,7 @@ body {
 
 /* --- ส่วนหัวของแบบทดสอบ --- */
 .header {
-    background: linear-gradient(135deg, #4CAF50, #45a049);
+    background: linear-gradient(135deg, #2f7484, #218197);
     color: white;
     padding: 2rem;
     text-align: center;
@@ -95,7 +95,7 @@ body {
     border-radius: 15px;
     padding: 2rem;
     margin-bottom: 2rem;
-    border-left: 5px solid #4CAF50;
+    border-left: 5px solid #2f7484;
 }
 
 .question-text {
@@ -124,12 +124,12 @@ body {
 }
 
 .option:hover {
-    border-color: #4CAF50;
+    border-color: #388b9e;
     background: #f1f8e9;
 }
 
 .option.selected {
-    border-color: #4CAF50;
+    border-color: #2f7484;
     background: #e8f5e8;
     font-weight: bold;
 }
@@ -137,7 +137,7 @@ body {
 .option input[type="radio"] {
     margin-right: 1rem;
     transform: scale(1.2);
-    accent-color: #4CAF50;
+    accent-color: #2f7484;
 }
 
 /* --- ส่วนปุ่มนำทาง (ก่อนหน้า, ถัดไป) --- */
@@ -170,12 +170,12 @@ body {
 }
 
 .btn-next {
-    background: #4CAF50;
+    background: #2f7484;
     color: white;
 }
 
 .btn-next:hover {
-    background: #45a049;
+    background: #004d40;
 }
 
 .btn-submit {
@@ -217,7 +217,7 @@ body {
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #4CAF50, #81C784);
+    background: linear-gradient(90deg, #2f7484, #3d97ab);
     transition: width 0.3s ease;
 }
 
@@ -268,7 +268,7 @@ body {
 }
 
 .result-btn {
-    background: #4CAF50;
+    background: #2f7484;
     color: white;
     border: none;
     border-radius: 25px;

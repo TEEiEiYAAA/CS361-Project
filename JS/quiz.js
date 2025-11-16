@@ -1,4 +1,4 @@
-// quiz.js (ฉบับเกณฑ์ผ่าน 80% + ป้องกันข้ามข้อ)
+// quiz.js (Final: แจ้งเตือนสีแดง + เกณฑ์ 80% + ป้องกันข้ามข้อ)
 
 const API_BASE_URL = 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod';
 
@@ -36,7 +36,7 @@ async function loadQuiz(url) {
         document.getElementById('quiz-title').textContent = data.examInfo?.title || 'แบบทดสอบ';
         document.getElementById('total-questions').textContent = questions.length;
         
-        // อัปเดต UI แสดงเกณฑ์ผ่านให้ตรงกัน (ถ้าหาเจอ)
+        // อัปเดต UI แสดงเกณฑ์ผ่านให้ตรงกัน
         const passCriteriaEl = Array.from(document.querySelectorAll('.info-label')).find(el => el.textContent.includes('เกณฑ์ผ่าน'));
         if (passCriteriaEl && passCriteriaEl.nextElementSibling) {
             passCriteriaEl.nextElementSibling.textContent = "80%";
@@ -60,7 +60,7 @@ function startTimer(seconds) {
         
         if (timeLeft <= 0) { 
             clearInterval(timerInterval); 
-            finishQuiz(true); // หมดเวลา บังคับส่ง
+            finishQuiz(true); // หมดเวลา
         }
         timeLeft--;
     }, 1000);
@@ -87,12 +87,16 @@ function renderQuestion() {
         `;
     });
 
+    // ★★★ เพิ่ม div id="question-error" สำหรับแสดงข้อความเตือน ★★★
     container.innerHTML = `
         <div class="question-counter">ข้อที่ ${currentQuestionIndex + 1} / ${questions.length}</div>
         <div class="question-card">
             <div class="question-text">${q.question}</div>
             <div class="options-container">${optionsHtml}</div>
         </div>
+
+        <div id="question-error" style="color: #dc3545; text-align: center; font-weight: bold; height: 24px; margin-bottom: 10px;"></div>
+
         <div class="navigation">
             <button class="nav-btn btn-prev" onclick="prevQuestion()" ${currentQuestionIndex === 0 ? 'disabled' : ''}>ก่อนหน้า</button>
             ${currentQuestionIndex === questions.length - 1 
@@ -103,14 +107,32 @@ function renderQuestion() {
     `;
 }
 
-function selectAnswer(qId, val) { userAnswers[qId] = val; renderQuestion(); }
+function selectAnswer(qId, val) { 
+    userAnswers[qId] = val; 
+    
+    // ★★★ เมื่อเลือกคำตอบปุ๊บ ให้ลบข้อความเตือนออกทันที ★★★
+    const errorDiv = document.getElementById('question-error');
+    if(errorDiv) errorDiv.textContent = '';
+
+    renderQuestion(); 
+}
 
 function nextQuestion() { 
     const currentQ = questions[currentQuestionIndex];
+    // ★★★ เปลี่ยนจาก alert เป็นแสดงข้อความใน div ★★★
     if (!userAnswers[currentQ.id]) {
-        alert("⚠️ กรุณาเลือกคำตอบก่อนไปข้อถัดไป");
+        const errorDiv = document.getElementById('question-error');
+        if(errorDiv) {
+            errorDiv.textContent = "⚠️ กรุณาเลือกคำตอบก่อนไปข้อถัดไป";
+            // เพิ่มลูกเล่นสั่นๆ
+            errorDiv.style.transition = "0.1s";
+            errorDiv.style.transform = "translateX(5px)";
+            setTimeout(() => errorDiv.style.transform = "translateX(-5px)", 100);
+            setTimeout(() => errorDiv.style.transform = "translateX(0)", 200);
+        }
         return; 
     }
+    
     if (currentQuestionIndex < questions.length - 1) { 
         currentQuestionIndex++; 
         renderQuestion(); 
@@ -126,8 +148,10 @@ function prevQuestion() {
 
 function trySubmitQuiz() {
     const currentQ = questions[currentQuestionIndex];
+    // ★★★ เปลี่ยนจาก alert เป็นแสดงข้อความใน div ★★★
     if (!userAnswers[currentQ.id]) {
-        alert("⚠️ กรุณาเลือกคำตอบข้อนี้ก่อนส่ง");
+        const errorDiv = document.getElementById('question-error');
+        if(errorDiv) errorDiv.textContent = "⚠️ กรุณาเลือกคำตอบข้อนี้ก่อนส่ง";
         return;
     }
     if(confirm('ยืนยันที่จะส่งคำตอบหรือไม่?')) {
@@ -164,8 +188,7 @@ async function finishQuiz(isTimeOut = false) {
     const total = questions.length;
     const percent = total === 0 ? 0 : Math.round((correctCount / total) * 100);
     
-    // ★★★ แก้ตรงนี้: เปลี่ยนเกณฑ์เป็น 80% ★★★
-    const isPassed = percent >= 80; 
+    const isPassed = percent >= 80; // เกณฑ์ 80%
 
     const answersPayload = questions.map(q => ({
         questionId: q.id.toString(),
@@ -181,6 +204,7 @@ async function finishQuiz(isTimeOut = false) {
         isPassed: isPassed   
     };
 
+    // แสดงหน้า Loading แบบ Clean
     const modal = document.getElementById('result-modal');
     const icon = document.getElementById('result-icon');
     const btn = document.querySelector('.result-btn');
