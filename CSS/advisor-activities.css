@@ -1,6 +1,7 @@
 * {
     box-sizing: border-box;
-    font-family: 'Sarabun', sans-serif; /* แก้ไข font-family ที่อาจจะผิดพลาด */
+    font-family: 'Sarabun', sans-serif;
+    /* แก้ไข font-family ที่อาจจะผิดพลาด */
     margin: 0;
     padding: 0;
 }
@@ -20,6 +21,7 @@ body {
     text-align: center;
     padding: 30px 20px;
 }
+
 .logo {
     font-size: 45px;
     font-weight: bold;
@@ -27,12 +29,14 @@ body {
     margin-bottom: 10px;
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
 }
+
 .nav-container {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 15px;
 }
+
 .nav-menu {
     display: inline-flex;
     align-items: center;
@@ -41,6 +45,7 @@ body {
     font-size: 16px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
+
 .nav-button {
     text-decoration: none;
     background: transparent;
@@ -52,6 +57,7 @@ body {
     transition: 0.3s;
     color: #000;
 }
+
 .nav-button.active,
 .nav-button:hover {
     background: white;
@@ -59,6 +65,7 @@ body {
     color: #37798B;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
+
 .logout-icon img {
     width: 40px;
     height: 40px;
@@ -69,32 +76,33 @@ body {
 
 /* --- Tab Buttons --- */
 .tab-buttons {
-  display: flex;
-  justify-content: space-between;
-  width: 95%;
-  max-width: 1400px;
-  margin: 20px auto 0 auto;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 12px 12px 0 0;
-  overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    width: 95%;
+    max-width: 1400px;
+    margin: 20px auto 0 auto;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 12px 12px 0 0;
+    overflow: hidden;
 }
 
 .tab-btn {
-  flex: 1;
-  text-align: center;
-  padding: 14px 0;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  transition: 0.3s;
-  font-size: 1rem;
+    flex: 1;
+    text-align: center;
+    padding: 14px 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 1rem;
 }
 
 .tab-btn.active {
-  background: white; /* Changed to solid white for better contrast */
-  color: #37798B;
-  font-weight: bold;
-  border-radius: 12px 12px 0 0;
+    background: white;
+    /* Changed to solid white for better contrast */
+    color: #37798B;
+    font-weight: bold;
+    border-radius: 12px 12px 0 0;
 }
 
 
@@ -103,13 +111,16 @@ body {
     /* --- เพิ่ม/แก้ไขคุณสมบัติตรงนี้ --- */
     width: 95%;
     max-width: 1400px;
-    margin: 0 auto 40px auto; /* จัดกลางและมีระยะห่างจาก footer */
+    margin: 0 auto 40px auto;
+    /* จัดกลางและมีระยะห่างจาก footer */
     background: rgba(255, 255, 255, 0.8);
-    border-radius: 0 0 16px 16px; /* ทำให้มุมล่างโค้งมน */
+    border-radius: 0 0 16px 16px;
+    /* ทำให้มุมล่างโค้งมน */
     padding: 20px 30px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    min-height: 400px; 
-    flex: 1; /* <<<< สำคัญมาก! ทำให้ container ขยายตัวดัน footer ลงไป */
+    min-height: 400px;
+    flex: 1;
+    /* <<<< สำคัญมาก! ทำให้ container ขยายตัวดัน footer ลงไป */
 }
 
 .activities-grid {
@@ -121,7 +132,7 @@ body {
 
 /* --- ส่วนที่เหลือปรับเล็กน้อย หรือคงไว้เหมือนเดิม --- */
 .activity-card {
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.845);
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -150,31 +161,47 @@ body {
 }
 
 .badge-row {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  display: flex;
-  gap: 6px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 6px;
 }
 
 .badge-skill,
 .badge-level {
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: white;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
 }
 
 /* สี skill */
-.soft-skill { background: #FF6B6B; }
-.hard-skill { background: #4ECDC4; }
-.multi-skill { background: #95A5A6; }
+.soft-skill {
+    background: #FF6B6B;
+}
+
+.hard-skill {
+    background: #4ECDC4;
+}
+
+.multi-skill {
+    background: #95A5A6;
+}
 
 /* สี level */
-.level-basic { background: #4CAF50; }
-.level-medium { background: #FFC107; }
-.level-advanced { background: #F44336; }
+.level-basic {
+    background: #4CAF50;
+}
+
+.level-medium {
+    background: #FFC107;
+}
+
+.level-advanced {
+    background: #F44336;
+}
 
 
 .activity-content {
@@ -224,7 +251,7 @@ body {
 
 .register-btn {
     width: 100%;
-    background-color: #4CAF50;
+    background-image: linear-gradient(to right, #50E486, #27C4B7);
     color: white;
     border: none;
     padding: 12px 20px;
@@ -236,7 +263,7 @@ body {
 }
 
 .register-btn:hover {
-    background-color: #45a049;
+    background-image: linear-gradient(to right, #0da678, #229e94);
 }
 
 .register-btn:disabled {
@@ -338,74 +365,127 @@ footer small {
     }
 }
 
+/* Container for the buttons */
 .card-actions {
     display: flex;
+    /* ทำให้ปุ่มอยู่แนวนอน */
     gap: 10px;
+    /* ระยะห่างระหว่างปุ่ม */
     margin-top: 12px;
-  }
-  
-  .btn {
+}
+
+/* ⭐️ MODIFIED: สไตล์ปุ่มพื้นฐาน */
+.btn {
+    flex: 1;
+    /* 👈 นี่คือส่วนสำคัญ! ทำให้ปุ่มทั้งสองขยายเต็มพื้นที่เท่าๆ กัน */
     border: none;
-    border-radius: 14px;
-    padding: 10px 16px;
-    font-weight: 600;
+    border-radius: 10px;
+    /* 👈 ลดความมนลงเล็กน้อย (เหมือนในรูป) */
+    padding: 12px 10px;
+    /* 👈 เพิ่มความสูงของปุ่ม */
+    font-weight: bold;
+    /* 👈 ทำให้ตัวอักษรหนา */
+    font-size: 16px;
+    /* 👈 ทำให้ตัวอักษรใหญ่ขึ้น */
     cursor: pointer;
-  }
-  
-  .btn-detail { background: #22c55e; color: #fff; }
-  .btn-detail:hover { filter: brightness(0.95); }
-  
-  .btn-edit { background: #e5e7eb; color: #111827; }
-  .btn-edit:hover { filter: brightness(0.95); }
-  
+    text-align: center;
+    /* 👈 จัดข้อความให้อยู่กลาง */
+    transition: all 0.3s ease;
+    /* 👈 ทำให้ hover สวยงาม */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ⭐️ MODIFIED: ปุ่มดูรายละเอียด (ใช้ Gradient ที่คุณให้มา) */
+.btn-detail {
+    flex-grow: 3;
+    background-image: linear-gradient(to right, #50E486, #27C4B7);
+    color: white;
+}
+
+.btn-detail:hover {
+    background-image: linear-gradient(to right, #0da678, #229e94);
+}
+
+/* ⭐️ MODIFIED: ปุ่มแก้ไข (สีเทาเหมือนในรูป) */
+.btn-edit {
+    background-color: #e5e7eb;
+    /* สีเทาอ่อน */
+    color: #111827;
+    /* สีตัวอักษรเข้ม */
+}
+
+.btn-edit:hover {
+    filter: brightness(95%);
+    /* ทำให้มืดลงเล็กน้อยเมื่อ hover */
+}
+
 .plo-section {
-  margin-top: 8px;
+    margin-top: 8px;
 }
 
 .plo-title {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
 }
 
 .plo-item {
-  font-size: 0.82rem;
-  color: #555;
-  line-height: 1.35rem;
-  margin-left: 4px;
+    font-size: 0.82rem;
+    color: #555;
+    line-height: 1.35rem;
+    margin-left: 4px;
 }
 
 /* การ์ดกิจกรรมที่สิ้นสุดแล้ว (past) */
 .activity-card--past {
-    background-color: #75787b;
-    opacity: 0.9;
-  }
-  
-  .activity-card--past .activity-title {
-    color: #c7c7c7;
-  }
-  
-  .activity-card--past .activity-description,
-  .activity-card--past .activity-date,
-  .activity-card--past .activity-location,
-  .activity-card--past .plo-item {
-    color: #c7c7c7;
-  }
-  
-  /* ทำ badge ให้หม่นลงหน่อย */
-  .activity-card--past .badge-skill,
-  .activity-card--past .badge-level {
+    background-color: #cac9c9;
+}
+
+.activity-card--past .activity-description,
+.activity-card--past .activity-title,
+.activity-card--past .plo-title,
+.activity-card--past .plo-item {
+    color: #ffffff;
+}
+
+.activity-card--past .btn-detail {
+    /* (ถ้าคุณอยากเปลี่ยนเป็นสีอื่น ให้แก้ #รหัสสี ตรงนี้) */
+    background-image: linear-gradient(to right, #bfd2c6, #b8d2d1);
+    color: rgb(138, 138, 138);
+}
+
+.activity-card--past .activity-date,
+.activity-card--past .activity-location {
+    color: #cac9c9;
+}
+
+/* ทำ badge ให้หม่นลงหน่อย */
+.activity-card--past .badge-skill,
+.activity-card--past .badge-level {
     filter: grayscale(0.6);
     opacity: 0.8;
-  }
-  
-  /* ปุ่มแก้ไขที่ถูก disable */
-  .btn-edit--disabled,
-  .btn-edit[disabled] {
+}
+
+.activity-card--past .activity-image {
+    opacity: 0.6;
+}
+
+.activity-card--past .btn {
+    transition: none;
+}
+
+/* 2. ลบเงาและ "การยกลอย" (transform) ตอน hover */
+.activity-card--past .btn-detail:hover,
+.activity-card--past .btn-edit:hover {
+    transform: none;
+}
+
+/* ปุ่มแก้ไขที่ถูก disable */
+.btn-edit--disabled,
+.btn-edit[disabled] {
     background-color: #535353 !important;
     color: #6b7280 !important;
     cursor: not-allowed !important;
     box-shadow: none !important;
-  }
-  
+}
