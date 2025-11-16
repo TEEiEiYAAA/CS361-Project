@@ -126,7 +126,8 @@ body {
     padding: 20px 30px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     min-height: 400px;
-    flex: 1; /* ดัน footer ลงล่าง */
+    flex: 1;
+    /* ดัน footer ลงล่าง */
 }
 
 /* grid การ์ดกิจกรรม */
@@ -185,14 +186,30 @@ body {
 }
 
 /* สี skill */
-.soft-skill { background: #FF6B6B; }
-.hard-skill { background: #4ECDC4; }
-.multi-skill { background: #95A5A6; }
+.soft-skill {
+    background: #FF6B6B;
+}
+
+.hard-skill {
+    background: #4ECDC4;
+}
+
+.multi-skill {
+    background: #95A5A6;
+}
 
 /* สี level */
-.level-basic { background: #4CAF50; }
-.level-medium { background: #FFC107; }
-.level-advanced { background: #F44336; }
+.level-basic {
+    background: #4CAF50;
+}
+
+.level-medium {
+    background: #FFC107;
+}
+
+.level-advanced {
+    background: #F44336;
+}
 
 .activity-content {
     padding: 1.5rem;
@@ -260,7 +277,7 @@ body {
 
 .register-btn {
     width: 100%;
-    background-color: #4CAF50;
+    background-image: linear-gradient(to right, #50E486, #27C4B7);
     color: white;
     border: none;
     padding: 12px 20px;
@@ -268,16 +285,17 @@ body {
     font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: filter 0.3s ease;
 }
 
 .register-btn:hover {
-    background-color: #45a049;
+    background-image: linear-gradient(to right, #0da678, #229e94);
 }
 
 .register-btn.disabled,
 .register-btn:disabled {
     background-color: #cccccc;
+    background-image: none;
     cursor: not-allowed;
 }
 
@@ -339,9 +357,11 @@ footer small {
     .header {
         padding: 1rem;
     }
+
     .nav-menu {
         gap: 0.5rem;
     }
+
     .nav-button {
         padding: 0.4rem 0.8rem;
         font-size: 0.9rem;
@@ -366,6 +386,7 @@ footer small {
     .logo {
         font-size: 1.5rem;
     }
+
     .nav-menu {
         flex-wrap: wrap;
     }
