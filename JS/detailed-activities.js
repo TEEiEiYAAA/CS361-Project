@@ -24,8 +24,15 @@ function initializeApp() {
   }
   */
 
-  // ⭐ DEV MODE: ยังไม่บังคับล็อกอิน แต่เก็บ userData ไว้ใช้ถ้ามี
-  currentUser = JSON.parse(localStorage.getItem('userData') || '{}');
+  // ✅ ของใหม่ (ใช้ sessionStorage แทน)
+  const sessionData = JSON.parse(sessionStorage.getItem('AchieveHubUser') || '{}');
+  currentUser = sessionData.user || {};
+
+  // เช็คหน่อยว่ามีข้อมูลไหม ถ้าไม่มีให้เด้งไป Login (Optional)
+  if (!currentUser.userId) {
+      console.warn("User not logged in");
+      // window.location.href = "login.html"; // ถ้าอยากบังคับ login ให้เปิดบรรทัดนี้
+  }
 
   const urlParams = new URLSearchParams(window.location.search);
   // รองรับทั้ง ...?activityId= และ ...?id=
