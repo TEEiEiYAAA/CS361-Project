@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         alert("ไม่พบรหัสกิจกรรมสำหรับแก้ไข");
         return;
       }
-      // ✅ ต้องเป็น string / template literal
       window.location.href = `edit-activity.html?activityId=${activityId}`;
     });
   }
@@ -26,24 +25,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     // ============================
-    // 🔒 บล็อกเช็กล็อกอิน (เก็บไว้ใช้ทีหลัง)
-    // ============================
-    /*
-    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-    const token = localStorage.getItem('token');
-    
-    if (!userData.userId || userData.role !== 'advisor' || !token) {
-      console.error('Authentication failed or not advisor');
-      window.location.href = "login.html";
-      return;
-    }
-    */
-
-    // ============================
     // DEV MODE: ยังไม่บังคับ login
     // ============================
-    const token = localStorage.getItem('token');
-    const commonHeaders = token ? { 'Authorization': `Bearer ${token}` } : {};
+    const token = localStorage.getItem("token");
+    const commonHeaders = token ? { Authorization: `Bearer ${token}` } : {};
 
     // ดึงข้อมูลกิจกรรมจาก Activities API (getActivityDetail)
     console.log("Fetching activity details...");
@@ -53,15 +38,44 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
 
     if (!activityResponse.ok) {
-      throw new Error(`Failed to fetch activity: ${activityResponse.status} ${activityResponse.statusText}`);
+      throw new Error(
+        `Failed to fetch activity: ${activityResponse.status} ${activityResponse.statusText}`
+      );
     }
 
     const activityData = await activityResponse.json();
     console.log("Activity data:", activityData);
 
+    // ==========================
+    // 🔥 เช็คกิจกรรมหมดอายุหรือไม่
+    // ==========================
+    let isPast = false;
+
+    if (activityData.endDateTime) {
+        const now = new Date();
+        const end = new Date(activityData.endDateTime);
+
+        if (!isNaN(end.getTime()) && end < now) {
+            isPast = true;
+            console.log("⛔ กิจกรรมนี้หมดอายุแล้ว — ซ่อนปุ่มแก้ไขและลบ");
+        }
+    }
+
+    // ==========================
+    // 🔥 ซ่อนปุ่มแก้ไข และ ลบ หากกิจกรรมหมดอายุ
+    // ==========================
+    if (isPast) {
+        const editBtn = document.querySelector(".edit-btn");
+        const deleteBtn = document.querySelector(".delete-btn");
+
+        if (editBtn) editBtn.style.display = "none";
+        if (deleteBtn) deleteBtn.style.display = "none";
+    }
+
+    // ===== รูปกิจกรรม (ใช้ id เดิมของเธอเลย) =====
     const imgElem = document.getElementById("activity-image");
     if (imgElem) {
-        imgElem.src = activityData.imageUrl || "./Image/default-image.png";
+      imgElem.src = activityData.imageUrl || "./Image/default-image.png";
     }
 
     // ✅ ประกาศ skill ให้ใช้ได้ทั้งไฟล์
@@ -73,10 +87,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       activityTitle.textContent = activityData.name || "ไม่มีชื่อกิจกรรม";
     }
 
-    // === แสดงรายละเอียดกิจกรรม ===
+    // === แสดงรายละเอียดกิจกรรม (เหมือนโค้ดเดิม) ===
     const detailBox = document.getElementById("activity-detail-box");
-
-    detailBox.innerHTML = `
+    if (detailBox) {
+      detailBox.innerHTML = `
         <h3>รายละเอียดกิจกรรม</h3>
 
         <p>${activityData.description || "ไม่มีรายละเอียดกิจกรรม"}</p>
@@ -85,32 +99,39 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             <!-- badge skill category -->
             ${
-                activityData.skillCategory
-                    ? `<span class="badge" style="
-                        background:${activityData.skillCategory.toLowerCase() === 'soft skill' ? '#ff6b6b' :
-                                    activityData.skillCategory.toLowerCase() === 'hard skill' ? '#4ecdc4' :
-                                    '#95a5a6'
+              activityData.skillCategory
+                ? `<span class="badge" style="
+                        background:${
+                          activityData.skillCategory.toLowerCase() === "soft skill"
+                            ? "#ff6b6b"
+                            : activityData.skillCategory.toLowerCase() === "hard skill"
+                            ? "#4ecdc4"
+                            : "#95a5a6"
                         }">
                         ${activityData.skillCategory}
                       </span>`
-                    : ""
+                : ""
             }
 
             <!-- badge level -->
             ${
-                activityData.level
-                    ? `<span class="badge" style="
-                        background:${activityData.level === 'พื้นฐาน' ? '#4CAF50' :
-                                    activityData.level === 'ปานกลาง' ? '#FFC107' :
-                                    '#F44336'
+              activityData.level
+                ? `<span class="badge" style="
+                        background:${
+                          activityData.level === "พื้นฐาน"
+                            ? "#4CAF50"
+                            : activityData.level === "ปานกลาง"
+                            ? "#FFC107"
+                            : "#F44336"
                         }">
                         ${activityData.level}
                       </span>`
-                    : ""
+                : ""
             }
 
         </div>
-    `;
+      `;
+    }
 
     // ========== ดึงข้อมูลผู้เข้าร่วม ==========
     console.log("Fetching participation stats...");
@@ -127,13 +148,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (participantsResponse.ok) {
       const participantsData = await participantsResponse.json();
       console.log("Participants data:", participantsData);
-      
+
       if (participantsData.statistics) {
         participantCount = participantsData.statistics.totalRegistered || 0;
         confirmedCount = participantsData.statistics.totalConfirmed || 0;
-        surveyCompletedCount = participantsData.statistics.totalSurveyCompleted || 0;
+        surveyCompletedCount =
+          participantsData.statistics.totalSurveyCompleted || 0;
       }
-      
+
       if (participantsData.participants) {
         participants = participantsData.participants;
       }
@@ -141,7 +163,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.warn("Failed to fetch participants data");
     }
 
-    // แสดงผลของจำนวนคนที่ลงทะเบียน
+    // แสดงผลของจำนวนคนที่ลงทะเบียน (layout เดิม)
     const countElem = document.querySelector(".participant-count");
     if (countElem) {
       if (participantCount > 0) {
@@ -164,7 +186,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
-    // ข้อมูลเพิ่มเติมของกิจกรรม
+    // ข้อมูลเพิ่มเติมของกิจกรรม (layout เดิม)
     const additionalInfo = document.querySelector(".additional-info");
     if (additionalInfo) {
       const infoHtml = `
@@ -186,48 +208,57 @@ document.addEventListener("DOMContentLoaded", async () => {
       additionalInfo.innerHTML = infoHtml;
     }
 
-    // แสดงข้อมูลทักษะ (PLO) ที่ได้รับ — รองรับหลายรายการ
+    // แสดงข้อมูลทักษะ (PLO) ที่ได้รับ — รองรับหลายรายการ (layout เดิม)
     const skillSection = document.querySelector(".skill-list");
-
-    const ploCodes = Array.isArray(activityData.plo)
+    if (skillSection) {
+      const ploCodes = Array.isArray(activityData.plo)
         ? activityData.plo
-        : (activityData.plo ? [activityData.plo] : []);
+        : activityData.plo
+        ? [activityData.plo]
+        : [];
 
-    const names = Array.isArray(skill.ploFullNames)
+      const names = Array.isArray(skill.ploFullNames)
         ? skill.ploFullNames
-        : (skill.ploFullNames ? [skill.ploFullNames] : []);
+        : skill.ploFullNames
+        ? [skill.ploFullNames]
+        : [];
 
-    const descs = Array.isArray(skill.ploDescriptions)
+      const descs = Array.isArray(skill.ploDescriptions)
         ? skill.ploDescriptions
-        : (skill.ploDescriptions ? [skill.ploDescriptions] : []);
+        : skill.ploDescriptions
+        ? [skill.ploDescriptions]
+        : [];
 
-    skillSection.innerHTML = names.map((name, idx) => {
-        const code = ploCodes[idx] || "";          // เช่น PLO3
-        const desc = descs[idx] || "";             // คำอธิบาย
-        const title = code ? `${code}: ${name}` : name;
+      skillSection.innerHTML = names
+        .map((name, idx) => {
+          const code = ploCodes[idx] || ""; // เช่น PLO3
+          const desc = descs[idx] || ""; // คำอธิบาย
+          const title = code ? `${code}: ${name}` : name;
 
-        return `
+          return `
             <div style="margin-bottom:15px;">
                 <p style="font-weight:600; color:#2e7d32;">
                     🎯 ${title}
                 </p>
-                ${desc
+                ${
+                  desc
                     ? `<p style="margin-left:20px; color:#444;">${desc}</p>`
                     : ""
                 }
             </div>
-        `;
-    }).join("");
-
-
+          `;
+        })
+        .join("");
+    }
   } catch (err) {
     console.error("โหลดข้อมูลกิจกรรมไม่สำเร็จ:", err);
-    
-    const activityTitle = document.querySelector("activity-title");
+
+    // 🔧 แก้ selector จาก "activity-title" เป็น ".activity-title"
+    const activityTitle = document.querySelector(".activity-title");
     if (activityTitle) {
       activityTitle.textContent = "เกิดข้อผิดพลาดในการโหลดข้อมูล";
     }
-    
+
     const countElem = document.querySelector(".participant-count");
     if (countElem) {
       countElem.innerHTML = `
@@ -241,59 +272,110 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // === โค้ดควบคุม POP-UP ลบกิจกรรม ===
-  const deleteModal = document.getElementById('delete-modal');
-  const mainDeleteBtn = document.querySelector('.delete-btn');
-  const cancelBtn = document.getElementById('cancel-btn');
-  const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+  // === โค้ดควบคุม POP-UP ลบกิจกรรม (ปรับเพิ่มให้ลบจริง แต่ไม่ยุ่ง layout) ===
+  const deleteModal = document.getElementById("delete-modal");
+  const mainDeleteBtn = document.querySelector(".delete-btn");
+  const cancelBtn = document.getElementById("cancel-btn");
+  const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
 
   if (deleteModal && mainDeleteBtn && cancelBtn && confirmDeleteBtn) {
-    mainDeleteBtn.addEventListener('click', () => {
-      deleteModal.style.display = 'flex';
+    // เปิด popup
+    mainDeleteBtn.addEventListener("click", () => {
+      deleteModal.style.display = "flex";
     });
 
-    cancelBtn.addEventListener('click', () => {
-      deleteModal.style.display = 'none';
+    // ปิด popup เมื่อกด "ยกเลิก"
+    cancelBtn.addEventListener("click", () => {
+      deleteModal.style.display = "none";
     });
 
-    confirmDeleteBtn.addEventListener('click', () => {
-      console.log(`Confirmed deletion for activity ID: ${activityId}`);
-      // TODO: เรียก API ลบจริงตรงนี้ถ้าต้องการ
-      deleteModal.style.display = 'none';
-    });
-
-    window.addEventListener('click', (event) => {
+    // ปิด popup เมื่อคลิกนอกกรอบ
+    window.addEventListener("click", (event) => {
       if (event.target === deleteModal) {
-        deleteModal.style.display = 'none';
+        deleteModal.style.display = "none";
       }
     });
-  }
-  // === จบส่วน POP-UP ===
 
+    // ฟังก์ชันลบจริง
+    const handleConfirmDeleteInternal = async () => {
+      if (!activityId) {
+        alert("ไม่พบรหัสกิจกรรมสำหรับลบ");
+        return;
+      }
+
+      const ok = confirm(
+        "ยืนยันการลบกิจกรรมนี้หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้"
+      );
+      if (!ok) return;
+
+      try {
+        // ดึง token ใหม่สำหรับฝั่งลบ (กัน scope งง)
+        const tokenForDelete = localStorage.getItem("token");
+        const headersForDelete = tokenForDelete
+          ? { Authorization: `Bearer ${tokenForDelete}` }
+          : {};
+
+        console.log("Sending DELETE request for activityId:", activityId);
+
+        const res = await fetch(
+          `https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod/activities/${activityId}`,
+          {
+            method: "DELETE",
+            headers: headersForDelete,
+          }
+        );
+
+        let data = {};
+        try {
+          data = await res.json();
+        } catch (e) {
+          console.warn("No JSON body in delete response");
+        }
+
+        if (!res.ok) {
+          console.error("Delete failed:", res.status, data);
+          alert(data.message || "ลบกิจกรรมไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+          return;
+        }
+
+        console.log("Delete success:", data);
+        alert("ลบกิจกรรมเรียบร้อยแล้ว");
+        deleteModal.style.display = "none";
+        window.location.href = "advisor-activities.html";
+      } catch (err) {
+        console.error("Error while deleting activity:", err);
+        alert("เกิดข้อผิดพลาดในการลบกิจกรรม กรุณาลองใหม่อีกครั้ง");
+      }
+    };
+
+    confirmDeleteBtn.addEventListener("click", handleConfirmDeleteInternal);
+    // เผื่อ HTML ยังมี onclick อยู่
+    window.handleConfirmDelete = handleConfirmDeleteInternal;
+  }
 });
 
 // Helper function to format date/time
 function formatDateTime(dateTimeString) {
-  if (!dateTimeString) return 'ไม่ระบุ';
-  
+  if (!dateTimeString) return "ไม่ระบุ";
+
   try {
     const date = new Date(dateTimeString);
-    return date.toLocaleDateString('th-TH', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleDateString("th-TH", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   } catch (error) {
-    return 'รูปแบบวันที่ไม่ถูกต้อง';
+    return "รูปแบบวันที่ไม่ถูกต้อง";
   }
 }
 
 // Helper function to generate participants list
 function generateParticipantsList(participants) {
   if (!participants || participants.length === 0) {
-    return '';
+    return "";
   }
 
   let html = `
@@ -303,12 +385,12 @@ function generateParticipantsList(participants) {
   `;
 
   participants.forEach((participant, index) => {
-    const statusColor = participant.isConfirmed ? '#4CAF50' : '#FF9800';
-    const statusText = participant.isConfirmed ? 'ยืนยันแล้ว' : 'รอยืนยัน';
-    const surveyStatus = participant.surveyCompleted ? '✅ ทำแล้ว' : '⏳ ยังไม่ทำ';
+    const statusColor = participant.isConfirmed ? "#4CAF50" : "#FF9800";
+    const statusText = participant.isConfirmed ? "ยืนยันแล้ว" : "รอยืนยัน";
+    const surveyStatus = participant.surveyCompleted ? "✅ ทำแล้ว" : "⏳ ยังไม่ทำ";
 
     html += `
-      <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; ${index === participants.length - 1 ? 'border-bottom: none;' : ''}">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; ${index === participants.length - 1 ? "border-bottom: none;" : ""}">
         <div>
           <div style="font-weight: bold; color: #333;">${participant.studentName}</div>
           <div style="font-size: 0.9rem; color: #666;">
@@ -340,16 +422,6 @@ function generateParticipantsList(participants) {
 
 // Navigation functions
 function navigateTo(page) {
-  // เก็บโค้ดเช็ก login ไว้ใช้ทีหลัง
-  /*
-  const token = localStorage.getItem('token');
-  const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-  
-  if (!token || !userData.userId) {
-    window.location.href = 'login.html';
-    return;
-  }
-  */
   window.location.href = page;
 }
 
@@ -358,10 +430,10 @@ function goBack() {
 }
 
 function logout() {
-  const confirmLogout = confirm('ต้องการออกจากระบบหรือไม่?');
+  const confirmLogout = confirm("ต้องการออกจากระบบหรือไม่?");
   if (confirmLogout) {
-    localStorage.removeItem('userData');
-    localStorage.removeItem('token');
+    localStorage.removeItem("userData");
+    localStorage.removeItem("token");
     window.location.href = "login.html";
   }
 }

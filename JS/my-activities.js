@@ -4,7 +4,8 @@ const CONFIG = {
   ENDPOINTS: {
     STUDENT_ACTIVITIES: '/students/{studentId}/activities',
     VERIFY_QR: '/activities/verify-qr',
-    CONFIRM_ATTENDANCE: '/activities/confirm'
+    CONFIRM_ATTENDANCE: '/activities/confirm',
+    CERTIFICATE: '/activities/{activityId}/certificate'
   }
 };
 
@@ -210,6 +211,73 @@ function getButtonState(a) {
   return { class: 'activity-button', text: 'ไม่ทราบสถานะ', disabled: true, action: 'none' };
 }
 
+// ⭐ NEW: ขอเกียรติบัตรจาก backend แล้วเปิด PDF
+async function requestCertificate(activityId) {
+  try {
+    if (!currentUser || !currentUser.userId) {
+      alert("ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่");
+      return;
+    }
+
+    const studentId = currentUser.userId;
+    const button = document.querySelector(`button[data-activity-id="${activityId}"]`);
+
+    // กันกดรัว ๆ
+    if (button) {
+      button.disabled = true;
+      const originalText = button.textContent;
+      button.dataset.originalText = originalText;
+      button.textContent = "กำลังออกเกียรติบัตร...";
+    }
+
+    const url =
+      CONFIG.API_BASE_URL +
+      CONFIG.ENDPOINTS.CERTIFICATE.replace("{activityId}", encodeURIComponent(activityId)) +
+      `?studentId=${encodeURIComponent(studentId)}`;
+
+    console.log("[DEBUG] requestCertificate url =", url);
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        // จะส่งหรือไม่ส่ง Authorization ก็ได้ แล้วแต่ว่าคุณเปิดตรวจที่ Lambda ไหม
+        "Authorization": `Bearer ${window.userToken || ""}`
+      }
+    });
+
+    const data = await res.json();
+    console.log("[DEBUG] certificate response:", data);
+
+    if (!res.ok || !data.success) {
+      alert(data.message || "เกิดข้อผิดพลาดในการออกเกียรติบัตร");
+      return;
+    }
+
+    const cert = data.certificate;
+    if (!cert || !cert.pdfUrl) {
+      alert("ไม่พบไฟล์เกียรติบัตร");
+      return;
+    }
+
+    // เปิด PDF ในแท็บใหม่
+    window.open(cert.pdfUrl, "_blank");
+
+  } catch (err) {
+    console.error("Error while requesting certificate:", err);
+    alert("เกิดข้อผิดพลาดภายในระบบ กรุณาลองใหม่อีกครั้ง");
+  } finally {
+    // คืนสภาพปุ่ม
+    const button = document.querySelector(`button[data-activity-id="${activityId}"]`);
+    if (button) {
+      button.disabled = false;
+      if (button.dataset.originalText) {
+        button.textContent = button.dataset.originalText;
+      }
+    }
+  }
+}
+
 /* ============================================================
    MAIN: Handle activity button click
    ============================================================ */
@@ -227,7 +295,7 @@ function handleActivityAction(activityId) {
     return;
   }
   if (action === 'certificate') {
-    window.location.href = `certificate.html?id=${activityId}`;
+    requestCertificate(activityId);   
     return;
   }
 }

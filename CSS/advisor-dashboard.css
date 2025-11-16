@@ -73,22 +73,21 @@ body {
 }
 
 /* --- Main Content Wrapper --- */
-/* (เพิ่มส่วนนี้เข้ามาเพื่อจัด Layout) */
 .main-content {
-    flex: 1; /* ★★★ ทำให้ส่วนนี้ยืดออกเพื่อดัน footer ลงไป ★★★ */
+    flex: 1; /* ดัน footer ลงไป */
     display: flex;
-    justify-content: center; /* จัดให้ .container (กล่องสีขาว) อยู่กลางจอ */
-    align-items: flex-start; /* จัดให้ .container ชิดด้านบนของพื้นที่ */
-    padding: 40px 20px; /* เพิ่มช่องว่างแนวตั้งและแนวนอน */
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
 }
 
 /* --- Content Box --- */
 .container {
     background: rgba(255, 255, 255, 0.929);
     border-radius: 20px;
-    margin: 40px auto;          /* ✅ เอากลับมา */
+    margin: 40px auto; 
     padding: 30px;
-    width: 1150px;              /* ✅ เอากลับมา */
+    width: 1150px; 
     max-width: 1150px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
@@ -97,52 +96,95 @@ body {
     margin-top: 0;
     margin-bottom: 20px;
     color: #006666;
-    font-size: 24px;       /* ✅ ตั้งขนาดหัวข้อ */
+    font-size: 24px;
     font-weight: 700;
   }
   
 
-/* --- Student List Styling --- */
+/* ⭐️⭐️⭐️ MODIFIED SECTION: STUDENT LIST STYLING ⭐️⭐️⭐️ */
+/* (โค้ดส่วนนี้ถูกเขียนใหม่ทั้งหมดเพื่อให้ตรงกับภาพ) */
+
+/* การ์ดนักศึกษาแต่ละคน (container) */
 .student-card {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    margin: 10px 0;
-    border-bottom: 1px solid #ddd;
+    align-items: center; /* จัดให้อยู่กลางแนวตั้ง */
+    padding: 20px 5px; /* เพิ่มช่องว่างบน-ล่าง */
+    border-bottom: 1px solid #eee; /* เส้นคั่น */
 }
 
-.student-info {
-    display: flex;
-    align-items: center;
+.student-card:last-child {
+    border-bottom: none; /* ไม่ต้องมีเส้นคั่นที่คนสุดท้าย */
 }
 
-.avatar {
-    width: 40px;
-    height: 40px;
-    background-color: #eee;
+/* วงกลมตัวอักษรย่อ */
+.student-initial {
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
+    background-color: #e0e0e0; /* สีพื้นหลังวงกลม (จะเปลี่ยนสีต้องใช้ JS) */
+    color: #333;
+    font-weight: bold;
+    font-size: 22px;
     display: flex;
-    justify-content: center;
     align-items: center;
-    font-size: 20px;
-    margin-right: 15px;
+    justify-content: center;
+    flex-shrink: 0; /* ไม่ให้หด */
+    user-select: none; /* ป้องกันการเลือกข้อความ */
 }
 
-.student-text {
-    line-height: 1.4;
+/* บล็อกข้อมูล (ชื่อ, รหัส, ชั้นปี) */
+.student-details {
+    flex-grow: 1; /* ยืดเพื่อเติมเต็มพื้นที่ว่าง */
+    margin: 0 20px; /* เว้นระยะห่างจากตัวย่อและปุ่ม */
+    line-height: 1.5;
 }
 
-.view-btn {
-    background: linear-gradient(to right, #4fe5a3, #38c6a0);
+.student-details h4 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700; /* ตัวหนา */
+    color: #000;
+}
+
+.student-details p {
+    margin: 0;
+    font-size: 14px;
+    color: #555; /* สีเทา */
+}
+
+/* บล็อกความก้าวหน้า (เปอร์เซ็นต์, ปุ่ม) */
+.student-progress {
+    text-align: right;
+    flex-shrink: 0; /* ไม่ให้หด */
+    min-width: 140px; /* กันพื้นที่ให้ปุ่ม */
+}
+
+.student-progress .progress-text {
+    margin: 0 0 8px 0; /* เว้นระยะล่างก่อนถึงปุ่ม */
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* ปุ่ม "ตรวจสอบ" */
+.review-button {
+    background-image: linear-gradient(to right, #50E486, #27C4B7);
     border: none;
-    border-radius: 20px;
-    padding: 10px 25px;
+    border-radius: 20px; /* ขอบมน */
+    padding: 8px 24px;
     color: white;
     font-weight: bold;
+    font-size: 14px;
     cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: backgroud-color 0.2s ease;
 }
+
+.review-button:hover {
+    background-image: linear-gradient(to right, #0da678, #229e94);
+}
+
+/* --- End of Modified Section --- */
+
 
 /* --- Footer --- */
 footer {
@@ -185,11 +227,10 @@ footer {
     /* 2. เพิ่มลูกศรใหม่เป็นภาพพื้นหลัง (SVG) */
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000000'%3e%3cpath d='M8 12.164l-5.33-5.33a.8.8 0 011.132-1.132L8 10.436l4.198-4.198a.8.8 0 111.132 1.132L8 12.164z'/%3e%3c/svg%3e");
     background-repeat: no-repeat;
-    background-position: right 15px center; /* ★★★ ตำแหน่งลูกศร: ขยับจากขวาเข้ามา 15px ★★★ */
-    background-size: 1em;                  /* ขนาดของลูกศร */
+    background-position: right 15px center; /* ตำแหน่งลูกศร */
+    background-size: 1em; /* ขนาดของลูกศร */
     
     /* 3. ปรับ padding เพื่อให้มีที่สำหรับลูกศรใหม่ */
-    /* ค่า padding-right (ตัวที่ 2) ต้องมากกว่า background-position-x (15px) */
     padding: 15px 40px 15px 25px;
 
     /* --- สไตล์เดิมที่คุณมีอยู่แล้ว --- */

@@ -1,13 +1,11 @@
 // Configuration
 const API_BASE_URL = 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod';
 
-// ⭐️ MODIFIED: ฟังก์ชันหลักที่ถูกเรียกโดย auth-check.js
+// ฟังก์ชันหลักที่ถูกเรียกโดย auth-check.js
 function initializeAdvisorDashboard() {
-    // ⭐️ ตรวจสอบ Role
     if (!window.userData || window.userData.role !== 'advisor') {
         console.error('Authentication failed - not an advisor:', window.userData.role);
         alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
-        // ใช้ navigateTo ที่อยู่ใน auth-check.js
         if (typeof navigateTo === 'function') {
             navigateTo("login.html");
         } else {
@@ -16,14 +14,11 @@ function initializeAdvisorDashboard() {
         return;
     }
     
-    // แสดงชื่อผู้ใช้ (user-name ถูกอัพเดทโดย updateBasicUserInfo ใน auth-check.js แล้ว)
     document.getElementById('user-name').textContent = window.userData.name || window.userData.userId;
-    
-    // เรียกข้อมูลนักศึกษาจาก API
     fetchStudents(window.userData.userId);
 }
 
-// ⭐️ MODIFIED: กำหนดให้ auth-check.js เรียกฟังก์ชันนี้เมื่อ Authentication ผ่าน
+// กำหนดให้ auth-check.js เรียกฟังก์ชันนี้เมื่อ Authentication ผ่าน
 window.initializePage = initializeAdvisorDashboard;
 
 
@@ -33,14 +28,18 @@ async function fetchStudents(advisorId) {
     studentsListElement.textContent = "กำลังโหลดข้อมูลนักศึกษา...";
     studentsListElement.classList.add('loading');
     
+    // ⭐️⭐️ MODIFIED: เปลี่ยน URL และ Method ⭐️⭐️
+    // 1. เปลี่ยน URL ให้ตรงกับ API Gateway (มี s และใส่ ID ใน path)
+    // 2. เปลี่ยน Method เป็น 'GET'
+    // 3. ลบ 'body' และ 'Content-Type' (GET ไม่มี body)
+    
     try {
-        const response = await fetch(`${API_BASE_URL}/advisor/students`, {
-            method: 'POST',
+        const response = await fetch(`${API_BASE_URL}/advisors/${advisorId}/students`, {
+            method: 'GET', // <--- เปลี่ยนเป็น GET
             headers: {
-                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${window.userToken}` // ใช้ Global Token
-            },
-            body: JSON.stringify({ advisorId: advisorId })
+                // (ลบ Content-Type และ body)
+            }
         });
 
         const students = await response.json();
@@ -60,7 +59,7 @@ async function fetchStudents(advisorId) {
     }
 }
 
-// ฟังก์ชันแสดงข้อมูลนักศึกษา
+// ⭐️⭐️ MODIFIED: อัปเดตฟังก์ชันแสดงผลให้ตรงกับ Schema ฐานข้อมูล ⭐️⭐️
 function displayStudents(students) {
     const studentsListElement = document.getElementById('students-list');
     studentsListElement.classList.remove('loading');
@@ -73,18 +72,47 @@ function displayStudents(students) {
 
     students.forEach(student => {
         const studentCard = document.createElement('div');
-        studentCard.className = 'student-card';
-        
-        // กำหนดสีตามสถานะทักษะ (สมมติว่ามี field skillStatus: 'completed'/'pending')
-        const statusClass = student.skillStatus === 'completed' ? 'status-pass' : 'status-fail';
+        studentCard.className = 'student-card'; // คลาสนี้ต้องมี CSS ที่เหมาะสม (เช่น display: flex)
 
+        // --- ประมวลผลข้อมูลตาม Schema ใหม่ ---
+        const name = student.name || 'ชื่อนักศึกษาไม่ระบุ';
+        
+        // ⭐️ MODIFIED: ใช้ 'studentId'
+        const id = student.studentId || 'N/A'; 
+        
+        // ⭐️ MODIFIED: ใช้ 'yearLevel'
+        const year = student.yearLevel || 'N/A';
+        
+        // ⭐️ MODIFIED: ใช้ 'department'
+        const major = student.department || 'ภาควิชาไม่ระบุ'; 
+        
+        // ⭐️ ATTENTION: API ต้องส่งค่านี้มาด้วย
+        const completed = student.completedSkillsCount || 0;
+        
+        // ⭐️ ATTENTION: API ต้องส่งค่านี้มาด้วย
+        const total = student.totalSkillsCount || 0; 
+
+        // คำนวณเปอร์เซ็นต์
+        let percentage = 0;
+        if (total > 0) {
+            percentage = Math.round((completed / total) * 100);
+        }
+
+        // ดึงอักษรตัวแรกของชื่อ
+        const initial = name.split('')[0] || '?';
+        
+        // สร้าง HTML card ใหม่
         studentCard.innerHTML = `
-            <div class="student-info">
-                <h3>${student.name || 'ชื่อนักศึกษาไม่ระบุ'} (${student.year || 'N/A'})</h3>
-                <p>รหัส: ${student.id}</p>
-                <p>จำนวนทักษะที่ผ่าน: <span class="${statusClass}">${student.completedSkillsCount || 0}</span></p>
+            <div class="student-initial">${initial}</div>
+            <div class="student-details">
+                <h4>${name}</h4>
+                <p>รหัสนักศึกษา: ${id}</p>
+                <p>ชั้นปี: ${year} | ภาควิชา: ${major}</p>
             </div>
-            <button onclick="viewStudentDetails('${student.id}')">ดูรายละเอียด</button>
+            <div class="student-progress">
+                <p class="progress-text">${percentage}% (${completed}/${total} ทักษะ)</p>
+                <button class="review-button" onclick="viewStudentDetails('${id}')">ตรวจสอบ</button>
+            </div>
         `;
         studentsListElement.appendChild(studentCard);
     });
@@ -98,7 +126,8 @@ function filterByYearDropdown() {
     let filteredStudents = window.allStudents;
 
     if (yearFilter !== 'all') {
-        filteredStudents = window.allStudents.filter(student => String(student.year) === yearFilter);
+        // ⭐️ MODIFIED: กรองด้วย 'yearLevel'
+        filteredStudents = window.allStudents.filter(student => String(student.yearLevel) === yearFilter);
     }
     
     displayStudents(filteredStudents);
@@ -106,9 +135,8 @@ function filterByYearDropdown() {
 
 // ฟังก์ชันดูรายละเอียดนักศึกษา
 function viewStudentDetails(studentId) {
-    // ⭐️ MODIFIED: ใช้ navigateTo (ที่อยู่ใน auth-check.js) และไม่ส่ง data=...
     if (typeof navigateTo === 'function') {
-        navigateTo(`my-students.html?studentId=${studentId}`); // Removed &data=...
+        navigateTo(`my-students.html?studentId=${studentId}`);
     } else {
         window.location.href = `my-students.html?studentId=${studentId}`;
     }
