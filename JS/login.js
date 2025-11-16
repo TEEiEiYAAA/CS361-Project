@@ -27,31 +27,38 @@ document.getElementById('login-form').addEventListener('submit', async function(
     
     if (data.success) {
       
-      // *** ⭐️ ส่วนที่แก้ไข: จัดเก็บข้อมูลผู้ใช้ใน Session Storage แทน ***
+      // 1. เก็บแบบเดิม (เพื่อไม่ให้กระทบระบบ Advisor หรือ Dashboard อื่นๆ)
       sessionStorage.setItem('AchieveHubUser', JSON.stringify({
         token: data.token,
-        user: data.user // มี role: 'student' หรือ 'advisor' อยู่ในนี้
+        user: data.user 
       }));
+
+      // ★★★ 2. เพิ่มส่วนนี้: เก็บแบบใหม่ (เพื่อให้หน้า Quiz ใช้งานได้) ★★★
+      // เราสร้าง "บัตรผ่าน" อีกใบ ใส่ลง LocalStorage ในชื่อที่หน้า Quiz รอรับอยู่
+      const quizUserData = {
+          studentId: data.user.username || data.user.id || userId, // พยายามหา ID มาใส่ให้ได้
+          role: data.user.role || 'student', // ถ้าไม่มี role ส่งมา ให้บังคับเป็น student
+          name: data.user.name || userId
+      };
+      localStorage.setItem('userData', JSON.stringify(quizUserData));
+      // ★★★ จบส่วนที่เพิ่ม ★★★
       
       // แสดงข้อความสำเร็จก่อนนำทาง
       errorMessage.style.color = '#4CAF50';
       errorMessage.style.background = 'rgba(76, 175, 80, 0.1)';
       errorMessage.textContent = "เข้าสู่ระบบสำเร็จ! กำลังนำทาง...";
       
-      // นำทางไปหน้าที่เหมาะสมตาม role โดยไม่ต้องส่งข้อมูลผ่าน URL
+      // นำทางไปหน้าที่เหมาะสม
       setTimeout(() => {
         if (data.user.role === 'student') {
-          window.location.href = `student-dashboard.html`; // ไม่มี ?data=...
+          window.location.href = `student-dashboard.html`; 
         } else if (data.user.role === 'advisor') {
-          window.location.href = `advisor-dashboard.html`; // ไม่มี ?data=...
+          window.location.href = `advisor-dashboard.html`; 
         } else {
-          errorMessage.style.color = '#ff6b6b';
-          errorMessage.style.background = 'rgba(255, 0, 0, 0.1)';
-          errorMessage.textContent = "ไม่สามารถระบุประเภทผู้ใช้งานได้";
-          // ควรลบข้อมูลที่เพิ่งเก็บไว้หากระบุ role ไม่ได้
-          sessionStorage.removeItem('AchieveHubUser');
+          // ถ้าหา role ไม่เจอ ก็ให้ไป student ก่อน (แก้ขัด)
+          window.location.href = `student-dashboard.html`; 
         }
-      }, 1000); // รอ 1 วินาที
+      }, 1000); 
       
     } else {
       // แสดงข้อความผิดพลาดจาก API
