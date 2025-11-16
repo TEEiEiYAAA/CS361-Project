@@ -237,7 +237,7 @@ function showResultModal(data) {
         title.style.color = "green";
         icon.textContent = "🎉";
     } else {
-        title.textContent = "เสียใจด้วย สอบไม่ผ่าน";
+        title.textContent = "เสียใจด้วย สอบไม่ผ่าน กรุณาทำใหม่";
         title.style.color = "red";
         icon.textContent = "😔";
     }
