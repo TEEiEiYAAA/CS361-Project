@@ -76,83 +76,230 @@ body {
 
 /* --- ส่วนเนื้อหาหลัก (Container) --- */
 .main-container {
-    max-width: 70%;
+    max-width: 80%;
     width: 100%;
     margin: 0 auto;
     flex-grow: 1;
 }
 
-
-/* --- กล่องข้อมูลในหน้าแรก --- */
+/* --- กล่องข้อมูลในหน้าแรก (Layout หลัก) --- */
 .info-skill-container {
     display: flex;
     gap: 30px;
     margin-bottom: 2rem;
+    justify-content: center;
+    align-items: stretch; /* ให้กล่องสูงเท่ากัน */
+}
+
+/* กล่อง Profile */
+.profile-box {
+    flex: 0 0 350px; /* Fix ความกว้าง */
 }
 
 .student-profile {
     display: flex;
-    gap: 25px;
+    gap: 20px;
+    align-items: flex-start;
 }
 
 .profile-icon {
-    font-size: 48px;
-    color: #4CAF50;
-    margin-top: 4px;
+    font-size: 50px;
+    margin-top: 5px;
 }
 
 .student-details p {
     margin: 8px 0;
-    font-weight: normal;
     color: #333;
 }
 
 .student-details span {
     font-weight: bold;
-    color: #333;
+    color: #000;
+}
+
+/* กล่อง Skill (Container หลักของ Tabs) */
+.skills-card-container {
+    flex: 1;
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    min-height: 280px;
 }
 
 .skill-box {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.6);
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    height: fit-content;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
 .skill-box h2 {
     margin-top: 0;
-    color: #004D40;
+    color: #00695c;
+    margin-bottom: 20px;
 }
 
-.skill-stats {
+/* --- Tabs Styles (Updated Clean Look) --- */
+.card-tabs {
     display: flex;
-    gap: 2rem;
-    align-items: center;
-    margin-top: 1rem;
+    background: rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid #ddd;
+    border-radius: 16px 16px 0 0;
 }
 
-.circle-progress {
+.card-tab-btn {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    background: transparent;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 1rem;
+    cursor: pointer;
+    color: #666;
+    transition: 0.3s;
+}
+
+.card-tab-btn:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.card-tab-btn.active {
+    background: #fff;
+    color: #0E8C7D;
+    font-weight: bold;
+    /* ลบขีดเส้นใต้สีเขียวออกแล้ว */
+    box-shadow: 0 -2px 0 0 #fff inset; 
+    border-radius: 16px 16px 0 0;
+}
+
+/* Tab Panels */
+.tab-panel {
+    display: none;
+    padding: 25px;
+    flex: 1;
+}
+
+.tab-panel.active {
+    display: block;
+    animation: fadeIn 0.4s;
+}
+
+/* --- Panel 1: Overview Layout (Updated) --- */
+.skills-stats-layout {
+    display: flex;
+    align-items: center;       /* กึ่งกลางแนวตั้ง */
+    justify-content: center;   /* กึ่งกลางแนวนอน */
+    gap: 40px;                 /* ระยะห่างระหว่างวงกลมกับข้อความ */
+    height: 100%;
+    padding: 10px 0;
+}
+
+/* วงกลม (ขยายใหญ่ขึ้นเป็น 160px) */
+.progress-section {
     position: relative;
-    width: 100px;
-    height: 100px;
+    width: 160px;   
+    height: 160px;
+    flex-shrink: 0; 
+}
+
+.circle-progress svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* ปรับขนาด SVG elements */
+#progress-circle circle {
+    /* สัมพันธ์กับ JS (cx=80, r=70) */
+}
+
+#progress-ring-circle {
+    transition: stroke-dashoffset 1s ease-in-out;
+    transform: rotate(-90deg); 
+    transform-origin: 50% 50%;
 }
 
 .circle-text {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 1.2rem;
+    text-align: center;
+}
+
+#total-earned-big { 
+    font-size: 3.5rem; /* ตัวเลขใหญ่ */
+    font-weight: bold; 
+    color: #0E8C7D; 
+    line-height: 1; 
+}
+
+/* รายละเอียดด้านขวา (จัดระเบียบใหม่) */
+.detail-section {
+    flex: 1; 
+    max-width: 300px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between; /* ชื่อชิดซ้าย ตัวเลขชิดขวา */
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 1.1rem; 
+    color: #444;
+}
+
+.stat-label {
+    text-align: left; /* บังคับชิดซ้าย */
+    font-weight: 500;
+}
+
+.stat-val {
     font-weight: bold;
+    color: #333;
+    font-size: 1.2rem;
 }
 
-.skill-detail p {
-    margin: 0.5rem 0;
+.total-row {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #bbb;
+    color: #666;
+    font-size: 0.95rem;
 }
 
-/* --- ส่วนท้ายของเว็บ (Footer) --- */
+/* --- Panel 2: PLO Styles --- */
+.plo-item-row { 
+    margin-bottom: 18px; 
+}
+
+.plo-label {
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.progress-bar-bg {
+    width: 100%;
+    height: 14px;
+    background-color: #e0e0e0;
+    border-radius: 7px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #80CEC7, #0E8C7D);
+    width: 0%;
+    transition: width 1s ease;
+    border-radius: 7px;
+}
+
+/* Footer */
 footer {
     background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(12px);
@@ -164,5 +311,13 @@ footer {
     border-radius: 16px 16px 0 0;
     box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
     width: 100%;
+    margin-top: auto;
 }
 
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Responsive */
+@media (max-width: 900px) {
+    .info-skill-container { flex-direction: column; }
+    .profile-box, .skills-card-container { flex: 1 1 auto; width: 100%; }
+}

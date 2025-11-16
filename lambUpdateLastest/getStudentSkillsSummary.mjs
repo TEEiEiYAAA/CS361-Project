@@ -3,6 +3,8 @@ console.log("🚀 student-dashboard.js: Script started loading...");
 // Configuration
 const API_BASE_URL = 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod';
 
+// ⭐️ ลบ PLO_MAP ที่ Hardcode ไว้ออก (ไม่ใช้แล้ว)
+
 // กำหนดให้ auth-check.js เรียกฟังก์ชันนี้
 window.initializePage = initializeStudentDashboard;
 
