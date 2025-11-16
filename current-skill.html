@@ -33,7 +33,10 @@
   <main class="skill-layout">
     <!-- การ์ดซ้าย: PLO -->
     <aside class="plo-card">
-      <h3>ผลลัพธ์การเรียนรู้<br>ของหลักสูตร</h3>
+      <h3 class="header-with-icon">
+        ผลลัพธ์การเรียนรู้<br>ของหลักสูตร
+        <i class="fas fa-info-circle info-btn" onclick="openPloModal()" title="ดูรายละเอียด PLO"></i>
+      </h3>
       <ul id="plo-menu-list">
         <li class="loading-text">กำลังโหลด...</li>
       </ul>
@@ -59,6 +62,18 @@
       นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475
     </small>
   </footer>
+
+  <div id="ploModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>รายละเอียดผลลัพธ์การเรียนรู้ (PLO)</h3>
+        <span class="close-btn" onclick="closePloModal()">&times;</span>
+      </div>
+      <div class="modal-body" id="plo-modal-body">
+        <p>กำลังโหลดข้อมูล...</p>
+      </div>
+    </div>
+  </div>
 
   <script src="../JS/current-skill.js"></script>
   <script src="../JS/auth-check.js"></script>

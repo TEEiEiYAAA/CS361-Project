@@ -189,3 +189,46 @@ function logout() {
     window.location.href = "login.html";
   }
 }*/
+
+/* =========================================
+   Modal Logic
+   ========================================= */
+
+window.openPloModal = function() {
+  const modal = document.getElementById('ploModal');
+  const modalBody = document.getElementById('plo-modal-body');
+  
+  if (!globalPloData || globalPloData.length === 0) {
+    modalBody.innerHTML = '<p style="text-align:center">ยังไม่มีข้อมูล หรือกำลังโหลด...</p>';
+  } else {
+    let html = '';
+    globalPloData.forEach(plo => {
+      const fullName = plo.ploName || "ไม่มีคำอธิบาย"; 
+      html += `
+        <div class="plo-detail-item">
+          <span class="plo-code">${plo.ploId}:</span>
+          <span class="plo-desc">${fullName}</span>
+        </div>
+      `;
+    });
+    modalBody.innerHTML = html;
+  }
+
+  modal.style.display = 'flex';
+};
+
+// เปลี่ยนจาก function closePloModal() {...} เป็นแบบนี้:
+window.closePloModal = function() {
+  const modal = document.getElementById('ploModal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+};
+
+// ปิด Modal เมื่อคลิกที่พื้นหลังดำๆ
+window.onclick = function(event) {
+  const modal = document.getElementById('ploModal');
+  if (event.target === modal) {
+    modal.style.display = 'none';
+  }
+}
