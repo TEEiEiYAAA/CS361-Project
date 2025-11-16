@@ -10,19 +10,26 @@ const CONFIG = {
 let currentActivity = null;
 let currentUser = null;
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   initializeApp();
 });
 
 function initializeApp() {
+  // 🔒 ของเดิม: บังคับต้องล็อกอิน (เก็บไว้ใช้ตอนต่อ auth จริง)
+  /*
   currentUser = JSON.parse(localStorage.getItem('userData') || '{}');
   if (!currentUser.studentId && !currentUser.userId) {
     window.location.href = "login.html";
     return;
   }
+  */
+
+  // ⭐ DEV MODE: ยังไม่บังคับล็อกอิน แต่เก็บ userData ไว้ใช้ถ้ามี
+  currentUser = JSON.parse(localStorage.getItem('userData') || '{}');
 
   const urlParams = new URLSearchParams(window.location.search);
-  const activityId = urlParams.get('id');
+  // รองรับทั้ง ...?activityId= และ ...?id=
+  const activityId = urlParams.get('activityId') || urlParams.get('id');
   if (!activityId) {
     showError('ไม่พบรหัสกิจกรรมในลิงก์');
     return;
@@ -34,13 +41,21 @@ async function loadActivityDetail(activityId) {
   const mainContent = document.getElementById('main-content');
   try {
     mainContent.innerHTML = '<div class="loading">กำลังโหลดรายละเอียดกิจกรรม...</div>';
-    const apiUrl = CONFIG.API_BASE_URL + CONFIG.ENDPOINTS.GET_ACTIVITY_DETAIL.replace('{activityId}', activityId);
+
+    const apiUrl =
+      CONFIG.API_BASE_URL +
+      CONFIG.ENDPOINTS.GET_ACTIVITY_DETAIL.replace('{activityId}', activityId);
+
+    // ใช้ token เฉพาะถ้ามี (เตรียมไว้ใช้กับ auth จริง)
+    const token = localStorage.getItem('token');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(apiUrl, {
       method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'Content-Type': 'application/json'
-      }
+      headers
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
 
@@ -59,8 +74,11 @@ function formatDateTime(dateTimeString) {
   try {
     const date = new Date(dateTimeString);
     return date.toLocaleDateString('th-TH', {
-      year: 'numeric', month: 'long', day: 'numeric',
-      hour: '2-digit', minute: '2-digit'
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   } catch {
     return 'รูปแบบวันที่ไม่ถูกต้อง';
@@ -70,111 +88,181 @@ function formatDateTime(dateTimeString) {
 function normalizeLevel(levelRaw) {
   const s = String(levelRaw || '').trim().toLowerCase();
   if (!s) return '';
-  if (['พื้นฐาน','basic'].includes(s)) return 'พื้นฐาน';
-  if (['กลาง','ปานกลาง','medium'].includes(s)) return 'ปานกลาง';
-  if (['ขั้นสูง','advanced'].includes(s)) return 'ขั้นสูง';
+  if (['พื้นฐาน', 'basic'].includes(s)) return 'พื้นฐาน';
+  if (['กลาง', 'ปานกลาง', 'medium'].includes(s)) return 'ปานกลาง';
+  if (['ขั้นสูง', 'advanced'].includes(s)) return 'ขั้นสูง';
   return s;
 }
-function getLevelDisplay(levelRaw) { return normalizeLevel(levelRaw); }
+function getLevelDisplay(levelRaw) {
+  return normalizeLevel(levelRaw);
+}
 function getLevelClass(levelRaw) {
   const lv = normalizeLevel(levelRaw);
   if (lv === 'พื้นฐาน') return 'level-basic';
   if (lv === 'ปานกลาง') return 'level-medium';
-  if (lv === 'ขั้นสูง')  return 'level-advanced';
+  if (lv === 'ขั้นสูง') return 'level-advanced';
   return '';
 }
 
-
 // Display activity details
 function displayActivityDetail(activity) {
-  const mainContent = document.getElementById('main-content');
+  const mainContent = document.getElementById("main-content");
 
+  // ===== Format date =====
   const startDate = formatDateTime(activity.startDateTime);
-  const endDate   = formatDateTime(activity.endDateTime);
+  const endDate = formatDateTime(activity.endDateTime);
 
-  // ✅ ใช้ skillCategory จากกิจกรรม (fallback เป็น skill.category)
-  const skillCategory = activity.skillCategory || activity.skill?.category || '';
-  const skillBadgeClass = (skillCategory || '').toLowerCase().replace(/\s+/g, '-');
-  const skillDisplayName =
-    skillCategory === 'soft skill'  ? 'Soft Skill'  :
-    skillCategory === 'hard skill'  ? 'Hard Skill'  :
-    skillCategory === 'multi-skill' ? 'Multi-Skill' : 'ทักษะทั่วไป';
+  // ===== Badge Skill Category =====
+  const skillCategoryRaw = activity.skillCategory || "";
+  const skillCategory = skillCategoryRaw.toLowerCase();
+  const skillBadge = skillCategoryRaw
+    ? `<span class="badge" style="
+          background: ${
+            skillCategory === "soft skill"
+              ? "#ff6b6b"
+              : skillCategory === "hard skill"
+              ? "#4ecdc4"
+              : "#95a5a6"
+          };
+          padding:6px 14px;
+          border-radius:20px;
+          color:white;
+          font-size: 14px;
+        ">
+        ${skillCategoryRaw}
+      </span>`
+    : "";
 
-  // ✅ badge ระดับ
-  const levelDisplay = getLevelDisplay(activity.skillLevel);
-  const levelClass   = getLevelClass(activity.skillLevel);
-  const levelBadge   = levelDisplay ? `<span class="level-badge">${levelDisplay}</span>` : '';
+  // ===== Badge Level =====
+  const levelRaw = activity.level || "";
+  const levelBadge = levelRaw
+    ? `<span class="badge" style="
+          background: ${
+            levelRaw === "พื้นฐาน"
+              ? "#4CAF50"
+              : levelRaw === "ปานกลาง"
+              ? "#FFC107"
+              : "#F44336"
+          };
+          padding:6px 14px;
+          border-radius:20px;
+          color:white;
+          font-size: 14px;
+        ">
+        ${levelRaw}
+      </span>`
+    : "";
 
-  // รูป
-  const imageUrl = activity.imageUrl || null;
+  // ===== Image =====
+  const imageUrl = activity.imageUrl;
   const imageHtml = imageUrl
-    ? `<img src="${imageUrl}" alt="${activity.name}" class="skill-image">`
-    : `<div class="img-placeholder">🖼️</div>`;
+    ? `<img src="${imageUrl}" class="skill-image" alt="${activity.name || ""}">`
+    : `<div class="img-placeholder">🖼️ ไม่มีรูปภาพ</div>`;
 
-  // ✅ PLO แสดงชื่อเต็ม
-  const ploFullNames = Array.isArray(activity.ploFullNames) ? activity.ploFullNames : [];
-  const ploDescriptions = Array.isArray(activity.ploDescriptions) ? activity.ploDescriptions : [];
-  const ploBlock = ploFullNames.length
-    ? `<div class="plo-box">
-         <div class="sec-title">🎯 ทักษะที่ได้รับ</div>
-         <div class="sec-body">
-           ${activity.activityGroup ? `<p><strong>กลุ่มกิจกรรม:</strong> ${activity.activityGroup}</p>` : ''}
-            ${ploFullNames.map((name, i) =>
-            `<div class="plo-line">• ${name}${ploDescriptions[i] ? ` — ${ploDescriptions[i]}` : ''}</div>`
-            ).join('')}
-           ${activity.yearLevel ? `<p><strong>เหมาะสำหรับชั้นปี:</strong> ${activity.yearLevel}</p>` : ''}
-           ${activity.requiredActivities ? `<p><strong>กิจกรรมที่ต้องเข้าร่วม:</strong> ${activity.requiredActivities} กิจกรรม</p>` : ''}
-         </div>
-       </div>`
-    : '';
+  // ===== PLO Data =====
+  const plos = Array.isArray(activity.plo) ? activity.plo : [];
+  const ploNames = Array.isArray(activity.ploFullNames) ? activity.ploFullNames : [];
+  const ploDescs = Array.isArray(activity.ploDescriptions) ? activity.ploDescriptions : [];
 
-  // ปุ่มสมัคร: เปิดก่อนวันเริ่มเท่านั้น
-  const now = new Date();
-  const start = activity.startDateTime ? new Date(activity.startDateTime) : null;
-  const end   = activity.endDateTime ? new Date(activity.endDateTime)   : null;
-  let canRegister = true, btnText = 'สมัครเข้าร่วม';
-  if (start && now >= start) {
-    canRegister = false;
-    btnText = (end && now <= end) ? 'กำลังจัดกิจกรรม' : 'ปิดรับสมัครแล้ว';
+  let ploHTML = "";
+
+  // กลุ่มกิจกรรม: ใช้ skillId
+  if (activity.skillId) {
+    ploHTML += `<p><strong>กลุ่มกิจกรรม:</strong> ${activity.skillId}</p>`;
   }
 
+  // ไล่ PLO ทั้งหมดเรียงกัน
+  for (let i = 0; i < plos.length; i++) {
+    const code = plos[i] || "";
+    const name = ploNames[i] || "";
+    const desc = ploDescs[i] || "";
+
+    if (code || name) {
+      ploHTML += `<p><strong>${code}:</strong> ${name}</p>`;
+    }
+    if (desc) {
+      ploHTML += `<p><strong>คำอธิบาย:</strong> ${desc}</p>`;
+    }
+    if (i < plos.length - 1) {
+      ploHTML += `<p></p>`; // เว้นระยะเบา ๆ ระหว่าง PLO
+    }
+  }
+
+  // เหมาะสำหรับชั้นปี
+  const suitableYear =
+    activity.suitableYearLevel || activity.yearLevel || activity.year || null;
+  if (suitableYear) {
+    ploHTML += `<p><strong>เหมาะสำหรับชั้นปี:</strong> ${suitableYear}</p>`;
+  }
+
+  // กิจกรรมที่ต้องเข้าร่วม
+  if (activity.requiredActivities) {
+    ploHTML += `<p><strong>กิจกรรมที่ต้องเข้าร่วม:</strong> ${activity.requiredActivities} กิจกรรม</p>`;
+  }
+
+  // ===== ปุ่มสมัคร =====
+  const now = new Date();
+  const start = activity.startDateTime ? new Date(activity.startDateTime) : null;
+  let canRegister = true;
+  if (start && now >= start) {
+    canRegister = false;
+  }
+  const btnText = canRegister ? "สมัครเข้าร่วม" : "ปิดรับสมัครแล้ว";
+
+  const registerButton = `
+    <button class="join-button" id="registerBtn" ${canRegister ? "" : "disabled"}>
+      ${btnText}
+    </button>
+  `;
+
+  // ===== FINAL HTML (ปรับลำดับ -> ชื่อ, badge, description) =====
   mainContent.innerHTML = `
     <div class="detail-card">
+
       ${imageHtml}
 
-      <div class="title-row">
-        <h2 class="activity-name">${activity.name || 'ไม่มีชื่อกิจกรรม'}</h2>
-        <div class="badges-row">
-          ${skillCategory ? `<span class="skill-badge ${skillBadgeClass}">${skillDisplayName}</span>` : ''}
-          ${levelBadge}
-        </div>
+      <h2 class="activity-name">${activity.name || ""}</h2>
+
+      <!-- badge อยู่ใต้ชื่อ -->
+      <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
+        ${skillBadge}
+        ${levelBadge}
       </div>
 
-      <p class="activity-desc">${activity.description || 'ไม่มีคำอธิบาย'}</p>
+      <!-- description อยู่ถัดจาก badge ลงมา -->
+      <p class="activity-desc" style="margin-top: 10px;">
+        ${activity.description || "-"}
+      </p>
 
+      <!-- TIME BOX -->
       <div class="time-box">
         <div class="sec-title">📅 รายละเอียดเวลา</div>
         <div class="sec-body">
           <p><strong>เริ่ม:</strong> ${startDate}</p>
           <p><strong>สิ้นสุด:</strong> ${endDate}</p>
-          <p><strong>สถานที่:</strong> ${activity.locationName || activity.location || 'ไม่ระบุสถานที่'}</p>
+          <p><strong>สถานที่:</strong> ${activity.locationName || activity.location || "-"}</p>
         </div>
       </div>
 
-      ${ploBlock}
+      <!-- PLO BOX -->
+      <div class="plo-box">
+        <div class="sec-title">🎯 ทักษะที่ได้รับ</div>
+        <div class="sec-body">
+          ${ploHTML || "<p>-</p>"}
+        </div>
+      </div>
 
-      <button type="button" id="registerBtn" class="join-button" ${canRegister ? '' : 'disabled'}>
-        ${btnText}
-      </button>
+      ${registerButton}
     </div>
   `;
 
-  // bind ปุ่มสมัคร
-  const registerBtn = document.getElementById('registerBtn');
-  if (canRegister) {
+  // bind ปุ่มสมัครให้ทำงานเหมือนเดิม
+  const registerBtn = document.getElementById("registerBtn");
+  if (canRegister && registerBtn) {
     registerBtn.onclick = registerForActivity;
   }
 }
+
 
 // Register for activity
 async function registerForActivity() {
@@ -192,16 +280,22 @@ async function registerForActivity() {
     const apiUrl = CONFIG.API_BASE_URL + CONFIG.ENDPOINTS.REGISTER_ACTIVITY;
     const response = await fetch(apiUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json','Authorization': `Bearer ${localStorage.getItem('token')}` },
+      headers: {
+        'Content-Type': 'application/json',
+        // auth ไว้ใช้ตอนเชื่อมระบบจริง
+        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+      },
       body: JSON.stringify({ activityId: currentActivity.activityId, studentId })
     });
     const result = await response.json();
 
     if (result.success) {
-      alert('สมัครเข้าร่วมกิจกรรมสำเร็จ!\nกำลังนำทางไปหน้ากิจกรรมของฉัน...');
+      alert('สมัครเข้าร่วมกิจกรรมสำเร็จ!\nกำลังนำทางไปหน้ากิจกรรมของฉัน.');
       registerBtn.textContent = 'สมัครเรียบร้อยแล้ว';
       registerBtn.style.backgroundColor = '#4CAF50';
-      setTimeout(() => { window.location.href = 'my-activities.html'; }, 1200);
+      setTimeout(() => {
+        window.location.href = 'my-activities.html';
+      }, 1200);
     } else {
       alert(`เกิดข้อผิดพลาด: ${result.message}`);
       registerBtn.disabled = false;
@@ -216,24 +310,18 @@ async function registerForActivity() {
 }
 
 // Show error message
-function showError(message, activityId = null) {
+function showError(message, activityId) {
   const mainContent = document.getElementById('main-content');
   mainContent.innerHTML = `
     <div class="error-message">
       <p>เกิดข้อผิดพลาดในการโหลดรายละเอียดกิจกรรม</p>
-      <p>${message}</p>
-      ${activityId ? `<button class="retry-btn" onclick="loadActivityDetail('${activityId}')">ลองใหม่</button>` : ''}
-      <button class="retry-btn" onclick="window.history.back()" style="background-color: #6c757d; margin-left: 10px;">กลับ</button>
+      <p>${message || ''}</p>
+      ${
+        activityId
+          ? `<button class="join-button" style="max-width:260px;margin-top:16px;"
+               onclick="loadActivityDetail('${activityId}')">ลองใหม่</button>`
+          : ''
+      }
     </div>
   `;
-}
-
-// Logout via icon
-function showUserMenu() {
-  const confirmLogout = confirm('ต้องการออกจากระบบหรือไม่?');
-  if (confirmLogout) {
-    localStorage.removeItem('userData');
-    localStorage.removeItem('token');
-    window.location.href = "login.html";
-  }
 }

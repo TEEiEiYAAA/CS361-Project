@@ -175,15 +175,24 @@
             
             // Create activities grid
             let html = '<div class="activities-grid">';
-            
             activities.forEach(activity => {
                 html += createActivityCard(activity);
             });
-            
             html += '</div>';
             
             activitiesList.innerHTML = html;
-        }
+        
+            // 🔗 ผูกคลิกการ์ด -> ไปหน้า detailed-activities
+            const cards = activitiesList.querySelectorAll('.activity-card');
+            cards.forEach(card => {
+                card.style.cursor = 'pointer';
+                card.addEventListener('click', () => {
+                    const id = card.getAttribute('data-activity-id');
+                    if (!id) return;
+                    window.location.href = `detailed-activities.html?activityId=${encodeURIComponent(id)}`;
+                });
+            });
+        }        
         
         // แสดงชื่อระดับบน badge
         function normalizeLevel(levelRaw) {
@@ -206,6 +215,7 @@
         
         // Create individual activity card HTML
         function createActivityCard(activity) {
+            const activityId = activity.activityId || activity.id;
             // ── badge skillCategory ──
             const skillCategory = activity.skillCategory || '';
             const skillBadgeClass = skillCategory.toLowerCase().replace(' ', '-');
@@ -286,7 +296,7 @@
                  </button>`;
           
             return `
-              <div class="activity-card">
+            <div class="activity-card" data-activity-id="${activityId}">
                 <div class="activity-image" ${imageStyle}>
                   ${badgeRow}
                 </div>
