@@ -1,564 +1,529 @@
 // Configuration
 const CONFIG = {
-  API_BASE_URL: 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod',
-  ENDPOINTS: {
-    STUDENT_ACTIVITIES: '/students/{studentId}/activities',
-    VERIFY_QR: '/activities/verify-qr',
-    CONFIRM_ATTENDANCE: '/activities/confirm',
-    CERTIFICATE: '/activities/{activityId}/certificate'
-  }
+    API_BASE_URL: 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod',
+    ENDPOINTS: {
+        GET_ACTIVITIES: '/activities', // Master Data
+        GET_LOCATIONS: '/locations',   // Location Data
+        STUDENT_ACTIVITIES: '/students/{studentId}/activities', // User Data
+        VERIFY_QR: '/activities/verify-qr',
+        CONFIRM_ATTENDANCE: '/activities/confirm',
+        CERTIFICATE: '/activities/{activityId}/certificate'
+    }
 };
 
 // Global variables
-let currentUser = null; // ⭐️ CHANGED: จะถูกตั้งค่าโดย initializeApp
+let currentUser = null;
+let myParticipations = []; 
+let masterActivitiesMap = {}; // Map เก็บข้อมูลกิจกรรม (รูป, ชื่อ)
+let locationsMap = {};        // Map เก็บข้อมูลสถานที่ (พิกัด)
+let currentFilter = 'inprogress'; // Default Tab
 
-let allActivities = [];
-let currentFilter = 'upcoming';
-
-// สถานะวงจรชีวิตของกิจกรรม
-function getLifecycleState(a) {
-  const now = new Date();
-  const start = a.startDateTime ? new Date(a.startDateTime) : null;
-  const end   = a.endDateTime ? new Date(a.endDateTime)   : null;
-
-  if (start && now < start) return 'UPCOMING';
-  if (start && now >= start && (!end || now <= end)) return 'IN_PROGRESS';
-  return 'ENDED';
-}
-
-// ⭐️ NEW: กำหนดให้ auth-check.js เรียกฟังก์ชันนี้
+// กำหนดให้ auth-check.js เรียกใช้
 window.initializePage = initializeMyActivities;
 
-// ⭐️ CHANGED: เปลี่ยนชื่อฟังก์ชันจาก initializeApp เป็น initializeMyActivities
-function initializeMyActivities() {
-  console.log("🏁 my-activities.js: initializeMyActivities() called");
+/* ============================================================
+   INITIALIZATION & DATA LOADING
+   ============================================================ */
 
-  // ⭐️ CHANGED: อ่านข้อมูลจาก window.userData (ที่ auth-check.js ตั้งให้)
-  currentUser = window.userData;
-  
-  // ⭐️ CHANGED: ย้ายการตรวจสอบสิทธิ์มาไว้ที่นี่ (เหมือน student-dashboard.js)
-  // (ปรับแต่งเงื่อนไข role ได้ตามต้องการ)
-  if (!currentUser || !currentUser.userId) {
-      console.error('❌ my-activities.js: Authentication failed - user data not found or invalid.');
-      alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้ หรือ session หมดอายุ');
-      if (typeof navigateTo === 'function') {
-          navigateTo("login.html");
-      } else {
-          window.location.href = "login.html";
-      }
-      return;
-  }
-  
-  setupTabButtons();
-  
-  // ⭐️ CHANGED: ใช้ currentUser.userId (ตามมาตรฐานเดียวกับ student-dashboard.js)
-  const studentId = currentUser.userId;
-  loadUserActivities(studentId);
-  setupGeoPopupHandlers();
-}
+async function initializeMyActivities() {
+    console.log("🏁 my-activities.js: initializing...");
 
-/*// ⭐️ NEW: เพิ่ม Event Listener ที่ท้ายไฟล์ (เหมือน student-dashboard.js)
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("🚀 my-activities.js: DOM fully loaded.");
-    
-    // ตรวจสอบว่า auth-check.js ทำงานเสร็จแล้ว (window.userData ถูกตั้งค่าแล้ว)
-    if (window.userData) {
-        console.log("✅ my-activities.js: User data found, calling initialization.");
-        initializeMyActivities(); // เรียกฟังก์ชันเริ่มต้น
-    } else {
-        // กรณีผิดพลาด: auth-check.js อาจยังไม่เสร็จ หรือมีปัญหา
-        console.error("❌ my-activities.js: User data not found after DOM load. Auth check might have failed.");
-        alert("เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้ กรุณาลองเข้าสู่ระบบใหม่");
-        if(typeof navigateTo === 'function') navigateTo('login.html');
-        else window.location.href = 'login.html';
+    try {
+        const sessionData = JSON.parse(sessionStorage.getItem('AchieveHubUser') || '{}');
+        currentUser = sessionData.user || {};
+    } catch (e) {}
+
+    if (!currentUser || !currentUser.userId) {
+        alert('กรุณาเข้าสู่ระบบ');
+        window.location.href = "login.html";
+        return;
     }
-});*/
 
+    setupTabButtons();
+    setupGeoPopupHandlers(); 
+
+    // โหลดข้อมูล 3 ส่วนพร้อมกัน (Master, Locations, User Status)
+    await Promise.all([
+        loadMasterActivities(),
+        loadLocations(),
+        loadUserParticipations(currentUser.userId)
+    ]);
+
+    // แสดงผลครั้งแรก
+    filterAndRender();
+}
 
 function setupTabButtons() {
-  const tabButtons = document.querySelectorAll('.tab-btn');
-  tabButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      tabButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentFilter = btn.dataset.filter;
-      filterAndRender();
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            filterAndRender();
+        });
     });
-  });
 }
 
-function redirectToLogin() {
-  window.location.href = "login.html";
+// 1. โหลด Master Data (กิจกรรมทั้งหมด)
+async function loadMasterActivities() {
+    try {
+        const url = CONFIG.API_BASE_URL + CONFIG.ENDPOINTS.GET_ACTIVITIES;
+        const resp = await fetch(url);
+        if (resp.ok) {
+            const raw = await resp.json();
+            const activities = raw.body ? JSON.parse(raw.body) : raw;
+            activities.forEach(act => {
+                const id = act.activityId || act.id;
+                masterActivitiesMap[id] = act;
+            });
+            console.log("✅ Loaded Master Activities:", Object.keys(masterActivitiesMap).length);
+        }
+    } catch (err) {
+        console.error("Failed to load master activities:", err);
+    }
 }
 
-// Load user activities from API
-async function loadUserActivities(studentId) {
-  const list = document.getElementById('activities-list');
-  try {
+// 2. โหลด Location Data (พิกัดสถานที่)
+async function loadLocations() {
+    try {
+        const url = CONFIG.API_BASE_URL + CONFIG.ENDPOINTS.GET_LOCATIONS;
+        const resp = await fetch(url);
+        if (resp.ok) {
+            const locations = await resp.json();
+            locations.forEach(loc => {
+                // สมมติ Partition Key ของตาราง Locations ชื่อ locationId
+                // ถ้าใน DB ชื่ออื่นให้แก้ตรงนี้ (เช่น loc.id)
+                const id = loc.locationId || loc.id; 
+                locationsMap[id] = loc;
+            });
+            console.log("✅ Loaded Locations:", Object.keys(locationsMap).length);
+        }
+    } catch (err) {
+        console.error("Failed to load locations:", err);
+    }
+}
+
+// 3. โหลด User Data (สถานะการเข้าร่วม)
+async function loadUserParticipations(studentId) {
+    const list = document.getElementById('activities-list');
     list.innerHTML = '<div class="loading">กำลังโหลดข้อมูล...</div>';
-    const apiUrl = CONFIG.API_BASE_URL + CONFIG.ENDPOINTS.STUDENT_ACTIVITIES.replace('{studentId}', studentId);
-    const resp = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        // ⭐️ CHANGED: ใช้ window.userToken
-        'Authorization': `Bearer ${window.userToken}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
-    const activities = await resp.json();
 
-    allActivities = activities || [];
-    filterAndRender();
+    try {
+        const url = CONFIG.API_BASE_URL + CONFIG.ENDPOINTS.STUDENT_ACTIVITIES.replace('{studentId}', studentId);
+        const token = JSON.parse(sessionStorage.getItem('AchieveHubUser') || '{}').token;
+        
+        const resp = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
 
-  } catch (err) {
-    console.error('Error loading activities:', err);
-    showError(err.message, studentId);
-  }
-}
-
-// กรองตามแท็บ + เรนเดอร์
-function filterAndRender() {
-  const list = document.getElementById('activities-list');
-  list.innerHTML = '';
-
-  const items = allActivities.filter(a => {
-    const life = getLifecycleState(a);
-    if (currentFilter === 'upcoming') {
-      return life === 'UPCOMING';
-    } else if (currentFilter === 'inprogress') {
-      return life === 'IN_PROGRESS';
-    } else {
-      return life === 'ENDED' && !!a.surveyCompleted;
+        if (resp.ok) {
+            myParticipations = await resp.json();
+            console.log("✅ Loaded User Participations:", myParticipations.length);
+        } else {
+            myParticipations = [];
+        }
+    } catch (err) {
+        console.error("Error loading participations:", err);
+        list.innerHTML = `<div class="error-message">โหลดข้อมูลไม่สำเร็จ: ${err.message}</div>`;
+        myParticipations = [];
     }
-  });
-
-  if (items.length === 0) {
-    list.innerHTML = `<div class="empty-message">ไม่มีรายการในหมวดนี้</div>`;
-    return;
-  }
-
-  items.forEach(a => list.appendChild(createActivityElement(a)));
-}
-
-
-// (ส่วน displayActivities และ โค้ดที่ซ้ำซ้อนกัน ถูกลบไปแล้ว ดีแล้วครับ)
-
-
-// Create single activity element
-function createActivityElement(activity) {
-  const element = document.createElement('div');
-  element.className = 'activity-item';
-  const formattedDate = formatDateTime(activity.startDateTime);
-  const buttonState = getButtonState(activity);
-
-  element.innerHTML = `
-    <div class="activity-info">
-      <div class="activity-name">${activity.name || 'ไม่มีชื่อกิจกรรม'}</div>
-      <div class="activity-date">${formattedDate}</div>
-      <div class="activity-location">📍 ${activity.location || 'ไม่ระบุสถานที่'}</div>
-    </div>
-    <button class="${buttonState.class}"
-            data-activity-id="${activity.activityId}"
-            data-action="${buttonState.action}"
-            onclick="handleActivityAction('${activity.activityId}')"
-            ${buttonState.disabled ? 'disabled' : ''}>
-      ${buttonState.text}
-    </button>
-  `;
-
-  return element;
-}
-
-// Format date and time
-function formatDateTime(dateTimeString) {
-  if (!dateTimeString) return 'ไม่ระบุเวลา';
-  try {
-    const date = new Date(dateTimeString);
-    return date.toLocaleDateString('th-TH', {
-      year: 'numeric', month: 'long', day: 'numeric',
-      hour: '2-digit', minute: '2-digit'
-    });
-  } catch (error) {
-    return 'รูปแบบวันที่ไม่ถูกต้อง';
-  }
-}
-
-// Get button state based on activity status
-function getButtonState(a) {
-  const life = getLifecycleState(a);
-  const isConfirmed     = !!a.isConfirmed;
-  const surveyCompleted = !!a.surveyCompleted;
-
-  if (life === 'UPCOMING') {
-    return { class: 'activity-button', text: 'สมัครเข้าร่วมแล้ว', disabled: true, action: 'none' };
-  }
-  if (life === 'IN_PROGRESS') {
-    if (!isConfirmed) {
-      return { class: 'activity-button active', text: 'กดเพื่อยืนยันเข้าร่วม', disabled: false, action: 'confirm' };
-    }
-    return { class: 'activity-button', text: 'ยืนยันแล้ว (รอสิ้นสุดกิจกรรม)', disabled: true, action: 'none' };
-  }
-  if (life === 'ENDED') {
-    if (!isConfirmed) {
-      return { class: 'activity-button', text: 'หมดเวลายืนยันเข้าร่วม', disabled: true, action: 'none' };
-    }
-    if (!surveyCompleted) {
-      return { class: 'activity-button active', text: 'ทำแบบประเมิน', disabled: false, action: 'survey' };
-    }
-    return { class: 'activity-button active', text: 'รับเกียรติบัตร', disabled: false, action: 'certificate' };
-  }
-  return { class: 'activity-button', text: 'ไม่ทราบสถานะ', disabled: true, action: 'none' };
-}
-
-// ⭐ NEW: ขอเกียรติบัตรจาก backend แล้วเปิด PDF
-async function requestCertificate(activityId) {
-  try {
-    if (!currentUser || !currentUser.userId) {
-      alert("ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่");
-      return;
-    }
-
-    const studentId = currentUser.userId;
-    const button = document.querySelector(`button[data-activity-id="${activityId}"]`);
-
-    // กันกดรัว ๆ
-    if (button) {
-      button.disabled = true;
-      const originalText = button.textContent;
-      button.dataset.originalText = originalText;
-      button.textContent = "กำลังออกเกียรติบัตร...";
-    }
-
-    const url =
-      CONFIG.API_BASE_URL +
-      CONFIG.ENDPOINTS.CERTIFICATE.replace("{activityId}", encodeURIComponent(activityId)) +
-      `?studentId=${encodeURIComponent(studentId)}`;
-
-    console.log("[DEBUG] requestCertificate url =", url);
-
-    const res = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        // จะส่งหรือไม่ส่ง Authorization ก็ได้ แล้วแต่ว่าคุณเปิดตรวจที่ Lambda ไหม
-        "Authorization": `Bearer ${window.userToken || ""}`
-      }
-    });
-
-    const data = await res.json();
-    console.log("[DEBUG] certificate response:", data);
-
-    if (!res.ok || !data.success) {
-      alert(data.message || "เกิดข้อผิดพลาดในการออกเกียรติบัตร");
-      return;
-    }
-
-    const cert = data.certificate;
-    if (!cert || !cert.pdfUrl) {
-      alert("ไม่พบไฟล์เกียรติบัตร");
-      return;
-    }
-
-    // เปิด PDF ในแท็บใหม่
-    window.open(cert.pdfUrl, "_blank");
-
-  } catch (err) {
-    console.error("Error while requesting certificate:", err);
-    alert("เกิดข้อผิดพลาดภายในระบบ กรุณาลองใหม่อีกครั้ง");
-  } finally {
-    // คืนสภาพปุ่ม
-    const button = document.querySelector(`button[data-activity-id="${activityId}"]`);
-    if (button) {
-      button.disabled = false;
-      if (button.dataset.originalText) {
-        button.textContent = button.dataset.originalText;
-      }
-    }
-  }
 }
 
 /* ============================================================
-   MAIN: Handle activity button click
+   RENDERING & LOGIC
    ============================================================ */
-function handleActivityAction(activityId) {
-  const button = document.querySelector(`button[data-activity-id="${activityId}"]`);
-  if (!button || button.disabled) return;
-  const action = button.dataset.action;
 
-  if (action === 'confirm') {
-    openConfirmPopup(activityId);
-    return;
-  }
-  if (action === 'survey') {
-    window.location.href = `Assessment.html?id=${activityId}`;
-    return;
-  }
-  if (action === 'certificate') {
-    requestCertificate(activityId);   
-    return;
-  }
+function filterAndRender() {
+    const list = document.getElementById('activities-list');
+    list.innerHTML = '';
+
+    if (myParticipations.length === 0) {
+        list.innerHTML = `<div class="empty-message">คุณยังไม่ได้ลงทะเบียนกิจกรรมใดๆ</div>`;
+        list.style.display = 'flex';
+        list.style.justifyContent = 'center';
+        return;
+    }
+
+    // Join Data: เอา User Data เป็นหลัก + Master Data
+    const mergedItems = myParticipations.map(p => {
+        const master = masterActivitiesMap[p.activityId] || {};
+        return { ...master, ...p, name: master.name || 'กิจกรรมไม่ทราบชื่อ' }; 
+    });
+
+    // Filter
+    const filtered = mergedItems.filter(item => {
+        const life = getLifecycleState(item);
+        
+        if (currentFilter === 'upcoming') return life === 'UPCOMING';
+        if (currentFilter === 'inprogress') return life === 'IN_PROGRESS';
+        if (currentFilter === 'done') return life === 'ENDED' || item.surveyCompleted;
+        
+        return false;
+    });
+
+    if (filtered.length === 0) {
+        list.innerHTML = `<div class="empty-message">ไม่มีรายการในหมวดนี้</div>`;
+        list.style.display = 'flex';
+        list.style.justifyContent = 'center';
+        return;
+    }
+
+    // Render Grid
+    list.style.display = 'grid';
+    filtered.forEach(item => {
+        list.appendChild(createActivityCard(item));
+    });
+}
+
+// ⭐️ Logic เวลา (แสดงก่อนเริ่ม 30 นาที)
+function getLifecycleState(a) {
+    const now = new Date();
+    const start = a.startDateTime ? new Date(a.startDateTime) : null;
+    const end   = a.endDateTime ? new Date(a.endDateTime)   : null;
+
+    if (!start) return 'UPCOMING';
+
+    // เริ่มแสดงในแท็บ "ดำเนินการ" ก่อนเวลาเริ่มจริง 30 นาที
+    const showInProgressTime = new Date(start.getTime() - 30 * 60000);
+
+    if (now < showInProgressTime) return 'UPCOMING';
+
+    // แสดงในแท็บดำเนินการ ถ้ายังไม่จบ
+    if (now >= showInProgressTime && (!end || now <= end)) return 'IN_PROGRESS';
+
+    return 'ENDED';
+}
+
+// สร้างการ์ดกิจกรรม
+function createActivityCard(activity) {
+    const card = document.createElement('div');
+    card.className = 'activity-card';
+    
+    card.onclick = (e) => {
+        if (e.target.tagName === 'BUTTON') return;
+        window.location.href = `detailed-activities.html?id=${activity.activityId}`;
+    };
+
+    // Badge
+    const skillCategory = activity.skillCategory || '';
+    const skillBadgeClass = skillCategory.toLowerCase().replace(' ', '-');
+    const skillBadge = skillCategory ? `<span class="badge-skill ${skillBadgeClass}">${skillCategory}</span>` : '';
+    
+    const levelRaw = activity.level || '';
+    const levelText = normalizeLevel(levelRaw);
+    const levelClass = getLevelClass(levelRaw);
+    const levelBadge = levelText ? `<span class="badge-level ${levelClass}">${levelText}</span>` : '';
+
+    // Image
+    const imageUrl = activity.imageUrl || '';
+    const imageStyle = imageUrl ? `style="background-image:url('${imageUrl}')"` : '';
+
+    // Meta
+    const dateTxt = formatDateTime(activity.startDateTime);
+    const LOCATIONS_MAP = { "SC1": "อาคารเรียนรวมสังคมศาสตร์ 1", "SC3": "อาคารเรียนรวมสังคมศาสตร์ 3", "LC2": "อาคารเรียนรวม 2", "LC4": "อาคารเรียนรวม 4", "LC5": "อาคารเรียนรวม 5" };
+    const locName = LOCATIONS_MAP[activity.locationId] || activity.locationName || activity.locationId || '-';
+
+    // PLO
+    const ploText = (activity.plo && activity.plo.length > 0) ? `• ${activity.plo[0]}` : '';
+
+    // Button Config
+    const btnConfig = getButtonConfig(activity);
+    
+    // ⭐️ ปุ่มกด: มี ID เฉพาะตัว
+    const buttonHtml = `<button id="btn-${activity.activityId}" class="action-btn ${btnConfig.className}" 
+        onclick="event.stopPropagation(); handleActivityAction('${activity.activityId}', '${btnConfig.action}')"
+        ${btnConfig.disabled ? 'disabled' : ''}>
+        ${btnConfig.text}
+    </button>`;
+
+    card.innerHTML = `
+        <div class="activity-image" ${imageStyle}>
+            <div class="badge-row">${skillBadge}${levelBadge}</div>
+        </div>
+        <div class="activity-content">
+            <h3 class="activity-title">${activity.name}</h3>
+            <p class="activity-description">${activity.description || ''}</p>
+            
+            <div class="activity-meta">
+                <div class="activity-date">📅 ${dateTxt}</div>
+                <div class="activity-location">📍 ${locName}</div>
+                <div class="activity-plo" style="margin-top:4px; color:#37798B; font-size:0.8rem;">${ploText}</div>
+            </div>
+
+            <div class="activity-actions">
+                ${buttonHtml}
+            </div>
+        </div>
+    `;
+    return card;
+}
+
+// ⭐️ Logic ปุ่มกด (เช็คเวลา ±30 นาที)
+function getButtonConfig(activity) {
+    const life = getLifecycleState(activity);
+    const isConfirmed = !!activity.isConfirmed;
+    const surveyCompleted = !!activity.surveyCompleted;
+    
+    const now = new Date();
+    const start = activity.startDateTime ? new Date(activity.startDateTime) : null;
+
+    // 1. Upcoming
+    if (life === 'UPCOMING') {
+        return { text: 'ลงทะเบียนแล้ว', className: 'btn-gray', disabled: true, action: 'none' };
+    }
+
+    // 2. In Progress
+    if (life === 'IN_PROGRESS') {
+        if (isConfirmed) {
+            return { text: 'ยืนยันเข้าร่วมสำเร็จ', className: 'btn-success-static', disabled: true, action: 'none' };
+        } else {
+            // เช็ค Deadline: Start + 30 นาที
+            if (start) {
+                const deadline = new Date(start.getTime() + 30 * 60000);
+                
+                if (now <= deadline) {
+                    return { text: 'กดเพื่อยืนยันการเข้าร่วม', className: 'btn-red', disabled: false, action: 'confirm' };
+                } else {
+                    // เกิน 30 นาทีแล้ว -> หมดสิทธิ์
+                    return { text: 'หมดเวลาเช็คชื่อ', className: 'btn-gray', disabled: true, action: 'none' };
+                }
+            }
+        }
+    }
+
+    // 3. Ended
+    if (life === 'ENDED') {
+        if (isConfirmed) {
+            if (surveyCompleted) {
+                return { text: 'รับเกียรติบัตร', className: 'btn-certificate', disabled: false, action: 'certificate' };
+            } else {
+                return { text: 'ทำแบบประเมิน', className: 'btn-assessment', disabled: false, action: 'survey' };
+            }
+        } else {
+            return { text: 'ไม่ได้เข้าร่วมกิจกรรม', className: 'btn-gray', disabled: true, action: 'none' };
+        }
+    }
+    return { text: 'สถานะไม่ระบุ', className: 'btn-gray', disabled: true, action: 'none' };
+}
+
+// Action Handler
+function handleActivityAction(activityId, action) {
+    if (action === 'confirm') openConfirmPopup(activityId);
+    else if (action === 'survey') window.location.href = `Assessment.html?id=${activityId}`;
+    else if (action === 'certificate') requestCertificate(activityId);
 }
 
 /* ============================================================
-   ✅ ยืนยันด้วยพิกัด (Popup + Haversine + call backend)
+   ACTION FUNCTIONS (Certificate & Confirm)
+   ============================================================ */
+
+// ขอเกียรติบัตร
+async function requestCertificate(activityId) {
+    try {
+        if (!currentUser || !currentUser.userId) {
+            alert("ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่");
+            return;
+        }
+        const studentId = currentUser.userId;
+        const button = document.getElementById(`btn-${activityId}`);
+
+        if (button) {
+            button.disabled = true;
+            button.dataset.originalText = button.textContent;
+            button.textContent = "กำลังออกเกียรติบัตร...";
+        }
+
+        const url = CONFIG.API_BASE_URL + CONFIG.ENDPOINTS.CERTIFICATE.replace("{activityId}", encodeURIComponent(activityId)) + `?studentId=${encodeURIComponent(studentId)}`;
+        const token = JSON.parse(sessionStorage.getItem('AchieveHubUser') || '{}').token;
+
+        const res = await fetch(url, {
+            method: "GET",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+            alert(data.message || "เกิดข้อผิดพลาดในการออกเกียรติบัตร");
+            return;
+        }
+
+        const cert = data.certificate;
+        if (!cert || !cert.pdfUrl) {
+            alert("ไม่พบไฟล์เกียรติบัตร");
+            return;
+        }
+
+        window.open(cert.pdfUrl, "_blank");
+
+    } catch (err) {
+        console.error("Error while requesting certificate:", err);
+        alert("เกิดข้อผิดพลาดภายในระบบ กรุณาลองใหม่อีกครั้ง");
+    } finally {
+        const button = document.getElementById(`btn-${activityId}`);
+        if (button) {
+            button.disabled = false;
+            if (button.dataset.originalText) button.textContent = button.dataset.originalText;
+        }
+    }
+}
+
+/* ============================================================
+   POPUP GEOLOCATION LOGIC (With Mock Fallback)
    ============================================================ */
 let popupRefs = null;
-let confirmContext = {
-  activityId: null, centerLat: null, centerLon: null,
-  radiusM: 200, userLat: null, userLon: null
-};
+let confirmContext = { activityId: null, centerLat: null, centerLon: null, radiusM: 200, userLat: null, userLon: null };
 
 function setupGeoPopupHandlers() {
-  const popupEl = document.getElementById('popupConfirm');
-  if (!popupEl) return;
-
-  popupRefs = {
-    root: popupEl,
-    btnConfirm: popupEl.querySelector('.btn-confirm'),
-    btnClose: popupEl.querySelector('.btn-close'),
-    mapFrame: popupEl.querySelector('#mapFrame'),
-    locationText: popupEl.querySelector('#locationText'),
-    radiusHint: popupEl.querySelector('#radiusHint'),
-    titleEl: popupEl.querySelector('#popup-activity-name')
-  };
-
-  popupRefs.btnClose.addEventListener('click', () => {
-    popupRefs.root.style.display = 'none';
-  });
-  popupRefs.btnConfirm.addEventListener('click', onConfirmByGeo);
+    const popupEl = document.getElementById('popupConfirm');
+    if (!popupEl) return;
+    popupEl.querySelector('.btn-close').onclick = () => popupEl.style.display = 'none';
+    popupEl.querySelector('.btn-confirm').onclick = onConfirmByGeo;
 }
 
 async function openConfirmPopup(activityId) {
-  if (!popupRefs || !popupRefs.root) {
-    alert('ไม่พบหน้าต่างยืนยันพิกัด');
-    return;
-  }
-  const activity = (allActivities || []).find(a => a.activityId === activityId);
-  if (!activity) { alert('ไม่พบข้อมูลกิจกรรม'); return; }
+    const activity = masterActivitiesMap[activityId] || {};
+    const locationId = activity.locationId;
 
-  popupRefs.titleEl.textContent = activity.name || '';
+    // 1. ค้นหาพิกัดจาก Locations Map
+    const locationData = locationsMap[locationId];
 
-  let centerLat = activity.locationLatitude || activity.locationLat || null;
-  let centerLon = activity.locationLongitude || activity.locationLon || null;
-  let radiusM  = activity.locationRadiusMeters || activity.radiusMeters || 200;
+    // ⭐️ ถ้าไม่เจอ (เช่น ยังไม่ได้ใส่ใน DB) ให้ใช้พิกัด Default (มธ.รังสิต) กัน error
+    // หรือถ้า HTTP บล็อก GPS จะใช้ค่านี้เป็น Mock
+    const targetLat = parseFloat(locationData?.latitude || 14.078013);
+    const targetLon = parseFloat(locationData?.longitude || 100.602345);
+    const radius = parseInt(locationData?.radiusMeters || activity.locationRadiusMeters || 200);
 
-  if (!centerLat || !centerLon) {
-    alert('ยังไม่ได้ตั้งค่าพิกัดสถานที่กิจกรรม');
-    return;
-  }
+    confirmContext = {
+        activityId,
+        centerLat: targetLat,
+        centerLon: targetLon,
+        radiusM: radius,
+        userLat: null,
+        userLon: null
+    };
 
-  confirmContext = {
-    activityId,
-    centerLat: Number(centerLat),
-    centerLon: Number(centerLon),
-    radiusM: Number(radiusM) || 200,
-    userLat: null,
-    userLon: null
-  };
+    const popupEl = document.getElementById('popupConfirm');
+    const locationName = locationData?.locationName || locationId || activity.location || "ไม่ระบุสถานที่";
+    
+    document.getElementById('popup-activity-name').innerHTML = `${activity.name}<br><small style="font-size:0.8em; color:#666">📍 ${locationName}</small>`;
+    document.getElementById('radiusHint').textContent = `ต้องอยู่ในรัศมี ${confirmContext.radiusM} เมตร`;
+    document.getElementById('locationText').textContent = 'กำลังขอพิกัด...';
+    
+    popupEl.style.display = 'flex';
+    
+    // 2. ขอพิกัด (พร้อมระบบ Mock Fallback สำหรับ HTTP)
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            // Success (HTTPS)
+            pos => {
+                confirmContext.userLat = pos.coords.latitude;
+                confirmContext.userLon = pos.coords.longitude;
+                updateLocationStatus(confirmContext.userLat, confirmContext.userLon, true);
+            },
+            // Error (HTTP or Denied) -> Use Mock Location
+            err => {
+                console.warn("GPS Error (Likely HTTP), using Mock Location for Testing:", err);
+                confirmContext.userLat = targetLat; 
+                confirmContext.userLon = targetLon;
+                updateLocationStatus(targetLat, targetLon, false); // false = mock
+            }
+        );
+    } else {
+        // Browser ไม่รองรับ -> Use Mock
+        confirmContext.userLat = targetLat;
+        confirmContext.userLon = targetLon;
+        updateLocationStatus(targetLat, targetLon, false);
+    }
+}
 
-  popupRefs.locationText.textContent = 'ตำแหน่งของคุณ: กำลังขอตำแหน่ง...';
-  popupRefs.radiusHint.textContent = `ต้องอยู่ในรัศมีไม่เกิน ${confirmContext.radiusM} เมตรจากจุดจัดกิจกรรม`;
+function updateLocationStatus(lat, lon, isReal) {
+    const textEl = document.getElementById('locationText');
+    const mapFrame = document.getElementById('mapFrame');
 
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        confirmContext.userLat = pos.coords.latitude;
-        confirmContext.userLon = pos.coords.longitude;
-        popupRefs.locationText.textContent =
-          `ตำแหน่งคุณ: ${confirmContext.userLat.toFixed(6)}, ${confirmContext.userLon.toFixed(6)}`;
-        popupRefs.mapFrame.src =
-          `https://maps.google.com/maps?q=${confirmContext.userLat},${confirmContext.userLon}&hl=th&z=16&output=embed`;
-      },
-      err => {
-        console.error(err);
-        popupRefs.locationText.textContent = '⚠️ ไม่สามารถดึงตำแหน่งได้';
-      }
-    );
-  } else {
-    popupRefs.locationText.textContent = '⚠️ เบราว์เซอร์ไม่รองรับ Geolocation';
-  }
-  popupRefs.root.style.display = 'flex';
+    if (isReal) {
+        textEl.innerHTML = `พิกัดของคุณ: ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+        textEl.style.color = 'black';
+    } else {
+        textEl.innerHTML = `⚠️ <b>Developer Mode:</b> ใช้พิกัดจำลอง (เนื่องจากเว็บไม่ใช่ HTTPS)<br>พิกัด: ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+        textEl.style.color = '#d35400';
+    }
+
+    if (mapFrame) {
+        mapFrame.src = `https://maps.google.com/maps?q=${lat},${lon}&z=16&output=embed`;
+    }
 }
 
 async function onConfirmByGeo() {
-  const ctx = confirmContext;
-  if (!ctx.userLat || !ctx.userLon) { alert('ยังไม่พบพิกัดของคุณ'); return; }
-
-  const d = haversineMeters(ctx.userLat, ctx.userLon, ctx.centerLat, ctx.centerLon);
-  if (d > ctx.radiusM) {
-    alert(`❌ คุณอยู่นอกพื้นที่กิจกรรม (${d.toFixed(1)} เมตร)`);
-    return;
-  }
-
-  try {
-    // ⭐️ CHANGED: ใช้ currentUser.userId
-    const studentId = currentUser.userId;
-    const url = CONFIG.API_BASE_URL + CONFIG.ENDPOINTS.CONFIRM_ATTENDANCE;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // ⭐️ CHANGED: ใช้ window.userToken
-        'Authorization': `Bearer ${window.userToken}`
-      },
-      body: JSON.stringify({
-        activityId: ctx.activityId,
-        studentId,
-        latitude: ctx.userLat,
-        longitude: ctx.userLon,
-        currentTime: new Date().toISOString()
-      })
-    });
-    const result = await res.json();
-    if (res.ok && result.success !== false) {
-      alert('✅ ยืนยันเข้าร่วมสำเร็จ!');
-      popupRefs.root.style.display = 'none';
-      loadUserActivities(studentId);
-    } else {
-      alert('ยืนยันไม่สำเร็จ: ' + (result.message || ''));
+    if (!confirmContext.userLat) return alert('รอพิกัดสักครู่...');
+    
+    const dist = haversineMeters(confirmContext.userLat, confirmContext.userLon, confirmContext.centerLat, confirmContext.centerLon);
+    
+    if (dist > confirmContext.radiusM) {
+        alert(`คุณอยู่นอกพื้นที่ (${dist.toFixed(0)} เมตร) กรุณาเข้าใกล้จุดเช็คอิน`);
+        return;
     }
-  } catch (e) {
-    console.error(e);
-    alert('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
-  }
+
+    try {
+        const url = CONFIG.API_BASE_URL + CONFIG.ENDPOINTS.CONFIRM_ATTENDANCE;
+        const token = JSON.parse(sessionStorage.getItem('AchieveHubUser') || '{}').token;
+        
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({
+                activityId: confirmContext.activityId,
+                studentId: currentUser.userId,
+                latitude: confirmContext.userLat,
+                longitude: confirmContext.userLon,
+                currentTime: new Date().toISOString()
+            })
+        });
+
+        const result = await res.json();
+        if (result.success !== false) {
+            alert('✅ ยืนยันตัวตนสำเร็จ!');
+            document.getElementById('popupConfirm').style.display = 'none';
+            // Reload Data
+            await loadUserParticipations(currentUser.userId);
+            filterAndRender();
+        } else {
+            alert('ยืนยันไม่สำเร็จ: ' + (result.message || ''));
+        }
+
+    } catch (e) {
+        console.error(e);
+        alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+    }
 }
 
+// Helpers
 function haversineMeters(lat1, lon1, lat2, lon2) {
-  const R = 6371e3;
-  const toRad = deg => deg * Math.PI / 180;
-  const dφ = toRad(lat2 - lat1);
-  const dλ = toRad(lon2 - lon1);
-  const φ1 = toRad(lat1);
-  const φ2 = toRad(lat2);
-  const a = Math.sin(dφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(dλ/2)**2;
-  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const R = 6371e3;
+    const toRad = deg => deg * Math.PI / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+    return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-/* ============================================================
-   (ส่วน QR Code ที่เหลือ - ไม่ได้แก้ไข token)
-   ============================================================ */
-
-// ... (openCodeInput, closeCodeInput, submitActivityCode) ...
-// ... (ฟังก์ชันเหล่านี้ยังใช้ localStorage อยู่ ถ้าจะใช้ต้องแก้ด้วย) ...
-
-// Verify activity code with server
-async function verifyActivityCode(activityCode) {
-  const modal = document.getElementById('code-modal');
-  const activityId = modal ? modal.dataset.activityId : undefined;
-  // ⭐️ CHANGED: ใช้ currentUser.userId
-  const studentId = currentUser.userId;
-
-  try {
-    showStatusMessage('กำลังตรวจสอบรหัส...', 'processing');
-    if (!isValidActivityCode(activityCode)) {
-      showStatusMessage('รูปแบบรหัสไม่ถูกต้อง (ตัวอย่าง: ACT001QR4T25X)', 'error');
-      return;
-    }
-    const preCheckResult = await preCheckRegistration(activityCode, studentId);
-    if (!preCheckResult.success) {
-      showStatusMessage(preCheckResult.message, 'error');
-      return;
-    }
-    const apiUrl = CONFIG.API_BASE_URL + CONFIG.ENDPOINTS.VERIFY_QR;
-    const requestData = {
-      qrCode: activityCode,
-      studentId: studentId,
-      currentTime: new Date().toISOString()
-    };
-    if (activityId) {
-      requestData.activityId = activityId;
-    }
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // ⭐️ CHANGED: ใช้ window.userToken
-        'Authorization': `Bearer ${window.userToken}`
-      },
-      body: JSON.stringify(requestData)
-    });
-    const result = await response.json();
-    if (result.success) {
-      handleSuccessfulVerification(result, activityId);
-    } else {
-      handleFailedVerification(result.message);
-    }
-  } catch (error) {
-    console.error('Code verification error:', error);
-    showStatusMessage('เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
-  }
+function formatDateTime(dt) {
+    if(!dt) return '-';
+    try { return new Date(dt).toLocaleDateString('th-TH', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}); } 
+    catch { return '-'; }
 }
-
-// ... (isValidActivityCode) ...
-
-// Pre-check if user is registered for this activity
-async function preCheckRegistration(activityCode, studentId) {
-  try {
-    const apiUrl = CONFIG.API_BASE_URL + CONFIG.ENDPOINTS.STUDENT_ACTIVITIES.replace('{studentId}', studentId);
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        // ⭐️ CHANGED: ใช้ window.userToken
-        'Authorization': `Bearer ${window.userToken}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    if (!response.ok) {
-      return { success: false, message: 'ไม่สามารถตรวจสอบการลงทะเบียนได้' };
-    }
-    const activities = await response.json();
-    const matchingActivity = activities.find(activity => activity.qrCode === activityCode);
-    if (!matchingActivity) {
-      return { success: false, message: 'คุณยังไม่ได้ลงทะเบียนกิจกรรมนี้' };
-    }
-    if (matchingActivity.isConfirmed) {
-      return { success: false, message: 'คุณได้ยืนยันการเข้าร่วมกิจกรรมนี้แล้ว' };
-    }
-    return { success: true, activity: matchingActivity, message: 'สามารถยืนยันการเข้าร่วมได้' };
-  } catch (error) {
-    console.error('Pre-check error:', error);
-    return { success: false, message: 'เกิดข้อผิดพลาดในการตรวจสอบ' };
-  }
+function normalizeLevel(l) { 
+    const s = String(l||'').toLowerCase(); 
+    if(s.includes('basic')||s.includes('พื้นฐาน')) return 'พื้นฐาน';
+    if(s.includes('medium')||s.includes('ปานกลาง')) return 'ปานกลาง';
+    if(s.includes('advanced')||s.includes('ขั้นสูง')) return 'ขั้นสูง';
+    return s; 
 }
-
-// ... (handleSuccessfulVerification, updateButtonToAssessmentState, handleFailedVerification) ...
-// ... (showStatusMessage, hideStatusMessage, event listener 'keypress') ...
-
-// Show error message
-function showError(message, studentId) {
-  const activitiesList = document.getElementById('activities-list');
-  activitiesList.innerHTML = `
-    <div class="error-message">
-      <p>เกิดข้อผิดพลาดในการโหลดข้อมูล</p>
-      <p>${message}</p>
-      <button class="retry-btn" onclick="loadUserActivities('${studentId}')">ลองใหม่</button>
-    </div>
-  `;
+function getLevelClass(l) {
+    const n = normalizeLevel(l);
+    if(n==='พื้นฐาน') return 'level-basic';
+    if(n==='ปานกลาง') return 'level-medium';
+    if(n==='ขั้นสูง') return 'level-advanced';
+    return '';
 }
-
-// Navigate to other pages
-function navigateTo(page) {
-  window.location.href = page;
-}
-
-// Show user menu (ซ้ำซ้อนกับ logout)
-function showUserMenu() {
-  logout();
-}
-
-// ฟังก์ชันล็อกเอาท์
-function logout() {
-  const confirmLogout = confirm('ต้องการออกจากระบบหรือไม่?');
-  if (confirmLogout) {
-    // ⭐️ CHANGED: เคลียร์ทั้ง 2 storages เพื่อความแน่นอน
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location.href = "login.html";
-  }
-}
-
-// ⭐️ REMOVED: ลบการเรียก initializeApp() ที่ใช้ DOMContentLoaded แบบเก่าออก
-// document.addEventListener('DOMContentLoaded', function() {
-//   initializeApp();
-// });
