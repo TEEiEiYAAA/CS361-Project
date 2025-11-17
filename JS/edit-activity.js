@@ -661,21 +661,24 @@ function toDatetimeLocal(value) {
   return d.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:mm"
 }
 
-
 function normalizeYearLevel(raw) {
   if (raw === null || raw === undefined) return "";
 
   // ถ้าเป็น number เช่น 0,1,2,3,4
   if (typeof raw === "number") {
-    if (raw === 0) return "0";
+    if (raw === 0) return "ทุกชั้นปี";   // map 0 -> ทุกชั้นปี
     return String(raw);
   }
 
   // ถ้าเป็น string
-  const s = String(raw).trim();
+  const s = String(raw).trim().toLowerCase();
 
-  if (s === "ทุกชั้นปี") return "0";   // เคสเก่าที่เก็บคำไทย
-  if (["0", "1", "2", "3", "4"].includes(s)) return s;
+  // เคสที่เก็บมาหลายรูปแบบ
+  if (s === "ทุกชั้นปี" || s === "all" || s === "0") {
+    return "ทุกชั้นปี";                 // ให้ตรงกับ value ของ option
+  }
+
+  if (["1", "2", "3", "4"].includes(s)) return s;
 
   // default: ไม่รู้จัก → ไม่ set อะไร
   return "";
