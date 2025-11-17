@@ -264,3 +264,97 @@ footer {
     position: relative;
     z-index: 5; /* ให้อยู่ใต้กล่องเทา */
 }
+
+
+/* 2. ซ่อนแถวข้อมูลตารางแบบเก่า (ถ้ายังอยู่) */
+.quiz-data-row {
+    display: none; 
+}
+
+/* 3. สไตล์ Accordion (ยืมมาจาก current-skill.css) */
+.accordion-card {
+    background: #fff;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.5);
+}
+
+.accordion-header {
+    padding: 15px 20px;
+    background: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.3s;
+}
+.accordion-header:hover {
+    background: rgba(255, 255, 255, 0.9);
+}
+.group-name {
+    font-weight: 700;
+    color: #0a5e6c;
+    font-size: 1.1rem;
+}
+.arrow-icon {
+    color: #2f7484;
+    transition: transform 0.3s ease;
+}
+
+.accordion-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease;
+    padding: 0 20px;
+    background: #fff;
+    border-top: 1px solid #eee;
+}
+
+/* เมื่อ Accordion ถูกเปิด (มี class 'open') */
+.accordion-card.open .accordion-body {
+    max-height: 500px; /* ขยายออก */
+    padding: 5px 20px 15px 20px;
+}
+.accordion-card.open .arrow-icon {
+    transform: rotate(180deg); /* หมุนลูกศร */
+}
+
+/* 4. สไตล์รายการย่อย (Level) */
+.level-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dashed #eee;
+    font-size: 0.95rem;
+}
+.level-item:last-child {
+    border-bottom: none;
+}
+
+.level-name {
+    flex: 2;
+    color: #333;
+}
+.level-plo {
+    flex: 1;
+    color: #888;
+    text-align: center;
+}
+.quiz-action {
+    flex: 1.5;
+    text-align: right;
+}
+
+/* 5. ปรับปุ่มให้สวยงาม */
+.quiz-action .quiz-start-btn {
+    padding: 6px 15px;
+    font-size: 0.85rem;
+}
+.level-status {
+    flex: 1.5;
+    text-align: right;
+    font-size: 0.9rem;
+}
