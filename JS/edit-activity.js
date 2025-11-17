@@ -1,3 +1,86 @@
+function normalizeGroup(rawValue) {
+  if (!rawValue) return "";
+
+  // ทำตัวพิมพ์เล็ก + เคลียร์ space + เปลี่ยน _ และ - เป็น space
+  let key = String(rawValue).trim().toLowerCase();
+  key = key.replace(/[_\-]+/g, " ");
+  key = key.replace(/\s+/g, " ");
+
+  const map = {
+    "web application development": "grp-web",
+    "virtualization": "grp-virt",
+    "time management": "grp-time",
+    "team collaboration": "grp-collab",
+    "statistical analysis": "grp-stat",
+    "software testing": "grp-test",
+    "requirement engineering": "grp-req",
+    "python programming": "grp-python",
+    "problem solving": "grp-probsol",
+    "machine learning": "grp-ml",
+    "linux command line": "grp-linux",
+    "leadership": "grp-leader",
+    "java programming": "grp-java",
+    "it ethics & law": "grp-ethics",
+    "generative ai": "grp-genai",
+    "effective communication": "grp-comm",
+    "deep learning": "grp-dl",
+    "detail oriented": "grp-detail",
+    "database management": "grp-db",
+    "data structures & algorithms": "grp-dsa",
+    "data structures and algorithms": "grp-dsa",   // กันเคส and/ &
+
+    "data engineering": "grp-deng",
+    "data analytics": "grp-danal",
+    "cybersecurity": "grp-sec",
+    "computer network": "grp-net",
+    "cloud computing": "grp-cloud",
+    "cloud architecture": "grp-carch",
+    "c programming": "grp-c",
+    "agile & teamwork": "grp-agile",
+    "agile and teamwork": "grp-agile",
+
+    // ➕ เพิ่มรองรับภาษาไทยเก่าใน DB (เพื่อให้ทุกอันขึ้นจริง)
+    "วิชาการ": "grp-web",
+    "จิตอาสา": "grp-collab",
+    "กีฬา": "grp-time",
+    "ประกวด": "grp-test",
+
+    // ➕ skill id เดิม (บางกิจกรรมอาจยังมี)
+    "skill academic": "grp-web",
+    "skill volunteer": "grp-collab",
+    "skill sport": "grp-time",
+    "skill contest": "grp-test"
+  };
+
+  return map[key] || "";
+}
+
+
+
+
+
+// ====== CONFIG & activityId (แก้ใหม่) ======
+
+// ใช้ URL ของ API Gateway ตรง ๆ (เปลี่ยนเป็นของโปรเจกต์ตัวเองถ้าต่าง)
+const API_BASE_URL = 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod';
+
+// ดึง id จาก query string (รองรับทั้ง ?id=xxx และ ?activityId=xxx)
+const params = new URLSearchParams(window.location.search);
+const ACTIVITY_ID = params.get("id") || params.get("activityId");
+
+// ตอนโหลดหน้า ถ้ามี id ให้ไปดึงข้อมูลกิจกรรมมาแสดง
+document.addEventListener("DOMContentLoaded", () => {
+  if (!ACTIVITY_ID) {
+    console.warn("ไม่พบ id/activityId ใน URL (หน้าอาจถูกใช้เป็นหน้าเพิ่มกิจกรรมใหม่ได้)");
+    return;
+  }
+  console.log("[EDIT] ACTIVITY_ID =", ACTIVITY_ID);
+  loadActivityForEdit(ACTIVITY_ID);
+});
+
+
+
+
 // ===== Mapping กำหนดประเภททักษะจากชุด PLO =====
 function computeCategory(plos) {
   const set = new Set(plos.filter(Boolean));
@@ -194,7 +277,7 @@ skillRowsEl.addEventListener('change', e => clearValidity(e.target));
   const descEl     = document.getElementById('description');
   const startEl    = document.getElementById('startDateTime');
   const endEl      = document.getElementById('endDateTime');
-  const placeEl    = document.getElementById('location');
+  const placeEl    = document.getElementById('locationId');
   const hostEl     = document.getElementById('organizerId');
   const groupEl    = document.getElementById('group');
   const yearEl     = document.getElementById('yearLevel');
@@ -251,18 +334,21 @@ function validateSkillsWrapper(errors) {
 function validateAll() {
   const errors = [];
 
-  // 2.1 ไฟล์รูป
-  if (!fileInput || !(fileInput.files && fileInput.files[0])) {
+ // 2.1 ไฟล์รูป (สำหรับหน้าแก้ไข: ไม่บังคับต้องเลือกไฟล์ใหม่)
+if (fileInput && fileInput.files && fileInput.files[0]) {
+  // ถ้าเลือกไฟล์มา ให้เช็คว่าเป็นรูปภาพจริง
+  if (!fileInput.files[0].type.startsWith('image/')) {
     markInvalid(fileInput);
-    errors.push('ต้องอัปโหลดรูปภาพกิจกรรม'); 
-  } else if (!fileInput.files[0].type.startsWith('image/')) {
-    markInvalid(fileInput);
+    errors.push('กรุณาเลือกเฉพาะไฟล์รูปภาพ');
   }
+}
+// ถ้าไม่ได้เลือกไฟล์เลย -> ไม่ต้อง markInvalid, ไม่ต้อง push error
+
 
   // 2.2 ฟิลด์ข้อความหลัก
   if (!titleEl?.value.trim()) { markInvalid(titleEl); }
   if (!descEl?.value.trim())  { markInvalid(descEl); }
-  if (!placeEl?.value.trim()) { markInvalid(placeEl); }
+  if (!placeEl?.value) { markInvalid(placeEl); }
   if (!hostEl?.value.trim())  { markInvalid(hostEl); }
   if (!requiredEl?.value.trim()) { markInvalid(requiredEl); }
   if (!skillPloEl?.value.trim()) { markInvalid(skillPloEl); }
@@ -336,30 +422,130 @@ function showSuccessPopup(message = 'บันทึกสำเร็จ') {
 }
 
   if (saveBtn && !window.__ACHV_bindSaveClick__) {
-    saveBtn.addEventListener('click', (e) => {
-      e.preventDefault(); 
+  saveBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
 
-      // เคลียร์ invalid เดิม ๆ
-      document.querySelectorAll('.invalid').forEach(el => clearInvalid(el));
+    // 1) เคลียร์ invalid เดิม ๆ
+    document.querySelectorAll('.invalid').forEach(el => clearInvalid(el));
 
-      const errors = validateAll();
-      if (errors.length) {
-        alert('กรุณากรอกข้อมูลให้ครบถ้วน\n');
+    // 2) ตรวจฟอร์ม
+    const errors = validateAll();
+    if (errors.length) {
+      alert('กรุณากรอกข้อมูลให้ครบถ้วน\n');
 
-        const firstInvalid = document.querySelector('.invalid, .upload-area input[type="file"].invalid');
-        if (firstInvalid && firstInvalid.scrollIntoView) {
-          firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+      const firstInvalid = document.querySelector('.invalid, .upload-area input[type="file"].invalid');
+      if (firstInvalid && firstInvalid.scrollIntoView) {
+        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
+    if (!ACTIVITY_ID) {
+      alert("ไม่พบรหัสกิจกรรมสำหรับแก้ไข");
+      return;
+    }
+
+    // 3) ดึงค่าจากฟอร์มทั้งหมด
+    const titleEl    = document.getElementById('name');
+    const descEl     = document.getElementById('description');
+    const startEl    = document.getElementById('startDateTime');
+    const endEl      = document.getElementById('endDateTime');
+    const placeEl    = document.getElementById('locationId');
+    const hostEl     = document.getElementById('organizerId');
+    const groupEl    = document.getElementById('group');
+    const yearEl     = document.getElementById('yearLevel');
+    const requiredEl = document.getElementById('required');
+    const levelRadio = document.querySelector('input[name="level"]:checked');
+
+    // ทักษะ/หมวดหมู่
+    const categoryHidden  = document.getElementById('category');
+    const ploDescHidden   = document.getElementById('ploDescriptions');
+    const skillCategoryEl = document.getElementById('skillCategory');
+
+    // อัปเดต hidden ให้ตรงกับแถว PLO ปัจจุบัน
+    recalcCategory();
+
+    let category = [];
+    let ploDescriptions = [];
+    try {
+      category        = categoryHidden?.value ? JSON.parse(categoryHidden.value) : [];
+      ploDescriptions = ploDescHidden?.value ? JSON.parse(ploDescHidden.value) : [];
+    } catch (e) {
+      console.warn('parse hidden PLO failed', e);
+    }
+        // ดึงค่า locationId / locationName จาก select
+    const locSel = document.getElementById('locationId');
+    const locationId = locSel ? locSel.value : "";
+    const locationName = (locSel && locSel.selectedIndex >= 0)
+      ? locSel.options[locSel.selectedIndex].textContent.trim()
+      : "";
+
+    const payload = {
+      // ฟิลด์หลัก
+      name:          titleEl.value.trim(),
+      description:   descEl.value.trim(),
+      startDateTime: startEl.value,
+      endDateTime:   endEl.value,
+
+      // ในตาราง Activities ตอนนี้มี locationId / skillId / yearLevel / requiredActivities
+      // ตรงนี้เราเก็บ "ฉบับอ่านง่าย" แยกไว้ก่อนก็ได้
+      
+      locationId,
+      locationName,
+
+      organizerId:   hostEl.value.trim(),
+
+      // กลุ่มกิจกรรม (select id="group")
+      group:         groupEl.value,          // สำหรับหน้าเว็บใช้เอง
+      yearLevel:     yearEl.value,           // 1,2,3,4,all (ตาม value ของ select)
+      required:      requiredEl.value.trim(),
+
+      level:         levelRadio ? levelRadio.value : null,
+
+      category:        category,
+      ploDescriptions: ploDescriptions,
+      skillCategory:   skillCategoryEl?.value || ""
+    };
+
+    console.log("[EDIT] PUT payload =", payload);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/activities/${ACTIVITY_ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      let data = {};
+      try {
+        data = await res.json();
+      } catch (e) {
+        console.warn("Response ไม่ใช่ JSON", e);
+      }
+
+      console.log("[EDIT] PUT result =", res.status, data);
+
+      if (!res.ok || data.success === false) {
+        alert(data.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล");
         return;
       }
 
-      // ผ่านทุกอย่าง → โชว์ป๊อปอัปสำเร็จ
+      // ✅ สำเร็จ → โชว์ popup แล้วเด้งกลับหน้า list
       showSuccessPopup('บันทึกสำเร็จ');
-      // ถ้าต้อง submit ฟอร์มจริง ให้ uncomment บรรทัดนี้:
-      // form?.submit();
-    });
-    window.__ACHV_bindSaveClick__ = true;
-  }
+
+      setTimeout(() => {
+        window.location.href = 'advisor-activities.html';
+      }, 800);
+
+    } catch (err) {
+      console.error(err);
+      alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+    }
+  });
+
+  window.__ACHV_bindSaveClick__ = true;
+}
+
 })();
 
 (function enhanceUploadArea() {
@@ -432,3 +618,250 @@ fileInput.addEventListener('change', () => {
   renderPreview(file);
 });
 })();
+
+
+// ===============================
+// โหลดข้อมูลกิจกรรมมาแสดงในฟอร์มแก้ไข
+// ===============================
+async function loadActivityForEdit(activityId) {
+  try {
+    const url = `${API_BASE_URL}/activities/${activityId}`;
+    console.log("[EDIT] Fetch activity for edit:", url);
+
+    const res  = await fetch(url);
+    const data = await res.json();
+    console.log("[EDIT] Response:", data);
+
+    if (!res.ok || !data) {
+      alert("ไม่สามารถโหลดข้อมูลกิจกรรมได้");
+      return;
+    }
+
+    // รองรับได้หลายแบบ: {activity: {...}} หรือ {data: {...}} หรือ {item: {...}}
+    const a = data.activity || data.data || data.item || data;
+    if (!a) {
+      alert("ไม่พบข้อมูลกิจกรรม");
+      return;
+    }
+
+    fillEditForm(a);
+  } catch (err) {
+    console.error(err);
+    alert("เกิดข้อผิดพลาดในการโหลดข้อมูลกิจกรรม");
+  }
+}
+
+// แปลงวันที่จากรูปแบบ ISO / string มาเป็น format ของ datetime-local (YYYY-MM-DDTHH:mm)
+function toDatetimeLocal(value) {
+  if (!value) return "";
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return "";
+  // แก้ timezone ให้ตรง local
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:mm"
+}
+
+function normalizeYearLevel(raw) {
+  if (raw === null || raw === undefined) return "";
+
+  // ถ้าเป็น number เช่น 0,1,2,3,4
+  if (typeof raw === "number") {
+    if (raw === 0) return "ทุกชั้นปี";   // map 0 -> ทุกชั้นปี
+    return String(raw);
+  }
+
+  // ถ้าเป็น string
+  const s = String(raw).trim().toLowerCase();
+
+  // เคสที่เก็บมาหลายรูปแบบ
+  if (s === "ทุกชั้นปี" || s === "all" || s === "0") {
+    return "ทุกชั้นปี";                 // ให้ตรงกับ value ของ option
+  }
+
+  if (["1", "2", "3", "4"].includes(s)) return s;
+
+  // default: ไม่รู้จัก → ไม่ set อะไร
+  return "";
+}
+
+// เติมค่าลง input ต่าง ๆ
+function fillEditForm(a) {
+  // ===== ข้อมูลพื้นฐาน =====
+  document.getElementById("name").value        = a.name        || "";
+  document.getElementById("description").value = a.description || "";
+
+  document.getElementById("startDateTime").value =
+    toDatetimeLocal(a.startDateTime || a.StartDateTime || a.start);
+  document.getElementById("endDateTime").value   =
+    toDatetimeLocal(a.endDateTime   || a.EndDateTime   || a.end);
+
+  // 🔹 สถานที่: locationName > location > locationId
+  const locSel = document.getElementById('locationId');
+if (locSel) {
+  locSel.value = a.locationId || "";
+}
+
+
+  // 🔹 ผู้จัด: organizerId (อันนี้ขึ้นแล้วอยู่แล้วแหละ)
+  document.getElementById("organizerId").value =
+    a.organizerId || a.organizer || a.OnName || a.onName || "";
+
+  // 🔹 กลุ่มกิจกรรม: group > activityGroup > skillId
+  const rawGroup =
+  a.group || a.activityGroup || a.ActivityGroup || a.skillId || "";
+
+document.getElementById("group").value = normalizeGroup(rawGroup);
+
+ // 🔹 เหมาะสำหรับชั้นปี: yearLevel / YearLevel (บางแถวอาจไม่มีใน DB)
+const rawYear = a.yearLevel || a.YearLevel || "";
+document.getElementById("yearLevel").value = normalizeYearLevel(rawYear);
+
+
+
+  // 🔹 กิจกรรมที่ต้องเข้าร่วม: required* ต่าง ๆ
+  let requiredVal =
+    a.required ||
+    a.requiredActivity ||
+    a.RequiredActivity ||
+    a.requiredActivities ||
+    a.RequiredActivities ||
+    "";
+
+  
+  if (requiredVal === "-") requiredVal = "";
+
+  document.getElementById("required").value = requiredVal;
+
+
+  // ระดับ (radio)
+  if (a.level) {
+    const radio = document.querySelector(`input[name="level"][value="${a.level}"]`);
+    if (radio) radio.checked = true;
+  }
+
+  // รูปภาพปก
+  const uploadArea = document.querySelector(".upload-area");
+  const coverUrl = a.coverImage || a.coverImageUrl || a.imageUrl;
+  if (uploadArea && coverUrl) {
+    uploadArea.style.backgroundImage    = `url(${coverUrl})`;
+    uploadArea.style.backgroundSize     = "cover";
+    uploadArea.style.backgroundPosition = "center";
+    uploadArea.style.backgroundRepeat   = "no-repeat";
+  }
+
+    // ทักษะ / PLO
+  let plos = [];
+  let descs = [];
+
+  // 1) เอาจาก a.plo ก่อน (ตัวหลักใน DB)
+  if (Array.isArray(a.plo)) {
+    plos = a.plo;
+  } else if (typeof a.plo === "string") {
+    try {
+      // ถ้าเก็บเป็น JSON string เช่น '["PLO1","PLO2"]'
+      const parsed = JSON.parse(a.plo);
+      if (Array.isArray(parsed)) plos = parsed;
+      else if (parsed) plos = [parsed];
+    } catch {
+      // ถ้าเป็น string เดี่ยว ๆ เช่น "PLO1"
+      plos = [a.plo];
+    }
+  }
+
+  // 2) สำรอง: เอาจาก category (ที่เคยใช้ตอน add-activity)
+  if (!plos.length) {
+    if (Array.isArray(a.category)) {
+      plos = a.category;
+    } else if (typeof a.category === "string") {
+      try { plos = JSON.parse(a.category); } catch { /* เฉย ๆ */ }
+    }
+  }
+
+  // 3) คำอธิบายทักษะ
+  if (Array.isArray(a.ploDescriptions)) {
+    descs = a.ploDescriptions;
+  } else if (typeof a.ploDescriptions === "string") {
+    try { descs = JSON.parse(a.ploDescriptions); } catch {}
+  } else if (Array.isArray(a.ploDescription)) {
+    descs = a.ploDescription;
+  }
+
+  // ถ้าไม่เจออะไรเลย แต่มี field เดี่ยว ๆ
+  if (!plos.length && a.PLO) plos = [a.PLO];
+  if (!descs.length && a.PLODescription) descs = [a.PLODescription];
+
+  renderSkillRowsFromData(plos, descs);
+
+
+  // category / ploDescriptions อาจเป็น array หรือ string JSON
+  if (Array.isArray(a.category)) {
+    plos = a.category;
+  } else if (typeof a.category === "string") {
+    try { plos = JSON.parse(a.category); } catch {}
+  }
+
+  if (Array.isArray(a.ploDescriptions)) {
+    descs = a.ploDescriptions;
+  } else if (typeof a.ploDescriptions === "string") {
+    try { descs = JSON.parse(a.ploDescriptions); } catch {}
+  }
+
+  // ถ้าไม่เจออะไรเลย แต่มี PLO ตัวเดียวใน field อื่น ก็ลองดึง
+  if (!plos.length && a.PLO) plos = [a.PLO];
+  if (!descs.length && a.PLODescription) descs = [a.PLODescription];
+
+  renderSkillRowsFromData(plos, descs);
+
+  // หมวดหมู่ skillCategory
+  const skillCategoryInput = document.getElementById("skillCategory");
+  if (skillCategoryInput && a.skillCategory) {
+    skillCategoryInput.value = a.skillCategory;
+  }
+
+  // อัปเดต hidden และหมวดหมู่ให้ตรง
+  recalcCategory();
+}
+
+function goBack() {
+  window.location.href = "advisor-activities.html";
+}
+
+
+// สร้างแถวทักษะตามข้อมูลที่ได้มา
+function renderSkillRowsFromData(plos, descs) {
+  const skillRows = document.getElementById("skill-rows");
+  if (!skillRows) return;
+
+  // เคลียร์ของเก่า
+  skillRows.innerHTML = "";
+
+  // ถ้าไม่มีข้อมูลเลย ให้มีแค่แถวว่าง 1 แถว
+  if (!plos || plos.length === 0) {
+    const row = createSkillRowDynamic();
+    skillRows.appendChild(row);
+    wireRowEvents(row);
+    placeAddButtonUnderLastRow();
+    return;
+  }
+
+  for (let i = 0; i < plos.length; i++) {
+    const row = createSkillRowDynamic();
+    skillRows.appendChild(row);
+    wireRowEvents(row);
+
+    const sel  = row.querySelector(".skill-plo");
+    const desc = row.querySelector(".skill-desc");
+
+    if (sel)  sel.value  = plos[i] || "";
+    if (desc) desc.value = (descs[i] || "");
+  }
+
+  // ทำแถวแรกเป็น fixed และเอาปุ่มลบออก (ตามดีไซน์เดิม)
+  const first = skillRows.querySelector(".skill-row");
+  if (first) {
+    first.classList.add("fixed");
+    first.querySelector(".btn-delete")?.remove();
+  }
+
+  placeAddButtonUnderLastRow();
+}

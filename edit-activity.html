@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="./CSS/edit-activity.css" />
   </head>
 
-  <body>dswa1
+  <body>
     <header class="header">
       <div class="logo">AchieveHub</div>
       <div class="nav-container">
@@ -17,7 +17,7 @@
               <a href="advisor-dashboard.html" class="nav-button">หน้าแรก</a>
               <a href="advisor-activities.html" class="nav-button">ตรวจสอบกิจกรรม</a>
               <a href="advisor-calender.html" class="nav-button">ปฏิทินกิจกรรม</a>
-              <a href="add-activity.html" class="nav-button active">เพิ่มกิจกรรม</a>
+              <a href="add-activity.html" class="nav-button">เพิ่มกิจกรรม</a>
           </nav>
           <div class="logout-icon" id="user-icon" onclick="logout()">
               <img src="./Image/LogOut.png" />
@@ -58,8 +58,15 @@
           </div>
 
           <div class="pair">
-            <label for="location">สถานที่</label>
-            <input id="location" type="text" placeholder="เช่น ห้องประชุม 301, อาคารเรียนรวม">
+            <label for="locationId">สถานที่</label>
+            <select id="locationId" required>
+              <option value="" selected hidden>เลือกสถานที่</option>
+              <option value="SC1">อาคารเรียนรวมสังคมศาสตร์ 1 (SC1)</option>
+              <option value="LC2">อาคารบรรยายรวม 2 (LC2)</option>
+              <option value="SC3">อาคารเรียนรวมสังคมศาสตร์ 3 (SC3)</option>
+              <option value="LC4">อาคารบรรยายรวม 4 (LC4)</option>
+              <option value="LC5"> อาคารบรรยายรวม 5 (LC5)</option>
+            </select>
 
             <label for="organizerId">ผู้จัด</label>
             <input id="organizerId" type="text" placeholder="ชมรม/หน่วยงานผู้รับผิดชอบ">
@@ -70,18 +77,43 @@
             <label for="group">กลุ่มกิจกรรม</label>
             <select id="group" required>
               <option value="" selected>กรุณาเลือกกลุ่มของกิจกรรม</option>
-              <option>วิชาการ</option>
-              <option>จิตอาสา</option>
-              <option>กีฬา/สันทนาการ</option>
-              <option>ประกวด/แข่งขัน</option>
+              <option value="grp-web">Web Application Development</option>
+              <option value="grp-virt">Virtualization</option>
+              <option value="grp-time">Time Management</option>
+              <option value="grp-collab">Team Collaboration</option>
+              <option value="grp-stat">Statistical Analysis</option>
+              <option value="grp-test">Software Testing</option>
+              <option value="grp-req">Requirement Engineering</option>
+              <option value="grp-python">Python Programming</option>
+              <option value="grp-probsol">Problem Solving</option>
+              <option value="grp-ml">Machine Learning</option>
+              <option value="grp-linux">Linux Command Line</option>
+              <option value="grp-leader">Leadership</option>
+              <option value="grp-java">Java Programming</option>
+              <option value="grp-ethics">IT Ethics & Law</option>
+              <option value="grp-genai">Generative AI</option>
+              <option value="grp-comm">Effective Communication</option>
+              <option value="grp-dl">Deep Learning</option>
+              <option value="grp-detail">Detail Oriented</option>
+              <option value="grp-db">Database Management</option>
+              <option value="grp-dsa">Data Structures & Algorithms</option>
+              <option value="grp-deng">Data Engineering</option>
+              <option value="grp-danal">Data Analytics</option>
+              <option value="grp-sec">Cybersecurity</option>
+              <option value="grp-net">Computer Network</option>
+              <option value="grp-cloud">Cloud Computing</option>
+              <option value="grp-carch">Cloud Architecture</option>
+              <option value="grp-c">C Programming</option>
+              <option value="grp-agile">Agile & Teamwork</option>
             </select>
 
             <label>ระดับ</label>
             <div class="level">
-              <label><input type="radio" name="level"> พื้นฐาน</label>
-              <label><input type="radio" name="level"> ปานกลาง</label>
-              <label><input type="radio" name="level"> สูงสุด</label>
+              <label><input type="radio" name="level" value="พื้นฐาน"> พื้นฐาน</label>
+              <label><input type="radio" name="level" value="ปานกลาง"> ปานกลาง</label>
+              <label><input type="radio" name="level" value="ขั้นสูง"> ขั้นสูง</label>
             </div>
+
           </div>
 
           <!-- ชั้นปี / กิจกรรมที่ต้องเข้าร่วม -->
@@ -89,12 +121,13 @@
             <label for="yearLevel">เหมาะสำหรับชั้นปี</label>
             <select id="yearLevel" required>
               <option value="" selected>เลือกชั้นปีที่เหมาะสม</option>
-              <option>ปี 1</option>
-              <option>ปี 2</option>
-              <option>ปี 3</option>
-              <option>ปี 4</option>
-              <option>ทุกชั้นปี</option>
+              <option value="1">ปี 1</option> 
+              <option value="2">ปี 2</option> 
+              <option value="3">ปี 3</option> 
+              <option value="4">ปี 4</option> 
+              <option value="ทุกชั้นปี">ทุกชั้นปี</option>
             </select>
+
 
             <label for="required">กิจกรรมที่ต้องเข้าร่วม</label>
             <input id="required" type="text" placeholder="เช่น ปฐมนิเทศ, Workshop A">
@@ -152,7 +185,8 @@
 
       <div class="actions">
         <button type="submit" class="btn-primary">บันทึก</button>
-        <button type="reset" class="btn-ghost">ยกเลิก</button>
+        <button type="button" class="btn-ghost" onclick="goBack()">ยกเลิก</button>
+
       </div>
     </div>
     
@@ -162,7 +196,10 @@
       นางสาวชลธาร ศิลปาจารย์ 6609650269 นายธีรัตม์ ศรีสุโข 6609650442 นายปริญ จิระมหาโภคี 6609650475</small>
   </footer>
 
+  
   <script src="./JS/edit-activity.js"></script>
   <script src="../JS/auth-check.js"></script>
+  
+    
   </body>
 </html>
