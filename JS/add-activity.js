@@ -526,7 +526,7 @@ async function saveActivity() {
   const skillId = document.querySelector('#group option:checked')?.textContent.trim() || null;
                                            // 👈 ตอนนี้ไม่เป็น undefined แล้ว
 
-  const yearLevel = Number(document.getElementById('yearLevel').value) || null;
+  const yearLevel = document.getElementById("yearLevel").value || null;
   const requiredActivities = document.getElementById('required').value.trim();
   const organizerId = document.getElementById('organizerId').value.trim();
 
@@ -590,7 +590,9 @@ async function saveActivity() {
     result?.activityId ||
     null;
 
-  window.showSuccessPopup('บันทึกสำเร็จ', activityId);
+    window.showSuccessPopup('บันทึกสำเร็จ', () => {
+      window.location.href = `advisor-overall.html?activityId=${activityId}`;
+  });
 }
 
 // =========================

@@ -12,12 +12,46 @@ SKILLS_TABLE = os.getenv('SKILLS_TABLE', 'Skills')
 
 ALLOWED_LEVELS = {'พื้นฐาน', 'ปานกลาง', 'ขั้นสูง'}
 
+# ===== Timezone Thailand support =====
+TH_TZ = datetime.timezone(datetime.timedelta(hours=7))
+
+def convert_utc_iso_to_thai_iso(dt_str):
+    """
+    รับค่า datetime จากเว็บ (เช่น '2025-11-20T10:00:00Z' หรือไม่มี timezone)
+    โดยถือว่า 'ตัวเลขเวลา' ตรงนั้นคือเวลา 'ไทย' อยู่แล้ว
+    แล้วแค่ผูก timezone เป็น +07:00 โดยไม่เลื่อนเวลา
+    เช่น '2025-11-20T10:00:00Z' -> '2025-11-20T10:00:00+07:00'
+    """
+    if not dt_str:
+        return None
+
+    # ตัด Z หรือ offset ทิ้ง เพื่อเอาเฉพาะส่วนวัน-เวลา
+    raw = dt_str.strip()
+
+    # ตัด Z ท้ายสุด (ถ้ามี)
+    if raw.endswith('Z') or raw.endswith('z'):
+        raw = raw[:-1]
+
+    # ถ้ามี offset เช่น +00:00 หรือ +07:00 ให้ตัดออก (เอาเฉพาะ yyyy-mm-ddThh:mm:ss)
+    # หาเครื่องหมาย + หรือ - หลังตำแหน่งวันที่
+    for sep in ['+', '-']:
+        idx = raw[10:].find(sep)
+        if idx != -1:
+            raw = raw[:10 + idx]   # ตัดส่วน timezone ทิ้ง
+            break
+
+    # ตอนนี้ raw เป็น datetime แบบไม่มี timezone เช่น '2025-11-20T10:00:00'
+    naive = datetime.datetime.fromisoformat(raw)
+
+    # ผูกว่า datetime นี้คือเวลาไทย (ไม่เปลี่ยนชั่วโมง)
+    th_dt = naive.replace(tzinfo=TH_TZ)
+
+    return th_dt.isoformat()
 
 def _now_iso():
-    return datetime.datetime.utcnow().replace(
-        tzinfo=datetime.timezone.utc
-    ).isoformat().replace('+00:00', 'Z')
-
+    now_utc = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
+    now_th = now_utc.astimezone(TH_TZ)
+    return now_th.isoformat()
 
 def _parse_int(s, default=None):
     try:
@@ -83,10 +117,18 @@ def lambda_handler(event, context):
             return json_response(400, {'error': 'endDateTime is required (ISO string)'})
 
         try:
-            start_dt = datetime.datetime.fromisoformat(startDateTime.replace('Z', '+00:00'))
-            end_dt = datetime.datetime.fromisoformat(endDateTime.replace('Z', '+00:00'))
-            if end_dt <= start_dt:
+            # แปลงจาก string → datetime (สมมติว่าเป็น UTC ก่อน)
+            start_dt_utc = datetime.datetime.fromisoformat(startDateTime.replace('Z', '+00:00'))
+            end_dt_utc = datetime.datetime.fromisoformat(endDateTime.replace('Z', '+00:00'))
+
+            # เช็คเงื่อนไขเวลาเหมือนเดิม (เทียบใน UTC)
+            if end_dt_utc <= start_dt_utc:
                 return json_response(400, {'error': 'endDateTime must be after startDateTime'})
+
+            # ⭐ แปลงเป็น "เวลาไทย" เอาไว้เก็บลงตาราง
+            start_th_iso = convert_utc_iso_to_thai_iso(startDateTime)
+            end_th_iso = convert_utc_iso_to_thai_iso(endDateTime)
+
         except Exception:
             return json_response(400, {'error': 'Invalid datetime format (must be ISO 8601)'})
 
@@ -118,7 +160,7 @@ def lambda_handler(event, context):
             return json_response(400, {'error': f'level must be one of {sorted(ALLOWED_LEVELS)}'})
 
         # yearLevel
-        year_level = _parse_int(body.get('yearLevel'), default=None)
+        year_level = body.get('yearLevel')
         if year_level is None:
             year_level = _parse_int(body.get('suitableYearLevel'), default=None)
 
@@ -132,8 +174,8 @@ def lambda_handler(event, context):
             'name': name,
             'description': description,
             'locationId': locationId,
-            'startDateTime': startDateTime,
-            'endDateTime': endDateTime,
+            'startDateTime': start_th_iso,
+            'endDateTime': end_th_iso,
             'skillCategory': skillCategory,
             'skillId': skillId,                   # << ใช้ skill_id ตรงนี้
             'plo': plos,
