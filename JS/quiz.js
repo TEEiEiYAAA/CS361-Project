@@ -1,4 +1,4 @@
-// quiz.js (Final: แจ้งเตือนสีแดง + เกณฑ์ 80% + ป้องกันข้ามข้อ)
+// quiz.js (Final Version: Fix Token & Header)
 
 const API_BASE_URL = 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod';
 
@@ -7,11 +7,20 @@ let currentQuestionIndex = 0;
 let userAnswers = {}; 
 let timerInterval = null;
 let skillId = null; 
+// เพิ่มตัวแปรเก็บ Token
+let userToken = null;
 
 document.addEventListener('DOMContentLoaded', function() {
+    // 1. ดึงข้อมูล User และ Token (เหมือนหน้า quiz-categories)
     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-    if (!userData.studentId) {
-        alert('กรุณาเข้าสู่ระบบ');
+    const sessionData = JSON.parse(sessionStorage.getItem('AchieveHubUser') || '{}');
+    
+    // เก็บ Token ไว้ใช้ตอนส่งคำตอบ
+    userToken = sessionData.token;
+
+    // เช็กความพร้อม
+    if (!userData.studentId || !userToken) {
+        alert('กรุณาเข้าสู่ระบบก่อนทำแบบทดสอบ');
         window.location.href = 'login.html';
         return;
     }
@@ -36,7 +45,6 @@ async function loadQuiz(url) {
         document.getElementById('quiz-title').textContent = data.examInfo?.title || 'แบบทดสอบ';
         document.getElementById('total-questions').textContent = questions.length;
         
-        // อัปเดต UI แสดงเกณฑ์ผ่านให้ตรงกัน
         const passCriteriaEl = Array.from(document.querySelectorAll('.info-label')).find(el => el.textContent.includes('เกณฑ์ผ่าน'));
         if (passCriteriaEl && passCriteriaEl.nextElementSibling) {
             passCriteriaEl.nextElementSibling.textContent = "80%";
@@ -87,7 +95,6 @@ function renderQuestion() {
         `;
     });
 
-    // ★★★ เพิ่ม div id="question-error" สำหรับแสดงข้อความเตือน ★★★
     container.innerHTML = `
         <div class="question-counter">ข้อที่ ${currentQuestionIndex + 1} / ${questions.length}</div>
         <div class="question-card">
@@ -109,22 +116,17 @@ function renderQuestion() {
 
 function selectAnswer(qId, val) { 
     userAnswers[qId] = val; 
-    
-    // ★★★ เมื่อเลือกคำตอบปุ๊บ ให้ลบข้อความเตือนออกทันที ★★★
     const errorDiv = document.getElementById('question-error');
     if(errorDiv) errorDiv.textContent = '';
-
     renderQuestion(); 
 }
 
 function nextQuestion() { 
     const currentQ = questions[currentQuestionIndex];
-    // ★★★ เปลี่ยนจาก alert เป็นแสดงข้อความใน div ★★★
     if (!userAnswers[currentQ.id]) {
         const errorDiv = document.getElementById('question-error');
         if(errorDiv) {
             errorDiv.textContent = "⚠️ กรุณาเลือกคำตอบก่อนไปข้อถัดไป";
-            // เพิ่มลูกเล่นสั่นๆ
             errorDiv.style.transition = "0.1s";
             errorDiv.style.transform = "translateX(5px)";
             setTimeout(() => errorDiv.style.transform = "translateX(-5px)", 100);
@@ -148,7 +150,6 @@ function prevQuestion() {
 
 function trySubmitQuiz() {
     const currentQ = questions[currentQuestionIndex];
-    // ★★★ เปลี่ยนจาก alert เป็นแสดงข้อความใน div ★★★
     if (!userAnswers[currentQ.id]) {
         const errorDiv = document.getElementById('question-error');
         if(errorDiv) errorDiv.textContent = "⚠️ กรุณาเลือกคำตอบข้อนี้ก่อนส่ง";
@@ -187,8 +188,7 @@ async function finishQuiz(isTimeOut = false) {
 
     const total = questions.length;
     const percent = total === 0 ? 0 : Math.round((correctCount / total) * 100);
-    
-    const isPassed = percent >= 80; // เกณฑ์ 80%
+    const isPassed = percent >= 80; 
 
     const answersPayload = questions.map(q => ({
         questionId: q.id.toString(),
@@ -204,7 +204,7 @@ async function finishQuiz(isTimeOut = false) {
         isPassed: isPassed   
     };
 
-    // แสดงหน้า Loading แบบ Clean
+    // UI Loading
     const modal = document.getElementById('result-modal');
     const icon = document.getElementById('result-icon');
     const btn = document.querySelector('.result-btn');
@@ -218,9 +218,13 @@ async function finishQuiz(isTimeOut = false) {
     if(btn) btn.style.display = 'none';   
 
     try {
+        // ❗️❗️ จุดสำคัญ: เพิ่ม Authorization Header ❗️❗️
         const response = await fetch(`${API_BASE_URL}/quiz/submit`, { 
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + userToken  // <--- ต้องมีบรรทัดนี้ครับ ข้อมูลถึงจะเข้า!
+            },
             body: JSON.stringify(payload)
         });
 
@@ -231,20 +235,23 @@ async function finishQuiz(isTimeOut = false) {
                 message: isPassed ? "บันทึกผลเรียบร้อย" : `คุณทำได้ ${percent}% (เกณฑ์ผ่าน 80%) พยายามใหม่นะ`
             });
         } else {
-            alert('บันทึก Server ไม่สำเร็จ แต่ผลสอบของคุณคือ: ' + percent + '%');
+            console.error("Server Error:", response.status);
+            // แจ้งเตือนถ้ายิงไม่เข้า
+            alert('บันทึกผลไม่สำเร็จ (Error ' + response.status + ') กรุณาแคปหน้าจอนี้แจ้งผู้ดูแล');
+            
             showResultModal({
                 score: percent,
                 isPassed: isPassed,
-                message: "ผลการสอบ (Offline Mode)"
+                message: "บันทึกไม่สำเร็จ (Server Error)"
             });
         }
     } catch (error) {
         console.error(error);
-        alert('เชื่อมต่อ Server ไม่ได้ (คะแนนของคุณคือ: ' + percent + '%)');
+        alert('เชื่อมต่อ Server ไม่ได้ กรุณาตรวจสอบอินเทอร์เน็ต');
         showResultModal({ 
             score: percent, 
             isPassed: isPassed, 
-            message: "บันทึกไม่ได้ (ตรวจสอบอินเทอร์เน็ต)" 
+            message: "บันทึกไม่ได้ (Connection Error)" 
         });
     }
 }
@@ -273,5 +280,8 @@ function showResultModal(data) {
     }
 }
 
-function goToDashboard() { window.location.href = 'quiz-categories.html'; }
+function goToDashboard() { 
+    // เมื่อกดกลับหน้าหลัก ข้อมูลควรจะอัปเดตทันทีเพราะเราบันทึกผ่าน API แล้ว
+    window.location.href = 'quiz-categories.html'; 
+}
 function showError(msg) { document.getElementById('quiz-container').innerHTML = `<div class="error">${msg}</div>`; }
