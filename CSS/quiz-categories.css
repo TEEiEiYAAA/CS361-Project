@@ -1,13 +1,15 @@
-/* --- ส่วนของการนำเข้าฟอนต์ --- */
+/* quiz-categories.css (Full Version) */
+
+/* --- 1. ส่วนของการนำเข้าฟอนต์ --- */
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
 
-/* --- การตั้งค่าเริ่มต้นสำหรับทุกองค์ประกอบ --- */
+/* --- 2. การตั้งค่าเริ่มต้น --- */
 * {
     box-sizing: border-box;
     font-family: 'Sarabun', sans-serif;
 }
 
-/* --- การตั้งค่าพื้นหลังและโครงหน้าเว็บหลัก --- */
+/* --- 3. โครงสร้างหลัก (Body & Background) --- */
 body {
     margin: 0;
     padding: 0;
@@ -17,7 +19,7 @@ body {
     flex-direction: column;
 }
 
-/* --- ส่วนหัวของเว็บ (Header) --- */
+/* --- 4. ส่วนหัว (Header & Nav) --- */
 .header {
     text-align: center;
     padding: 30px 20px;
@@ -74,21 +76,7 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* --- ส่วนท้ายของเว็บ (Footer) --- */
-footer {
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    text-align: center;
-    color: #333;
-    font-size: 0.9rem;
-    padding: 1.25rem;
-    border-radius: 16px 16px 0 0;
-    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
-    width: 100%;
-}
-
-/* --- ส่วนเนื้อหาหลัก (Container) --- */
+/* --- 5. ส่วนเนื้อหา (Container) --- */
 .main-content {
     flex: 1;
 }
@@ -102,30 +90,40 @@ footer {
     background: transparent;
 }
 
-/* --- การตั้งค่า Responsive สำหรับหน้าจอขนาดต่างๆ --- */
+/* --- 6. ส่วนท้าย (Footer) --- */
+footer {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    text-align: center;
+    color: #333;
+    font-size: 0.9rem;
+    padding: 1.25rem;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
+    width: 100%;
+}
+
+/* --- 7. Responsive Design --- */
 @media (max-width: 768px) {
-    .header {
-        padding: 1rem;
+    .header { padding: 1rem; }
+    .nav-menu { gap: 0.5rem; }
+    .nav-button { padding: 0.4rem 0.8rem; font-size: 0.9rem; }
+    
+    /* ปรับ Grid ในมือถือให้ดูง่ายขึ้น */
+    .quiz-header-row, .level-item {
+        grid-template-columns: 1fr 1fr !important; /* เหลือ 2 คอลัมน์ */
+        gap: 10px;
     }
-    .nav-menu {
-        gap: 0.5rem;
-    }
-    .nav-button {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.9rem;
-    }
+    .level-plo, .item-subject { display: none; } /* ซ่อนบางช่องในมือถือ */
 }
 
 @media (max-width: 480px) {
-    .logo {
-        font-size: 1.5rem;
-    }
-    .nav-menu {
-        flex-wrap: wrap;
-    }
+    .logo { font-size: 1.5rem; }
+    .nav-menu { flex-wrap: wrap; }
 }
 
-/* --- ส่วนของปุ่ม Tabs และกล่องกิจกรรม --- */
+/* --- 8. ปุ่ม Tabs --- */
 .tab-buttons {
     display: flex;
     justify-content: space-between;
@@ -153,125 +151,50 @@ footer {
     color: #37798B;
     font-weight: bold;
     border-radius: 12px 12px 0 0;
-
     border-bottom: 1px solid rgba(255, 255, 255, 0.8);
     margin-bottom: -1px;
 }
 
+/* --- 9. กล่องครอบตาราง (Wrapper) --- */
 .quiz-container {
     width: 95%;
     max-width: 1400px;
     margin: 0 auto 40px auto;
     min-height: 400px;
-    /* เราจะย้าย background และ padding ไปไว้ที่กล่องลูกแทน */
 }
 
-/* --- ส่วนของรายการแบบทดสอบ (ที่สร้างโดย JS) --- */
-
-/* หัวข้อของตาราง (กลุ่มกิจกรรม, ระดับ, ฯลฯ) */
+/* --- 10. หัวตาราง (Header Row) --- */
 .quiz-header-row {
     display: grid;
-    grid-template-columns: 2fr 1.5fr 2fr 1fr; /* ★ 4 คอลัมน์ (คอลัมน์ 4 ว่าง) */
+    /* ★ Grid 4 คอลัมน์: วิชา | ระดับ | PLO | ปุ่ม */
+    grid-template-columns: 2fr 1.5fr 2fr 1fr; 
     gap: 15px;
     font-size: 1.25rem; 
     font-weight: bold; 
     color: #37798B; 
-    background: #F8F9FA; /* สีเทาอ่อน */
+    background: #F8F9FA; 
     padding: 20px 30px;
     text-align: center;
-
-    /* ★ ทำให้ "มนทั้ง 4 มุม" ★ */
-    border-radius:0px 0px 12px 12px;
-
-    position: relative; /* ★ ทำให้ "ลอย" ได้ */
-    z-index: 10;        /* ★ ให้อยู่ทับกล่องขาว */
+    border-radius: 0px 0px 12px 12px;
+    position: relative;
+    z-index: 10;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* แถวข้อมูล */
-.quiz-data-row {
-    display: grid;
-    grid-template-columns: 2fr 1.5fr 2fr 1fr;
-    gap: 15px;
-    align-items: center;
-    text-align: center;
-    padding: 15px;
-    border-bottom: 1px solid #F0F0F0;
-    transition: background-color 0.2s;
-}
-
-.quiz-data-row:hover {
-    background-color: rgba(255, 255, 255, 0.5);
-}
-
-/* ปุ่ม "กดเพื่อทำแบบทดสอบ" */
-.quiz-start-btn {
-    background-color: #FFECEC;
-    color: #D9534F;
-    border: none;
-    border-radius: 20px;
-    padding: 8px 12px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background-color 0.2s;
-    text-align: center;
-}
-
-.quiz-start-btn:hover {
-    background-color: #FFD9D9;
-}
-
-/* ป้ายคะแนน "ผ่าน" */
-.score-badge {
-    background-color: #E6F7F0;
-    color: #28A745;
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 0.9rem;
-    font-weight: bold;
-}
-
-/* ข้อความตอนไม่มีข้อมูล หรือ กำลังโหลด */
-.loading,
-.empty-message,
-.error-message {
-    text-align: center;
-    padding: 40px;
-    color: #6C757D;
-    font-size: 1.1rem;
-}
-.empty-message small {
-    font-size: 0.9rem;
-    color: #888;
-}
-.error-message {
-    color: #D9534F;
-}
-
+/* --- 11. พื้นที่แสดงรายการ (Content Area) --- */
 #quiz-list-data {
     background: rgba(255, 255, 255, 0.85);
     padding: 20px 30px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     min-height: 300px;
-
-    border-radius:0px 0px 12px 12px; 
-
-    /* ★ ดึงตัวเองขึ้นไป "ซ้อน" ใต้กล่องเทา ★ */
+    border-radius: 0px 0px 12px 12px; 
     margin-top: -20px; 
-    padding-top: 40px; /* เพิ่มช่องว่างไม่ให้ข้อมูลจม */
+    padding-top: 40px;
     position: relative;
-    z-index: 5; /* ให้อยู่ใต้กล่องเทา */
+    z-index: 5;
 }
 
-
-/* 2. ซ่อนแถวข้อมูลตารางแบบเก่า (ถ้ายังอยู่) */
-.quiz-data-row {
-    display: none; 
-}
-
-/* 3. สไตล์ Accordion (ยืมมาจาก current-skill.css) */
+/* --- 12. Accordion (กล่องยืดหด) --- */
 .accordion-card {
     background: #fff;
     border-radius: 12px;
@@ -290,14 +213,17 @@ footer {
     align-items: center;
     transition: background 0.3s;
 }
+
 .accordion-header:hover {
     background: rgba(255, 255, 255, 0.9);
 }
+
 .group-name {
     font-weight: 700;
     color: #0a5e6c;
     font-size: 1.1rem;
 }
+
 .arrow-icon {
     color: #2f7484;
     transition: transform 0.3s ease;
@@ -312,49 +238,99 @@ footer {
     border-top: 1px solid #eee;
 }
 
-/* เมื่อ Accordion ถูกเปิด (มี class 'open') */
+/* สถานะเปิด */
 .accordion-card.open .accordion-body {
-    max-height: 500px; /* ขยายออก */
+    max-height: 800px; /* เผื่อไว้เยอะๆ */
     padding: 5px 20px 15px 20px;
 }
+
 .accordion-card.open .arrow-icon {
-    transform: rotate(180deg); /* หมุนลูกศร */
+    transform: rotate(180deg);
 }
 
-/* 4. สไตล์รายการย่อย (Level) */
+/* --- 13. รายการย่อย (Level Item) --- */
 .level-item {
-    display: flex;
-    justify-content: space-between;
+    display: grid; /* ★ ใช้ Grid ให้ตรงกับ Header */
+    grid-template-columns: 2fr 1.5fr 2fr 1fr; /* สัดส่วนเท่า Header เป๊ะ */
+    gap: 15px;
     align-items: center;
-    padding: 10px 0;
+    padding: 15px 0;
     border-bottom: 1px dashed #eee;
     font-size: 0.95rem;
+    text-align: center; /* จัดกลาง */
 }
+
 .level-item:last-child {
     border-bottom: none;
 }
 
-.level-name {
-    flex: 2;
-    color: #333;
-}
-.level-plo {
-    flex: 1;
-    color: #888;
-    text-align: center;
-}
-.quiz-action {
-    flex: 1.5;
-    text-align: right;
+.item-subject {
+    text-align: left; /* ชื่อวิชาชิดซ้าย */
+    padding-left: 10px;
+    font-weight: 600;
+    color: #2c3e50;
 }
 
-/* 5. ปรับปุ่มให้สวยงาม */
-.quiz-action .quiz-start-btn {
-    padding: 6px 15px;
-    font-size: 0.85rem;
+.level-name {
+    color: #333;
 }
-.level-status {
-    flex: 1.5;
+
+.level-plo {
+    color: #888;
+}
+
+.quiz-action {
     text-align: right;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* --- 14. ปุ่มและสถานะ --- */
+.quiz-start-btn {
+    background-color: #FFECEC;
+    color: #D9534F;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 15px;
     font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.quiz-start-btn:hover {
+    background-color: #FFD9D9;
+}
+
+/* ปุ่มล็อก (เผื่อไว้ override style) */
+.quiz-start-btn:disabled {
+    opacity: 0.7;
+}
+
+.level-status {
+    color: #28a745;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+/* --- 15. Loading / Error States --- */
+.loading,
+.empty-message,
+.error-message {
+    text-align: center;
+    padding: 40px;
+    color: #6C757D;
+    font-size: 1.1rem;
+}
+
+.error-message {
+    color: #D9534F;
+}
+
+/* ซ่อน Layout เก่าที่ไม่ใช้ */
+.quiz-data-row {
+    display: none;
 }

@@ -1,5 +1,3 @@
-// quiz.js (Final Version: Fix Token & Header)
-
 const API_BASE_URL = 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod';
 
 let questions = [];
@@ -11,7 +9,7 @@ let skillId = null;
 let userToken = null;
 
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. ดึงข้อมูล User และ Token (เหมือนหน้า quiz-categories)
+    // 1. ดึงข้อมูล User และ Token
     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
     const sessionData = JSON.parse(sessionStorage.getItem('AchieveHubUser') || '{}');
     
@@ -80,16 +78,20 @@ function renderQuestion() {
     const selectedValue = userAnswers[q.id]; 
 
     let optionsHtml = '';
-    q.choices.forEach((choice) => {
+    // ✅ เพิ่ม index เข้าไปใน loop
+    q.choices.forEach((choice, index) => {
         const choiceText = (typeof choice === 'object') ? choice.text : choice; 
         const choiceValue = (typeof choice === 'object') ? choice.id : choice; 
 
         const isChecked = (selectedValue == choiceValue) ? 'checked' : '';
         const isSelectedClass = (selectedValue == choiceValue) ? 'selected' : '';
 
+        // แปลงเครื่องหมายพิเศษสำหรับใส่ใน HTML Attribute (value)
+        const safeForHtml = String(choiceValue).replace(/"/g, "&quot;");
+
         optionsHtml += `
-            <label class="option ${isSelectedClass}" onclick="selectAnswer(${q.id}, '${choiceValue}')">
-                <input type="radio" name="q_${q.id}" value="${choiceValue}" ${isChecked}>
+            <label class="option ${isSelectedClass}" onclick="selectAnswer(${q.id}, ${index})">
+                <input type="radio" name="q_${q.id}" value="${safeForHtml}" ${isChecked}>
                 ${choiceText}
             </label>
         `;
@@ -114,10 +116,21 @@ function renderQuestion() {
     `;
 }
 
-function selectAnswer(qId, val) { 
+// ✅ รับ index แทน value
+function selectAnswer(qId, choiceIndex) { 
+    // 1. หาโจทย์ข้อปัจจุบัน
+    const question = questions.find(q => q.id == qId);
+    
+    // 2. หยิบค่าจริงจาก Array ต้นฉบับ (ไม่ต้องกลัวเรื่องเครื่องหมายเพี้ยน)
+    const rawChoice = question.choices[choiceIndex];
+    const val = (typeof rawChoice === 'object') ? rawChoice.id : rawChoice;
+
+    // 3. บันทึกค่าจริงลงไป
     userAnswers[qId] = val; 
+    
     const errorDiv = document.getElementById('question-error');
     if(errorDiv) errorDiv.textContent = '';
+    
     renderQuestion(); 
 }
 
@@ -218,12 +231,12 @@ async function finishQuiz(isTimeOut = false) {
     if(btn) btn.style.display = 'none';   
 
     try {
-        // ❗️❗️ จุดสำคัญ: เพิ่ม Authorization Header ❗️❗️
+        // ❗️❗️ ส่ง Token ไปด้วย
         const response = await fetch(`${API_BASE_URL}/quiz/submit`, { 
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + userToken  // <--- ต้องมีบรรทัดนี้ครับ ข้อมูลถึงจะเข้า!
+                'Authorization': 'Bearer ' + userToken 
             },
             body: JSON.stringify(payload)
         });
