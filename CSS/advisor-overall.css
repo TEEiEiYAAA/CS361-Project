@@ -397,10 +397,15 @@ main {
 }
 
 .detail-card p {
-    margin-top: 6px;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #444;
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #444;
+
+  /* 🟢 บังคับให้ตัดคำยาวๆ */
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-wrap;
 }
 
 /* badge */
@@ -410,3 +415,4 @@ main {
     font-size: 13px;
     color: white;
 }
+

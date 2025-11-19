@@ -56,9 +56,6 @@ function normalizeGroup(rawValue) {
 }
 
 
-
-
-
 // ====== CONFIG & activityId (แก้ใหม่) ======
 
 // ใช้ URL ของ API Gateway ตรง ๆ (เปลี่ยนเป็นของโปรเจกต์ตัวเองถ้าต่าง)
@@ -268,6 +265,36 @@ if (form && !window.__ACHV_bindSubmit__) {
 skillRowsEl.addEventListener('input',  e => clearValidity(e.target));
 skillRowsEl.addEventListener('change', e => clearValidity(e.target));
 
+// ========== ส่วนอัพโหลดรูปเหมือนหน้า add ==========
+const API_BASE = "https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod";
+const GET_UPLOAD_URL = `${API_BASE}/activities/upload-url`;
+
+async function getUploadUrl(file) {
+  const fileName = file.name;
+  const fileType = file.type;
+
+  const res = await fetch(GET_UPLOAD_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fileName, fileType })
+  });
+
+  const data = await res.json();
+  return typeof data.body === "string" ? JSON.parse(data.body) : data.body;
+}
+
+async function putToS3(uploadUrl, file, contentType) {
+  const res = await fetch(uploadUrl, {
+    method: "PUT",
+    headers: { "Content-Type": contentType },
+    body: file
+  });
+
+  if (!res.ok) throw new Error("S3 upload failed " + res.status);
+  return true;
+}
+
+
 
 (function setupValidationAndSaveFlow() {
   const form       = document.getElementById('edit-activity-form') || document.querySelector('form');
@@ -391,8 +418,7 @@ if (fileInput && fileInput.files && fileInput.files[0]) {
 // ==========================
 // 3) ปุ่มบันทึก + Popup สำเร็จ
 // ==========================
-function showSuccessPopup(message = 'บันทึกสำเร็จ') {
-  // โมดัลเล็ก ๆ แบบไม่พึ่ง CSS เพิ่ม
+function showSuccessPopup(message = 'บันทึกสำเร็จ', onClose = null) {
   const overlay = document.createElement('div');
   Object.assign(overlay.style, {
     position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)',
@@ -404,8 +430,10 @@ function showSuccessPopup(message = 'บันทึกสำเร็จ') {
     background: '#fff', padding: '20px 24px', borderRadius: '14px',
     boxShadow: '0 12px 28px rgba(0,0,0,.12)', minWidth: '280px', textAlign: 'center'
   });
-  box.innerHTML = `<div style="font-weight:700;font-size:18px;margin-bottom:8px">${message}</div>
-                    <div style="margin-bottom:16px;color:#4b5563">ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว</div>`;
+  box.innerHTML = `
+      <div style="font-weight:700;font-size:18px;margin-bottom:8px">${message}</div>
+      <div style="margin-bottom:16px;color:#4b5563">ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว</div>
+  `;
 
   const okBtn = document.createElement('button');
   okBtn.textContent = 'ตกลง';
@@ -414,12 +442,17 @@ function showSuccessPopup(message = 'บันทึกสำเร็จ') {
     background: 'linear-gradient(90deg, #50E486 0%, #27C4B7 100%)',
     color: '#fff', fontWeight: 800, cursor: 'pointer'
   });
-  okBtn.addEventListener('click', () => overlay.remove());
+
+  okBtn.addEventListener('click', () => {
+    overlay.remove();
+    if (typeof onClose === 'function') onClose();
+  });
 
   box.appendChild(okBtn);
   overlay.appendChild(box);
   document.body.appendChild(overlay);
 }
+
 
   if (saveBtn && !window.__ACHV_bindSaveClick__) {
   saveBtn.addEventListener('click', async (e) => {
@@ -444,6 +477,9 @@ function showSuccessPopup(message = 'บันทึกสำเร็จ') {
       alert("ไม่พบรหัสกิจกรรมสำหรับแก้ไข");
       return;
     }
+
+
+
 
     // 3) ดึงค่าจากฟอร์มทั้งหมด
     const titleEl    = document.getElementById('name');
@@ -480,6 +516,21 @@ function showSuccessPopup(message = 'บันทึกสำเร็จ') {
       ? locSel.options[locSel.selectedIndex].textContent.trim()
       : "";
 
+    // ⭐⭐ ตรงนี้ใส่เข้าไป ⭐⭐
+    let imageUrl = existingImageUrl || "";
+
+    if (fileInput && fileInput.files && fileInput.files[0]) {
+      // ถ้า user เลือกรูปใหม่ → upload
+      const file = fileInput.files[0];
+      console.log("[EDIT] uploading new image:", file.name);
+
+      const { uploadUrl, objectUrl, contentType } = await getUploadUrl(file);
+      await putToS3(uploadUrl, file, contentType);
+
+      imageUrl = objectUrl;  // ใช้ URL ใหม่แทน
+    }
+
+
     const payload = {
       // ฟิลด์หลัก
       name:          titleEl.value.trim(),
@@ -487,25 +538,46 @@ function showSuccessPopup(message = 'บันทึกสำเร็จ') {
       startDateTime: startEl.value,
       endDateTime:   endEl.value,
 
-      // ในตาราง Activities ตอนนี้มี locationId / skillId / yearLevel / requiredActivities
-      // ตรงนี้เราเก็บ "ฉบับอ่านง่าย" แยกไว้ก่อนก็ได้
-      
+      // สถานที่
       locationId,
       locationName,
 
       organizerId:   hostEl.value.trim(),
 
-      // กลุ่มกิจกรรม (select id="group")
-      group:         groupEl.value,          // สำหรับหน้าเว็บใช้เอง
-      yearLevel:     yearEl.value,           // 1,2,3,4,all (ตาม value ของ select)
-      required:      requiredEl.value.trim(),
+      // ==== กลุ่มกิจกรรม ====
+      // เก็บ "ชื่อเต็ม" เช่น Java Programming, Virtualization
+      // ถ้าหา option ไม่เจอ ให้ fallback เป็น value เดิม
+      skillId: (function () {
+        if (!groupEl) return "";
+        const opt = groupEl.options[groupEl.selectedIndex];
+        return opt ? opt.textContent.trim() : groupEl.value;
+      })(),
+      group: (function () {           // ถ้าหลังบ้านยังอ่าน field group อยู่ จะได้ค่าเหมือนกัน
+        if (!groupEl) return "";
+        const opt = groupEl.options[groupEl.selectedIndex];
+        return opt ? opt.textContent.trim() : groupEl.value;
+      })(),
 
+      // ชั้นปี + กิจกรรมที่ต้องเข้าร่วม
+      yearLevel:          yearEl.value,
+      requiredActivities: requiredEl.value.trim(),   // ✅ เปลี่ยนชื่อฟิลด์ให้ตรงกับที่หน้าอื่นใช้
+
+      // ระดับกิจกรรม
       level:         levelRadio ? levelRadio.value : null,
 
-      category:        category,
+      // PLO / PLO Description
+      // category (จาก hidden #category) คือ array ของ PLO ที่เราเลือก เช่น ["PLO1","PLO4"]
+      plo:             category,        // ✅ ส่งเป็น plo ด้วย
+      category:        category,        // เผื่อหลังบ้านยังใช้ชื่อเดิม
       ploDescriptions: ploDescriptions,
-      skillCategory:   skillCategoryEl?.value || ""
-    };
+
+      // Hard / Soft / Multi-Skill
+      skillCategory:   skillCategoryEl?.value || "",
+
+      // ★★ เพิ่มอันนี้ ★★
+      imageUrl: imageUrl
+      //coverImage: imageUrl
+    };  
 
     console.log("[EDIT] PUT payload =", payload);
 
@@ -531,11 +603,12 @@ function showSuccessPopup(message = 'บันทึกสำเร็จ') {
       }
 
       // ✅ สำเร็จ → โชว์ popup แล้วเด้งกลับหน้า list
-      showSuccessPopup('บันทึกสำเร็จ');
-
-      setTimeout(() => {
-        window.location.href = 'advisor-activities.html';
-      }, 800);
+      showSuccessPopup('บันทึกสำเร็จ', () => {
+        // เมื่อผู้ใช้กด "ตกลง" ค่อยเปลี่ยนหน้า
+        window.location.href = `advisor-overall.html?activityId=${ACTIVITY_ID}`;
+      });
+      
+      
 
     } catch (err) {
       console.error(err);
@@ -728,7 +801,7 @@ document.getElementById("yearLevel").value = normalizeYearLevel(rawYear);
     "";
 
   
-  if (requiredVal === "-") requiredVal = "";
+  
 
   document.getElementById("required").value = requiredVal;
 
@@ -747,6 +820,8 @@ document.getElementById("yearLevel").value = normalizeYearLevel(rawYear);
     uploadArea.style.backgroundSize     = "cover";
     uploadArea.style.backgroundPosition = "center";
     uploadArea.style.backgroundRepeat   = "no-repeat";
+
+    existingImageUrl = coverUrl; 
   }
 
     // ทักษะ / PLO
