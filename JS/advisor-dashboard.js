@@ -1,5 +1,5 @@
 // Configuration
-const API_BASE_URL = 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod';
+const API_BASE_URL = 'https://jcxjc9ot0e.execute-api.us-east-1.amazonaws.com/prod';
 
 // ฟังก์ชันหลักที่ถูกเรียกโดย auth-check.js
 function initializeAdvisorDashboard() {
