@@ -1,5 +1,5 @@
 // Configuration
-const API_URL_TEMPLATE = 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod/plo-skills/{studentId}';
+const API_URL_TEMPLATE = 'https://jcxjc9ot0e.execute-api.us-east-1.amazonaws.com/prod/plo-skills/{studentId}';
 
 // Global State
 let globalPloData = [];
