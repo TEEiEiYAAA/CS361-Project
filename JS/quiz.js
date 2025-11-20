@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod';
+const API_BASE_URL = 'https://jcxjc9ot0e.execute-api.us-east-1.amazonaws.com/prod';
 
 let questions = [];
 let currentQuestionIndex = 0;
