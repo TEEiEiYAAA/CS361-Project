@@ -59,7 +59,7 @@ function normalizeGroup(rawValue) {
 // ====== CONFIG & activityId (แก้ใหม่) ======
 
 // ใช้ URL ของ API Gateway ตรง ๆ (เปลี่ยนเป็นของโปรเจกต์ตัวเองถ้าต่าง)
-const API_BASE_URL = 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod';
+const API_BASE_URL = 'https://jcxjc9ot0e.execute-api.us-east-1.amazonaws.com/prod';
 
 // ดึง id จาก query string (รองรับทั้ง ?id=xxx และ ?activityId=xxx)
 const params = new URLSearchParams(window.location.search);
