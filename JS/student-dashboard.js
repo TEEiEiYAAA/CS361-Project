@@ -1,7 +1,7 @@
 console.log("🚀 student-dashboard.js: Script started loading...");
 
 // Configuration
-const API_BASE_URL = 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod';
+const API_BASE_URL = 'https://jcxjc9ot0e.execute-api.us-east-1.amazonaws.com/prod';
 
 // กำหนดให้ auth-check.js เรียกฟังก์ชันนี้
 window.initializePage = initializeStudentDashboard;
