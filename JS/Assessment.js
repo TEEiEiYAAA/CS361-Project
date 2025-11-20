@@ -1,6 +1,6 @@
 // Configuration
 const CONFIG = {
-  API_BASE_URL: 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod',
+  API_BASE_URL: 'https://jcxjc9ot0e.execute-api.us-east-1.amazonaws.com/prod',
   ENDPOINTS: {
     STUDENT_ACTIVITIES: '/students/{studentId}/activities',
     SUBMIT_ASSESSMENT: '/activities/{activityId}/assessment'
