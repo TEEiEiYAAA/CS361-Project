@@ -13,7 +13,7 @@ document.getElementById('login-form').addEventListener('submit', async function(
     errorMessage.textContent = "กำลังเข้าสู่ระบบ...";
     
     // เรียก API เพื่อล็อกอิน (TU API ผ่าน Lambda)
-    const apiUrl = `https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod/login`;
+    const apiUrl = `https://jcxjc9ot0e.execute-api.us-east-1.amazonaws.com/prod`;
     
     const response = await fetch(apiUrl, {
       method: 'POST',
