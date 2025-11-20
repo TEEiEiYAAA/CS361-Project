@@ -18,39 +18,54 @@ function initializeAdvisorDashboard() {
     fetchStudents(window.userData.userId);
 }
 
-// กำหนดให้ auth-check.js เรียกฟังก์ชันนี้เมื่อ Authentication ผ่าน
 window.initializePage = initializeAdvisorDashboard;
 
-
-// ฟังก์ชันเรียกข้อมูลนักศึกษาจาก API
+// ★★★ ฟังก์ชันนี้ถูกรื้อเขียนใหม่ (Frontend Orchestration) ★★★
 async function fetchStudents(advisorId) {
     const studentsListElement = document.getElementById('students-list');
     studentsListElement.textContent = "กำลังโหลดข้อมูลนักศึกษา...";
     studentsListElement.classList.add('loading');
     
-    // ⭐️⭐️ MODIFIED: เปลี่ยน URL และ Method ⭐️⭐️
-    // 1. เปลี่ยน URL ให้ตรงกับ API Gateway (มี s และใส่ ID ใน path)
-    // 2. เปลี่ยน Method เป็น 'GET'
-    // 3. ลบ 'body' และ 'Content-Type' (GET ไม่มี body)
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/advisors/${advisorId}/students`, {
-            method: 'GET', // <--- เปลี่ยนเป็น GET
-            headers: {
-                'Authorization': `Bearer ${window.userToken}` // ใช้ Global Token
-                // (ลบ Content-Type และ body)
-            }
+        // 1. ดึง "รายชื่อนักศึกษา" มาก่อน (จาก API เดิมที่ส่งเลขผิดๆ มา)
+        const listResponse = await fetch(`${API_BASE_URL}/advisors/${advisorId}/students`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${window.userToken}` }
         });
 
-        const students = await response.json();
+        const listResult = await listResponse.json();
+        const basicStudents = Array.isArray(listResult) ? listResult : (listResult.data || []);
 
-        if (response.ok) {
-            window.allStudents = students; // เก็บไว้สำหรับฟิลเตอร์
-            displayStudents(students);
-        } else {
-            studentsListElement.textContent = students.message || "เกิดข้อผิดพลาดในการโหลดข้อมูลนักศึกษา";
-            studentsListElement.classList.remove('loading');
-        }
+        // 2. วนลูปดึง "ข้อมูลสถิติที่ถูกต้อง" ของนักศึกษาทีละคน (จาก API Dashboard /skills)
+        // ใช้ Promise.all เพื่อดึงพร้อมกันหลายคน (จะได้ไม่ช้ามาก)
+        const detailedStudents = await Promise.all(basicStudents.map(async (student) => {
+            try {
+                // ยิงไปที่ API /skills ของนักศึกษาคนนั้น (API ตัวเดียวกับที่ Student Dashboard ใช้)
+                const statsResponse = await fetch(`${API_BASE_URL}/students/${student.studentId}/skills`, {
+                    headers: { 'Authorization': `Bearer ${window.userToken}` }
+                });
+                
+                if (statsResponse.ok) {
+                    const statsResult = await statsResponse.json();
+                    const statsData = statsResult.data;
+                    
+                    // เอาค่า Badge (totalEarned) และ Total (32) ที่ถูกต้อง มาแปะทับ
+                    return {
+                        ...student,
+                        realEarned: statsData.totalEarned || 0,     // ค่า Badge ที่ถูกต้อง (1)
+                        realTotal: statsData.totalAvailable || 0,   // ค่า Total ที่ถูกต้อง (32)
+                        realPercent: 0 // เดี๋ยวคำนวณใหม่ตอนแสดงผล
+                    };
+                }
+            } catch (err) {
+                console.warn(`Failed to fetch stats for ${student.studentId}`, err);
+            }
+            // ถ้าดึงไม่ได้ ให้ใช้ค่า 0 ไปก่อน
+            return { ...student, realEarned: 0, realTotal: 32 };
+        }));
+
+        window.allStudents = detailedStudents; // เก็บข้อมูลชุดสมบูรณ์ไว้
+        displayStudents(detailedStudents);
 
     } catch (error) {
         console.error('Error fetching students:', error);
@@ -59,49 +74,43 @@ async function fetchStudents(advisorId) {
     }
 }
 
-// ⭐️⭐️ MODIFIED: อัปเดตฟังก์ชันแสดงผลให้ตรงกับ Schema ฐานข้อมูล ⭐️⭐️
+// ฟังก์ชันแสดงผลการ์ดนักศึกษา
 function displayStudents(students) {
     const studentsListElement = document.getElementById('students-list');
     studentsListElement.classList.remove('loading');
     studentsListElement.innerHTML = ''; 
 
-    if (students.length === 0) {
+    if (!students || students.length === 0) {
         studentsListElement.textContent = "ไม่พบนักศึกษาในที่ปรึกษา";
         return;
     }
 
     students.forEach(student => {
         const studentCard = document.createElement('div');
-        studentCard.className = 'student-card'; // คลาสนี้ต้องมี CSS ที่เหมาะสม (เช่น display: flex)
+        studentCard.className = 'student-card';
 
-        // --- ประมวลผลข้อมูลตาม Schema ใหม่ ---
         const name = student.name || 'ชื่อนักศึกษาไม่ระบุ';
-        
-        // ⭐️ MODIFIED: ใช้ 'studentId'
-        const id = student.studentId || 'N/A'; 
-        
-        // ⭐️ MODIFIED: ใช้ 'yearLevel'
+        const id = student.studentId || 'N/A';
         const year = student.yearLevel || 'N/A';
-        
-        // ⭐️ MODIFIED: ใช้ 'department'
         const major = student.department || 'ภาควิชาไม่ระบุ'; 
         
-        // ⭐️ ATTENTION: API ต้องส่งค่านี้มาด้วย
-        const completed = student.completedSkillsCount || 0;
-        
-        // ⭐️ ATTENTION: API ต้องส่งค่านี้มาด้วย
-        const total = student.totalSkillsCount || 0; 
+        // ★★★ ใช้ค่าใหม่ที่เราไปดึงมาเสริมเมื่อกี้ ★★★
+        const earned = student.realEarned || 0;     
+        const total = student.realTotal || 32; // ใช้ 32 เป็นค่า Default ถ้า API มีปัญหา
 
         // คำนวณเปอร์เซ็นต์
-        let percentage = 0;
+        let percent = 0;
         if (total > 0) {
-            percentage = Math.round((completed / total) * 100);
+            percent = Math.round((earned / total) * 100);
         }
 
-        // ดึงอักษรตัวแรกของชื่อ
-        const initial = name.split('')[0] || '?';
+        // กำหนดสี
+        let progressColor = '#dc3545'; // แดง
+        if (percent >= 50) progressColor = '#ffc107'; // เหลือง
+        if (percent >= 80) progressColor = '#28a745'; // เขียว
+
+        const initial = name.charAt(0) || '?';
         
-        // สร้าง HTML card ใหม่
         studentCard.innerHTML = `
             <div class="student-initial">${initial}</div>
             <div class="student-details">
@@ -110,7 +119,13 @@ function displayStudents(students) {
                 <p>ชั้นปี: ${year} | ภาควิชา: ${major}</p>
             </div>
             <div class="student-progress">
-                <p class="progress-text">${percentage}% (${completed}/${total} ทักษะ)</p>
+                <div class="progress-info">
+                    <span class="progress-percent" style="color: ${progressColor}">${percent}%</span>
+                    <span class="progress-fraction">(${earned}/${total} กลุ่มทักษะ)</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: ${percent}%; background-color: ${progressColor};"></div>
+                </div>
                 <button class="review-button" onclick="viewStudentDetails('${id}')">ตรวจสอบ</button>
             </div>
         `;
@@ -118,22 +133,17 @@ function displayStudents(students) {
     });
 }
 
-// ฟังก์ชันกรองตามชั้นปี (ใช้กับ dropdown ใน HTML)
+// ฟังก์ชันกรองตามชั้นปี
 function filterByYearDropdown() {
     if (!window.allStudents) return;
-
     const yearFilter = document.getElementById('year-filter').value;
     let filteredStudents = window.allStudents;
-
     if (yearFilter !== 'all') {
-        // ⭐️ MODIFIED: กรองด้วย 'yearLevel'
-        filteredStudents = window.allStudents.filter(student => String(student.yearLevel) === yearFilter);
+        filteredStudents = window.allStudents.filter(student => String(student.yearLevel) === String(yearFilter));
     }
-    
     displayStudents(filteredStudents);
 }
 
-// ฟังก์ชันดูรายละเอียดนักศึกษา
 function viewStudentDetails(studentId) {
     if (typeof navigateTo === 'function') {
         navigateTo(`my-students.html?studentId=${studentId}`);

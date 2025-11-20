@@ -58,53 +58,60 @@
             </div>
           </section>
 
-          <section class="skill-box">
-            <h2>ทักษะปัจจุบัน</h2>
-            <div class="skill-stats">
-              <div class="circle-progress">
-                <svg width="100" height="100" id="progress-circle">
-                  <circle cx="50" cy="50" r="45" stroke="#FFFFFF" stroke-width="10" fill="none" />
-                  <circle id="progress-indicator" cx="50" cy="50" r="45" stroke="#0E8C7D" stroke-width="10" fill="none"
-                    stroke-dasharray="282.74" stroke-dashoffset="141.37" transform="rotate(-90 50 50)" />
-                </svg>
-                <div class="circle-text" id="progress-text">0/0</div>
-              </div>
-              <div class="skill-detail">
-                <p>ทักษะบังคับที่ผ่านแล้ว: <strong id="completed-required-skills">0</strong></p>
-                <p>ทักษะบังคับที่ยังไม่ผ่าน: <strong id="pending-required-skills">0</strong></p>
-                <p>ทักษะเพิ่มเติมที่ได้รับ: <strong id="completed-optional-skills">0</strong></p>
-                <p>...</p>
+          <section class="skill-box skills-card-container">
+            <div class="card-tabs">
+              <button class="card-tab-btn active" onclick="switchDashTab('overview')">ภาพรวมทักษะ</button>
+              <button class="card-tab-btn" onclick="switchDashTab('plo')">ตาม PLO</button>
+            </div>
+
+            <div id="panel-overview" class="tab-panel active">
+              <div class="skills-stats-layout">
+
+                <div class="progress-section">
+                  <div class="circle-progress">
+                    <svg width="160" height="160" id="progress-circle">
+                      <circle cx="80" cy="80" r="70" stroke="#e0e0e0" stroke-width="12" fill="none" />
+                      <circle id="progress-ring-circle" cx="80" cy="80" r="70" stroke="#0E8C7D" stroke-width="12"
+                        fill="none" stroke-dasharray="440" stroke-dashoffset="440" transform="rotate(-90 80 80)" />
+                    </svg>
+                    <div class="circle-text">
+                      <span id="total-earned-big">0</span>
+                      <span style="font-size: 14px; color: #888; display: block; font-weight:normal;">Badges</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="detail-section">
+                  <div class="stat-row">
+                    <span class="stat-label">ระดับพื้นฐาน:</span>
+                    <span class="stat-val" id="count-easy">0</span>
+                  </div>
+                  <div class="stat-row">
+                    <span class="stat-label">ระดับปานกลาง:</span>
+                    <span class="stat-val" id="count-medium">0</span>
+                  </div>
+                  <div class="stat-row">
+                    <span class="stat-label">ระดับขั้นสูง:</span>
+                    <span class="stat-val" id="count-hard">0</span>
+                  </div>
+                  <div class="stat-row total-row">
+                    <span class="stat-label">รวมทั้งหมดที่มีในระบบ:</span>
+                    <span class="stat-val" id="total-system">0</span>
+                  </div>
+                </div>
+
               </div>
             </div>
+
+            <div id="panel-plo" class="tab-panel">
+              <div class="plo-stats-container" id="plo-stats-list">
+                <div class="loading-text" style="text-align:center; color:#666;">กำลังโหลดข้อมูล PLO...</div>
+              </div>
+            </div>
+
           </section>
         </div>
 
-        <!-- Requirement Notice -->
-        <div class="requirement-notice">
-          <strong>📋 เงื่อนไขการนับทักษะ:</strong>
-          กิจกรรมจะนับเข้าทักษะเมื่อ <strong>ยืนยันการเข้าร่วม</strong> และ <strong>ทำแบบประเมินเสร็จสิ้น</strong>
-          เท่านั้น
-        </div>
-
-        <!-- Skills Detail Section -->
-        <div class="skills-detail-container">
-          <h2 class="section-title">ทักษะที่นักศึกษาได้รับ</h2>
-
-          <!-- Skills section -->
-          <div class="skills-section">
-            <h3>ทักษะที่ได้ผ่านการทดสอบแล้ว</h3>
-            <div id="completed-skills">
-              <div class="loading">กำลังโหลดข้อมูล...</div>
-            </div>
-          </div>
-
-          <div class="skills-section">
-            <h3>ทักษะที่ยังไม่ได้ทำการทดสอบ</h3>
-            <div id="pending-skills">
-              <div class="loading">กำลังโหลดข้อมูล...</div>
-            </div>
-          </div>
-        </div>
       </div>
     </main>
   </div>

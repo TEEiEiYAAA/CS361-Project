@@ -42,6 +42,9 @@ body {
     border-radius: 40px;
     font-size: 16px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    /* เพิ่มการ wrap สำหรับจอเล็กที่ไม่เล็กมาก */
+    flex-wrap: wrap; 
+    justify-content: center;
 }
 
 .nav-button {
@@ -54,6 +57,7 @@ body {
     cursor: pointer;
     transition: 0.3s;
     color: #000;
+    white-space: nowrap; /* ป้องกันข้อความตัดคำ */
 }
 
 .nav-button.active,
@@ -74,117 +78,109 @@ body {
 
 /* --- Main Content Wrapper --- */
 .main-content {
-    flex: 1; /* ดัน footer ลงไป */
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: flex-start;
     padding: 40px 20px;
 }
 
-/* --- Content Box --- */
+/* --- Content Box (UPDATED) --- */
 .container {
     background: rgba(255, 255, 255, 0.929);
     border-radius: 20px;
     margin: 40px auto; 
     padding: 30px;
-    width: 1150px; 
+    
+    /* ✅ แก้ไข Responsive: ใช้ % และ max-width */
+    width: 95%; 
     max-width: 1150px;
+    
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
+}
 
-  .container h2 {
+.container h2 {
     margin-top: 0;
     margin-bottom: 20px;
     color: #006666;
     font-size: 24px;
     font-weight: 700;
-  }
-  
+}
 
-/* ⭐️⭐️⭐️ MODIFIED SECTION: STUDENT LIST STYLING ⭐️⭐️⭐️ */
-/* (โค้ดส่วนนี้ถูกเขียนใหม่ทั้งหมดเพื่อให้ตรงกับภาพ) */
-
-/* การ์ดนักศึกษาแต่ละคน (container) */
+/* --- Student List Styling --- */
 .student-card {
     display: flex;
-    align-items: center; /* จัดให้อยู่กลางแนวตั้ง */
-    padding: 20px 5px; /* เพิ่มช่องว่างบน-ล่าง */
-    border-bottom: 1px solid #eee; /* เส้นคั่น */
+    align-items: center;
+    padding: 20px 5px;
+    border-bottom: 1px solid #eee;
 }
 
 .student-card:last-child {
-    border-bottom: none; /* ไม่ต้องมีเส้นคั่นที่คนสุดท้าย */
+    border-bottom: none;
 }
 
-/* วงกลมตัวอักษรย่อ */
 .student-initial {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background-color: #e0e0e0; /* สีพื้นหลังวงกลม (จะเปลี่ยนสีต้องใช้ JS) */
+    background-color: #e0e0e0;
     color: #333;
     font-weight: bold;
     font-size: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0; /* ไม่ให้หด */
-    user-select: none; /* ป้องกันการเลือกข้อความ */
+    flex-shrink: 0;
+    user-select: none;
 }
 
-/* บล็อกข้อมูล (ชื่อ, รหัส, ชั้นปี) */
 .student-details {
-    flex-grow: 1; /* ยืดเพื่อเติมเต็มพื้นที่ว่าง */
-    margin: 0 20px; /* เว้นระยะห่างจากตัวย่อและปุ่ม */
+    flex-grow: 1;
+    margin: 0 20px;
     line-height: 1.5;
 }
 
 .student-details h4 {
     margin: 0;
     font-size: 17px;
-    font-weight: 700; /* ตัวหนา */
+    font-weight: 700;
     color: #000;
 }
 
 .student-details p {
     margin: 0;
     font-size: 14px;
-    color: #555; /* สีเทา */
+    color: #555;
 }
 
-/* บล็อกความก้าวหน้า (เปอร์เซ็นต์, ปุ่ม) */
 .student-progress {
     text-align: right;
-    flex-shrink: 0; /* ไม่ให้หด */
-    min-width: 140px; /* กันพื้นที่ให้ปุ่ม */
+    flex-shrink: 0;
+    min-width: 140px;
 }
 
 .student-progress .progress-text {
-    margin: 0 0 8px 0; /* เว้นระยะล่างก่อนถึงปุ่ม */
+    margin: 0 0 8px 0;
     font-size: 14px;
     font-weight: bold;
     color: #333;
 }
 
-/* ปุ่ม "ตรวจสอบ" */
 .review-button {
     background-image: linear-gradient(to right, #50E486, #27C4B7);
     border: none;
-    border-radius: 20px; /* ขอบมน */
+    border-radius: 20px;
     padding: 8px 24px;
     color: white;
     font-weight: bold;
     font-size: 14px;
     cursor: pointer;
-    transition: backgroud-color 0.2s ease;
+    transition: background-color 0.2s ease; /* แก้ไขคำผิด backgroud */
 }
 
 .review-button:hover {
     background-image: linear-gradient(to right, #0da678, #229e94);
 }
-
-/* --- End of Modified Section --- */
-
 
 /* --- Footer --- */
 footer {
@@ -198,9 +194,10 @@ footer {
     border-radius: 16px 16px 0 0;
     box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.05);
     width: 100%;
+    margin-top: auto; /* ดัน footer ลงล่างสุดเสมอ */
 }
 
-/* จัดหัวข้อซ้าย – ตัวกรองขวา */
+/* --- List Header & Filters --- */
 .list-header {
   display: flex;
   align-items: center;
@@ -209,7 +206,6 @@ footer {
   margin-bottom: 8px;
 }
 
-/* ซ่อน label เพื่อการเข้าถึง (ยังคงอยู่ให้ screen reader) */
 .visually-hidden {
   position: absolute;
   width: 1px; height: 1px;
@@ -217,33 +213,88 @@ footer {
   clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
 }
 
-/* สไตล์ dropdown ให้เข้ากับ UI (ฉบับปรับปรุง) */
 .filter-container select#year-filter {
-    /* 1. ซ่อนลูกศรเริ่มต้นของเบราว์เซอร์ */
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-
-    /* 2. เพิ่มลูกศรใหม่เป็นภาพพื้นหลัง (SVG) */
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000000'%3e%3cpath d='M8 12.164l-5.33-5.33a.8.8 0 011.132-1.132L8 10.436l4.198-4.198a.8.8 0 111.132 1.132L8 12.164z'/%3e%3c/svg%3e");
     background-repeat: no-repeat;
-    background-position: right 15px center; /* ตำแหน่งลูกศร */
-    background-size: 1em; /* ขนาดของลูกศร */
-    
-    /* 3. ปรับ padding เพื่อให้มีที่สำหรับลูกศรใหม่ */
+    background-position: right 15px center;
+    background-size: 1em;
     padding: 15px 40px 15px 25px;
-
-    /* --- สไตล์เดิมที่คุณมีอยู่แล้ว --- */
     border-radius: 999px;
     border: 1.5px solid #000000;
-    background-color: #fff; /* เปลี่ยนจาก background เป็น background-color */
-    font-weight: 1000;
+    background-color: #fff;
+    font-weight: bold;
     color: #000000;
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0);
 }
 
-/* รองรับจอแคบ: ให้ dropdown ลงบรรทัดใหม่ */
-@media (max-width: 640px) {
-  .list-header { flex-wrap: wrap; }
+/* =========================================
+   🔥 RESPONSIVE MEDIA QUERIES (NEW) 🔥
+   ========================================= */
+
+/* Tablet & Small Desktop (max-width: 1024px) */
+@media (max-width: 1024px) {
+    .container {
+        padding: 20px;
+        margin: 20px auto;
+    }
+    
+    .logo {
+        font-size: 36px;
+    }
+}
+
+/* Mobile (max-width: 768px) */
+@media (max-width: 768px) {
+    /* 1. Header & Navigation */
+    .header {
+        padding: 15px 10px;
+    }
+
+    /* 2. List Header & Filters */
+    .list-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .filter-container {
+        width: 100%;
+    }
+
+    .filter-container select#year-filter {
+        width: 100%; /* Dropdown เต็มความกว้าง */
+    }
+
+    /* 3. Student Card (Card Layout) */
+    .student-card {
+        flex-direction: column; /* เรียงแนวตั้ง */
+        text-align: center;
+        padding: 25px 10px;
+        gap: 15px;
+    }
+
+    .student-details {
+        margin: 0;
+        width: 100%;
+    }
+
+    .student-progress {
+        text-align: center;
+        width: 100%;
+    }
+    
+    .student-progress .progress-text {
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .review-button {
+        width: 100%; /* ปุ่มใหญ่เต็มความกว้าง */
+        padding: 12px 0;
+        font-size: 16px;
+    }
 }
