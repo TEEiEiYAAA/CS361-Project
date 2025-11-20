@@ -1,6 +1,6 @@
 // Configuration
 const CONFIG = {
-    API_BASE_URL: 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod',
+    API_BASE_URL: 'https://jcxjc9ot0e.execute-api.us-east-1.amazonaws.com/prod',
     ENDPOINTS: {
         GET_ACTIVITIES: '/activities', // Master Data
         GET_LOCATIONS: '/locations',   // Location Data
