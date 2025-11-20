@@ -203,10 +203,22 @@ async function finishQuiz(isTimeOut = false) {
     const percent = total === 0 ? 0 : Math.round((correctCount / total) * 100);
     const isPassed = percent >= 80; 
 
-    const answersPayload = questions.map(q => ({
-        questionId: q.id.toString(),
-        selectedAnswer: userAnswers[q.id] || ""
-    }));
+    // 🔥🔥 แก้ไขแบบไม้ตาย: ส่งเป็น "Choice X" แทนข้อความยาวๆ 🔥🔥
+    // วิธีนี้ปลอดภัย 100% ไม่มีทางติด Error Server เพราะส่งแค่ตัวเลขกับภาษาอังกฤษ
+    const answersPayload = questions.map(q => {
+        const userAnswerVal = userAnswers[q.id];
+        // หาว่าคำตอบที่เลือก คือช้อยส์ลำดับที่เท่าไหร่ (0, 1, 2, 3)
+        const index = q.choices.findIndex(c => {
+             const val = (typeof c === 'object') ? c.id : c;
+             return val === userAnswerVal;
+        });
+
+        return {
+            questionId: q.id.toString(),
+            // ถ้าหาเจอส่ง "Choice 1", "Choice 2"... ถ้าไม่เจอส่ง ""
+            selectedAnswer: index !== -1 ? `Choice ${index + 1}` : "" 
+        };
+    });
 
     const payload = {
         studentId: userData.studentId,
@@ -216,6 +228,9 @@ async function finishQuiz(isTimeOut = false) {
         score: percent,      
         isPassed: isPassed   
     };
+
+    // ดู Log ว่าส่งอะไรไป (เช็กใน Console ได้เลย)
+    console.log("📦 Payload ที่จะส่ง:", payload);
 
     // UI Loading
     const modal = document.getElementById('result-modal');
@@ -231,7 +246,6 @@ async function finishQuiz(isTimeOut = false) {
     if(btn) btn.style.display = 'none';   
 
     try {
-        // ❗️❗️ ส่ง Token ไปด้วย
         const response = await fetch(`${API_BASE_URL}/quiz/submit`, { 
             method: 'POST',
             headers: { 
