@@ -120,10 +120,10 @@ function createSkillRowDynamic() {
         <label class="skill-plo-label" for="skill-plo-${index}">ทักษะที่ได้รับ</label>
         <select id="skill-plo-${index}" class="skill-plo" required>
           <option value="" disabled selected hidden>เลือก PLO</option>
-          <option value="PLO1">PLO1</option>
-          <option value="PLO2">PLO2</option>
-          <option value="PLO3">PLO3</option>
-          <option value="PLO4">PLO4</option>
+          <option value="PLO1">PLO1 – ความรู้พื้นฐานด้านการเขียนโปรแกรม</option>
+          <option value="PLO2">PLO2 – ทักษะการพัฒนาและออกแบบระบบ</option>
+          <option value="PLO3">PLO3 – ความรับผิดชอบและจริยธรรมวิชาชีพ</option>
+          <option value="PLO4">PLO4 – การทำงานร่วมกับผู้อื่นและภาวะผู้นำ</option>
         </select>
       </div>
       <div>
