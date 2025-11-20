@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // ดึงข้อมูลกิจกรรมจาก Activities API (getActivityDetail)
     console.log("Fetching activity details...");
     const activityResponse = await fetch(
-      `https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod/activities/${activityId}`,
+      `https://jcxjc9ot0e.execute-api.us-east-1.amazonaws.com/prod/activities/${activityId}`,
       { headers: commonHeaders }
     );
 
