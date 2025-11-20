@@ -1,5 +1,5 @@
 const EXAM_LIST_URL = 'https://quiz-exam-data.s3.us-east-1.amazonaws.com/exams_list.json';
-const API_BASE_URL = 'https://mb252cstbb.execute-api.us-east-1.amazonaws.com/prod';
+const API_BASE_URL = 'https://jcxjc9ot0e.execute-api.us-east-1.amazonaws.com/prod';
 let allExams = [];
 
 // ============================================================
