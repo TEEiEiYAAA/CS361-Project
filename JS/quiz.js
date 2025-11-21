@@ -1,3 +1,6 @@
+// quiz.js (Final Fixed: Fix Quote Bug + Server Error + Border Stuck)
+
+// ✅ ใช้ API Gateway ตัวใหม่
 const API_BASE_URL = 'https://jcxjc9ot0e.execute-api.us-east-1.amazonaws.com/prod';
 
 let questions = [];
@@ -5,18 +8,14 @@ let currentQuestionIndex = 0;
 let userAnswers = {}; 
 let timerInterval = null;
 let skillId = null; 
-// เพิ่มตัวแปรเก็บ Token
 let userToken = null;
 
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. ดึงข้อมูล User และ Token
     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
     const sessionData = JSON.parse(sessionStorage.getItem('AchieveHubUser') || '{}');
     
-    // เก็บ Token ไว้ใช้ตอนส่งคำตอบ
     userToken = sessionData.token;
 
-    // เช็กความพร้อม
     if (!userData.studentId || !userToken) {
         alert('กรุณาเข้าสู่ระบบก่อนทำแบบทดสอบ');
         window.location.href = 'login.html';
@@ -66,19 +65,21 @@ function startTimer(seconds) {
         
         if (timeLeft <= 0) { 
             clearInterval(timerInterval); 
-            finishQuiz(true); // หมดเวลา
+            finishQuiz(true); 
         }
         timeLeft--;
     }, 1000);
 }
 
+// --- 🔥 จุดแก้ที่ 1: Render ด้วย Index แทนข้อความ (แก้ Python เลือกไม่ได้) ---
 function renderQuestion() {
     const container = document.getElementById('quiz-container');
     const q = questions[currentQuestionIndex];
     const selectedValue = userAnswers[q.id]; 
 
     let optionsHtml = '';
-    // ✅ เพิ่ม index เข้าไปใน loop
+    
+    // ใช้ index (ตัวเลข) ในการวนลูป
     q.choices.forEach((choice, index) => {
         const choiceText = (typeof choice === 'object') ? choice.text : choice; 
         const choiceValue = (typeof choice === 'object') ? choice.id : choice; 
@@ -86,9 +87,10 @@ function renderQuestion() {
         const isChecked = (selectedValue == choiceValue) ? 'checked' : '';
         const isSelectedClass = (selectedValue == choiceValue) ? 'selected' : '';
 
-        // แปลงเครื่องหมายพิเศษสำหรับใส่ใน HTML Attribute (value)
+        // แปลงเฉพาะตอนแสดงผล HTML เพื่อไม่ให้หน้าเว็บพัง
         const safeForHtml = String(choiceValue).replace(/"/g, "&quot;");
 
+        // ส่ง index (ตัวเลข) ไปให้ฟังก์ชัน selectAnswer
         optionsHtml += `
             <label class="option ${isSelectedClass}" onclick="selectAnswer(${q.id}, ${index})">
                 <input type="radio" name="q_${q.id}" value="${safeForHtml}" ${isChecked}>
@@ -96,6 +98,10 @@ function renderQuestion() {
             </label>
         `;
     });
+
+    // ปุ่มย้อนกลับ (แก้ให้ข้อ 1 กดแล้วถามยกเลิก)
+    const prevButtonText = currentQuestionIndex === 0 ? 'ยกเลิก' : 'ก่อนหน้า';
+    const prevButtonAction = `onclick="prevQuestion()"`;
 
     container.innerHTML = `
         <div class="question-counter">ข้อที่ ${currentQuestionIndex + 1} / ${questions.length}</div>
@@ -107,7 +113,8 @@ function renderQuestion() {
         <div id="question-error" style="color: #dc3545; text-align: center; font-weight: bold; height: 24px; margin-bottom: 10px;"></div>
 
         <div class="navigation">
-            <button class="nav-btn btn-prev" onclick="prevQuestion()" ${currentQuestionIndex === 0 ? 'disabled' : ''}>ก่อนหน้า</button>
+            <button class="nav-btn btn-prev" ${prevButtonAction}>${prevButtonText}</button>
+            
             ${currentQuestionIndex === questions.length - 1 
                 ? `<button class="nav-btn btn-submit" onclick="trySubmitQuiz()">ส่งคำตอบ</button>` 
                 : `<button class="nav-btn btn-next" onclick="nextQuestion()">ถัดไป</button>`
@@ -116,12 +123,12 @@ function renderQuestion() {
     `;
 }
 
-// ✅ รับ index แทน value
+// --- 🔥 จุดแก้ที่ 2: รับ Index มาหาค่าจริง (แก้กรอบค้าง) ---
 function selectAnswer(qId, choiceIndex) { 
     // 1. หาโจทย์ข้อปัจจุบัน
     const question = questions.find(q => q.id == qId);
     
-    // 2. หยิบค่าจริงจาก Array ต้นฉบับ (ไม่ต้องกลัวเรื่องเครื่องหมายเพี้ยน)
+    // 2. หยิบค่าจริงจาก Array ต้นฉบับ (ไม่ต้องกลัว Quote เพี้ยน)
     const rawChoice = question.choices[choiceIndex];
     const val = (typeof rawChoice === 'object') ? rawChoice.id : rawChoice;
 
@@ -131,7 +138,7 @@ function selectAnswer(qId, choiceIndex) {
     const errorDiv = document.getElementById('question-error');
     if(errorDiv) errorDiv.textContent = '';
     
-    renderQuestion(); 
+    renderQuestion(); // รีเฟรชหน้าจอ
 }
 
 function nextQuestion() { 
@@ -158,7 +165,12 @@ function prevQuestion() {
     if (currentQuestionIndex > 0) { 
         currentQuestionIndex--; 
         renderQuestion(); 
-    } 
+    } else {
+        // ถ้าเป็นข้อแรก ให้ถามก่อนออก
+        if (confirm('ต้องการยกเลิกการทำแบบทดสอบใช่หรือไม่?')) {
+            window.location.href = 'quiz-categories.html';
+        }
+    }
 }
 
 function trySubmitQuiz() {
@@ -203,22 +215,12 @@ async function finishQuiz(isTimeOut = false) {
     const percent = total === 0 ? 0 : Math.round((correctCount / total) * 100);
     const isPassed = percent >= 80; 
 
-    // 🔥🔥 แก้ไขแบบไม้ตาย: ส่งเป็น "Choice X" แทนข้อความยาวๆ 🔥🔥
-    // วิธีนี้ปลอดภัย 100% ไม่มีทางติด Error Server เพราะส่งแค่ตัวเลขกับภาษาอังกฤษ
-    const answersPayload = questions.map(q => {
-        const userAnswerVal = userAnswers[q.id];
-        // หาว่าคำตอบที่เลือก คือช้อยส์ลำดับที่เท่าไหร่ (0, 1, 2, 3)
-        const index = q.choices.findIndex(c => {
-             const val = (typeof c === 'object') ? c.id : c;
-             return val === userAnswerVal;
-        });
-
-        return {
-            questionId: q.id.toString(),
-            // ถ้าหาเจอส่ง "Choice 1", "Choice 2"... ถ้าไม่เจอส่ง ""
-            selectedAnswer: index !== -1 ? `Choice ${index + 1}` : "" 
-        };
-    });
+    // --- 🔥 จุดแก้ที่ 3: ล้าง Quote ออกก่อนส่ง Server (แก้ Error 500) ---
+    const answersPayload = questions.map(q => ({
+        questionId: q.id.toString(),
+        // ล้าง ' และ " ออกจากคำตอบที่จะส่งไปเก็บ เพื่อกัน Server Error
+        selectedAnswer: (userAnswers[q.id] || "").replace(/['"]/g, "") 
+    }));
 
     const payload = {
         studentId: userData.studentId,
@@ -228,9 +230,6 @@ async function finishQuiz(isTimeOut = false) {
         score: percent,      
         isPassed: isPassed   
     };
-
-    // ดู Log ว่าส่งอะไรไป (เช็กใน Console ได้เลย)
-    console.log("📦 Payload ที่จะส่ง:", payload);
 
     // UI Loading
     const modal = document.getElementById('result-modal');
@@ -263,7 +262,6 @@ async function finishQuiz(isTimeOut = false) {
             });
         } else {
             console.error("Server Error:", response.status);
-            // แจ้งเตือนถ้ายิงไม่เข้า
             alert('บันทึกผลไม่สำเร็จ (Error ' + response.status + ') กรุณาแคปหน้าจอนี้แจ้งผู้ดูแล');
             
             showResultModal({
@@ -308,7 +306,6 @@ function showResultModal(data) {
 }
 
 function goToDashboard() { 
-    // เมื่อกดกลับหน้าหลัก ข้อมูลควรจะอัปเดตทันทีเพราะเราบันทึกผ่าน API แล้ว
     window.location.href = 'quiz-categories.html'; 
 }
 function showError(msg) { document.getElementById('quiz-container').innerHTML = `<div class="error">${msg}</div>`; }
